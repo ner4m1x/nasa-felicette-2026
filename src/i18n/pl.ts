@@ -230,18 +230,22 @@ export const pl: Dictionary = {
   },
   targets: {
     moon_shackleton: {
+      short: "Shackletona",
       label: "Księżyc — biegun (krawędź Shackletona)",
       cat: "Polarna zamrażarka i nasłoneczniony drapak",
     },
     moon_tranquillitatis_pit: {
+      short: "jamy w Tranquillitatis",
       label: "Księżyc — tunel lawowy / morze (jama w Mare Tranquillitatis)",
       cat: "Wulkaniczna jaskinia na drzemkę",
     },
     mars_jezero: {
+      short: "Jezero",
       label: "Mars — basen / delta (Jezero)",
       cat: "Imperialna czerwona kuweta",
     },
     mars_arcadia: {
+      short: "Arcadii",
       label: "Mars — lodowe równiny (Arcadia Planitia)",
       cat: "Płaska podkładka z lodem pod spodem",
     },
@@ -370,6 +374,17 @@ export const pl: Dictionary = {
       crossLine: "Opady — POWER: {power} mm/rok, nasza siatka: {grid} mm/rok",
       crossNote:
         "Niezależne źródła obok siebie, nigdy nie mieszane. Roczna średnia dobowa POWER × liczba dni w roku; oba bazują na MERRA-2, ale obejmują inne okresy i rozdzielczości, więc zgodność jest tylko przybliżona.",
+      allTitle: "Który cel najlepiej pasuje do tego miejsca?",
+      best: "najlepszy",
+      configured: "twój cel",
+      colTarget: "Cel",
+      colScore: "Wynik",
+      colPct: "Percentyl",
+      colLimiting: "Ogranicza",
+      summary: "Najbliżej do {target} – ogranicza: {dim}.",
+      summaryNoLimit: "Najbliżej do {target}.",
+      noneScored: "Żaden z czterech celów nie jest oceniony dla tej komórki.",
+      fitNote: "Dopasowanie misji poniżej dotyczy tylko twojego celu: {target}.",
       targetNote: "Wyniki dotyczą skonfigurowanego celu: {target}.",
       chartAria: "Parametr wykresu miesięcznego",
       monthly: "klimatologia miesięczna",

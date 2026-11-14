@@ -6,6 +6,8 @@
  *    "pending" until scan_grid_meta.json + scan_grid.bin.gz are published.
  * 2. Live NASA POWER climatology (src/lib/power.ts): annual values with the units read from the
  *    response (mapped to display units), plus a small monthly chart. Debounced; stale requests are aborted; cached.
+ *    All four targets side by side (TargetComparison), best highlighted; Mission Fit and the
+ *    detailed breakdown stay for the configured target. PlanetaryComparison follows the best target.
  * 3. Cross-check: "POWER: X mm/yr, our grid: Y mm/yr" — shown side by side, never blended.
  */
 
@@ -15,10 +17,12 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
 import { PlanetaryComparison } from "@/components/planetary/PlanetaryComparison";
 import { formatCoords, reasonText, ScoreBar } from "@/components/swipe/parts";
+import { TargetComparison } from "./TargetComparison";
 import { PowerValueList } from "@/components/swipe/PowerValueList";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { Lang } from "@/i18n/types";
+import { bestTarget, targetRows } from "@/lib/bestTarget";
 import { precipCrossCheck } from "@/lib/crossCheck";
 import { displayUnit } from "@/lib/format";
 import { HONESTY_NOTE_KEY, missionFit } from "@/lib/missionFit";
@@ -94,6 +98,13 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
     [point, grid],
   );
 
+  // All four targets for this cell, and the best one (scores straight from the grid).
+  const targets = useMemo(() => {
+    if (!point || !sample || sample.land === false || grid?.status !== "ready") return null;
+    const rows = targetRows(sample, (tid) => grid.grid.percentile(tid, point.lat, point.lon));
+    return { rows, best: bestTarget(rows) };
+  }, [point, sample, grid]);
+
   if (!point) {
     return (
       <div className="space-y-3 p-4">
@@ -118,10 +129,15 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
           {t("map.inspector.scanTitle")}
           {(!grid || grid.status !== "ready") && <span className="text-amber"> {t("map.inspector.pendingTag")}</span>}
         </h3>
+        {targets && (
+          <div className="mt-2">
+            <TargetComparison rows={targets.rows} best={targets.best} configured={config.target} />
+          </div>
+        )}
         <GridSection grid={grid} sample={sample} point={point} config={config} />
         <div className="mt-3">
           <PlanetaryComparison
-            target={config.target}
+            target={targets?.best ?? config.target}
             sample={sample && sample.land !== false ? sample : null}
             gridLoading={grid === undefined}
           />
@@ -206,6 +222,9 @@ function GridSection({
 
   return (
     <div className="mt-2 space-y-3">
+      <p className="border-t border-line pt-2 text-[10px] uppercase tracking-wider text-dim">
+        {t("map.inspector.fitNote", { target: t(TARGETS[config.target].labelKey) })}
+      </p>
       <ScoreBar
         label={t("card.analog")}
         hint={t("card.analogHint")}

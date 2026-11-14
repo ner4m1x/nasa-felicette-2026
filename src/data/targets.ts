@@ -22,6 +22,8 @@ export interface TargetMeta {
   environment: "polar" | "lava_tube" | "basin_delta" | "ice_plains";
   labelKey: I18nKey;
   catKey: I18nKey;
+  /** short name for one-line summaries, e.g. "Jezero" */
+  shortKey: I18nKey;
   resource: TargetResource;
   /** false = the global scan cannot see this resource; mission fit only adds a note */
   resourceGloballyCaptured: boolean;
@@ -34,6 +36,7 @@ export const TARGETS: Record<TargetId, TargetMeta> = {
     environment: "polar",
     labelKey: "targets.moon_shackleton.label",
     catKey: "targets.moon_shackleton.cat",
+    shortKey: "targets.moon_shackleton.short",
     resource: "ice",
     resourceGloballyCaptured: true,
   },
@@ -43,6 +46,7 @@ export const TARGETS: Record<TargetId, TargetMeta> = {
     environment: "lava_tube",
     labelKey: "targets.moon_tranquillitatis_pit.label",
     catKey: "targets.moon_tranquillitatis_pit.cat",
+    shortKey: "targets.moon_tranquillitatis_pit.short",
     resource: "basalt",
     resourceGloballyCaptured: true,
   },
@@ -52,6 +56,7 @@ export const TARGETS: Record<TargetId, TargetMeta> = {
     environment: "basin_delta",
     labelKey: "targets.mars_jezero.label",
     catKey: "targets.mars_jezero.cat",
+    shortKey: "targets.mars_jezero.short",
     resource: "hydratedMinerals",
     resourceGloballyCaptured: false,
   },
@@ -61,6 +66,7 @@ export const TARGETS: Record<TargetId, TargetMeta> = {
     environment: "ice_plains",
     labelKey: "targets.mars_arcadia.label",
     catKey: "targets.mars_arcadia.cat",
+    shortKey: "targets.mars_arcadia.short",
     resource: "ice",
     resourceGloballyCaptured: true,
   },

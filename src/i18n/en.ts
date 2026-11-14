@@ -233,18 +233,22 @@ export const en = {
   },
   targets: {
     moon_shackleton: {
+      short: "Shackleton",
       label: "Moon — polar (Shackleton rim)",
       cat: "Polar Freezer & Sunlit Scratching Post",
     },
     moon_tranquillitatis_pit: {
+      short: "Tranquillitatis pit",
       label: "Moon — lava tube / mare (Tranquillitatis pit)",
       cat: "Volcanic Nap Cave",
     },
     mars_jezero: {
+      short: "Jezero",
       label: "Mars — basin / delta (Jezero)",
       cat: "Imperial Red Litterbox",
     },
     mars_arcadia: {
+      short: "Arcadia",
       label: "Mars — ice plains (Arcadia Planitia)",
       cat: "Flat Subsurface Ice Pad",
     },
@@ -375,6 +379,17 @@ export const en = {
       crossNote:
         "Independent sources shown side by side, never blended. POWER's annual mean daily rate × days per year; both are MERRA-2-based but cover different periods and resolutions, so expect rough agreement only.",
       targetNote: "Scores are for your configured target: {target}.",
+      allTitle: "Which target fits this place best?",
+      best: "best",
+      configured: "your target",
+      colTarget: "Target",
+      colScore: "Score",
+      colPct: "Percentile",
+      colLimiting: "Limiting",
+      summary: "Closest to {target} – held back by {dim}.",
+      summaryNoLimit: "Closest to {target}.",
+      noneScored: "None of the four targets is scored for this cell.",
+      fitNote: "Mission Fit below is for your configured target only: {target}.",
       chartAria: "Monthly chart parameter",
       monthly: "monthly climatology",
       chart: {
