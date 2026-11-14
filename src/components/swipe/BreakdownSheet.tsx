@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useRef } from "react";
+import { PlanetaryComparisonAt } from "@/components/planetary/PlanetaryComparison";
 import { Sheet } from "@/components/ui/Sheet";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -179,6 +180,8 @@ export function BreakdownSheet({
             )}
           </section>
         ))}
+
+        <PlanetaryComparisonAt target={config.target} lat={card.lat} lon={card.lon} />
 
         <section>
           <h3 className="text-xs font-bold uppercase tracking-wider text-phosphor">

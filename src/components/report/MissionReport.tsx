@@ -30,6 +30,7 @@ import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
 import { useManifest, useValidationReport } from "@/state/usePipeline";
 import { MissionPatch } from "./MissionPatch";
+import { PlanetaryReferenceList } from "./PlanetaryReferenceList";
 
 const BLIND_SPOTS: I18nKey[] = [
   "report.blind.mineralogy",
@@ -197,6 +198,7 @@ export function MissionReport({ onGoToSwipe }: MissionReportProps) {
               )}
             </div>
           </section>
+          <PlanetaryReferenceList />
           <section>
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.methods.literature")}</h4>
             <div className="mt-1.5">

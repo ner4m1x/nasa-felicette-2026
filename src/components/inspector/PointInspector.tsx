@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
+import { PlanetaryComparison } from "@/components/planetary/PlanetaryComparison";
 import { formatCoords, reasonText, ScoreBar } from "@/components/swipe/parts";
 import { PowerValueList } from "@/components/swipe/PowerValueList";
 import { TARGETS } from "@/data/targets";
@@ -118,6 +119,9 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
           {(!grid || grid.status !== "ready") && <span className="text-amber"> {t("map.inspector.pendingTag")}</span>}
         </h3>
         <GridSection grid={grid} sample={sample} point={point} config={config} />
+        <div className="mt-3">
+          <PlanetaryComparison target={config.target} sample={sample && sample.land !== false ? sample : null} />
+        </div>
       </section>
 
       {/* ---- 2. Live NASA POWER ---- */}
