@@ -6,12 +6,99 @@
 export const en = {
   app: {
     title: "P.U.R.R. Command Center",
+    short: "P.U.R.R.",
     subtitle: "Planetary Utility for Regolith Reconnaissance",
   },
   nav: {
     swipe: "Swipe",
     map: "Map",
     report: "Report",
+    aria: "Main sections",
+  },
+  topbar: {
+    limits: "Earth limits",
+    limitsAria: "Open Earth's fundamental limits",
+  },
+  lang: {
+    groupAria: "Interface language",
+    en: "EN",
+    pl: "PL",
+    enName: "English",
+    plName: "Polski",
+  },
+  limits: {
+    title: "Earth's fundamental limits",
+    intro:
+      "No Earth site can reproduce these. They are identical for every card, so they are kept out of all scores.",
+    close: "Close",
+    sources: "Sources",
+    unverified: "not yet human-verified",
+    gravity: {
+      title: "Gravity",
+      body: "Moon {moon} m/s² (≈ {moonRatio} g) · Mars {mars} m/s² (≈ {marsRatio} g). Every Earth analog sits at 1 g.",
+    },
+    atmosphere: {
+      title: "Atmosphere",
+      body: "Mars: surface pressure ≈ {marsKpa} kPa ({marsMb} mb, {minMb}–{maxMb} mb by season). Moon: exosphere only (night surface pressure {moonBar} bar).",
+    },
+    radiation: {
+      title: "Radiation",
+      body: "No global magnetic field and little or no atmosphere: crews and hardware are exposed to galactic cosmic rays (GCR) and solar particle events (SPE).",
+    },
+    dust: {
+      title: "Lunar dust",
+      body: "Lunar dust is sticky, sharp and electrostatically charged: it clings to seals, suits and optics.",
+    },
+    cat: "Even nine lives can't fix gravity.",
+  },
+  tabs: {
+    mapOffline: "Global Scan Map: module not installed yet.",
+    reportOffline: "Mission Report: module not installed yet.",
+  },
+  config: {
+    heading: "Mission Configurator",
+    stepOf: "Question {n} of {total}",
+    progressAria: "Configurator progress",
+    back: "Back",
+    next: "Next",
+    launch: "Launch scan",
+    reconfigure: "Reconfigure",
+    briefTitle: "Mission brief",
+    shareHint: "This mission is encoded in the page URL: copy the link to share it.",
+  },
+  felicette: {
+    name: "Félicette",
+    intro: "Félicette online. Tell me what base you're planning and I'll sniff out Earth's best analogs.",
+    launch: "Whiskers calibrated. Scanning the whole planet for you…",
+    deckDocking: "The Orbital Swipe deck is still docking. I'll hold your mission until it arrives.",
+    choice: {
+      target: {
+        moon_shackleton:
+          "The lunar south pole: eternal shadow for ice, sunlit rims for my nap. Cold paws, warm heart.",
+        moon_tranquillitatis_pit:
+          "A pit into a lava tube. A cave with a ceiling of solid rock is the best nap spot in the Solar System.",
+        mars_jezero:
+          "An ancient lake and its delta. The most scientific litterbox on Mars.",
+        mars_arcadia:
+          "Flat plains with ice just below the dust. I can already hear the drills purring.",
+      },
+      footprint: {
+        compact:
+          "Small and cozy. Careful: that's below my scan resolution, so final siting needs sharper eyes.",
+        medium: "A sensible territory. Room to stretch, not too much to patrol.",
+        mega: "A whole kingdom! You'll need huge areas of smooth ground for those traverses.",
+      },
+      mobility: {
+        climber: "A climber! Steep, rough slopes become a playground instead of a problem.",
+        heavy: "Heavy pressurized rovers: comfy for the crew, picky about slopes. Smooth ground only.",
+      },
+      crew: {
+        robotic: "Robots only. No snacks to pack, and no shielding to argue about.",
+        short: "Four astronauts for a short stay. I'll keep an eye out for crew-training sites too.",
+        permanent:
+          "A permanent base! You'll need local ice to mine or rock overhead for shielding. I'll be strict.",
+      },
+    },
   },
   fixture: {
     banner: "DEV FIXTURE DATA — not real measurements",
@@ -75,6 +162,11 @@ export const en = {
     target: {
       title: "Target body & environment",
     },
+  },
+  dims: {
+    aridity: { sci: "Aridity (annual precipitation)", cat: "Litterbox dryness" },
+    fixture_dim_a: { sci: "FIXTURE DIMENSION A", cat: "Dev fixture, not a real dimension" },
+    fixture_dim_b: { sci: "FIXTURE DIMENSION B", cat: "Dev fixture, not a real dimension" },
   },
   fit: {
     constraint: {

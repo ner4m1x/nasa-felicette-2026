@@ -1,26 +1,101 @@
 @import "tailwindcss";
 
+/*
+ * P.U.R.R. terminal palette. Dark only (an orbital console has no light mode).
+ * Contrast on --bg (#050a07): fg 17.1:1, phosphor 15.3:1, amber 11.1:1, dim 8.8:1, danger 7.2:1;
+ * on --panel-2 the lowest is dim at 7.7:1 (all ≥ WCAG AA 4.5:1).
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #050a07;
+  --panel: #0a140e;
+  --panel-2: #0f1d14;
+  --line: #1f3a29;
+  --fg: #d6f5de;
+  --dim: #85b896;
+  --phosphor: #4dff9a;
+  --amber: #ffb22e;
+  --danger: #ff6b6b;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-dim: var(--dim);
+  --color-phosphor: var(--phosphor);
+  --color-amber: var(--amber);
+  --color-danger: var(--danger);
+  --font-mono: var(--font-terminal), ui-monospace, monospace;
+  --font-sans: var(--font-terminal), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Subtle CRT scanlines + vignette, never intercepting input. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background:
+    repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgb(0 0 0 / 0.35) 100%);
+}
+
+::selection {
+  background: var(--phosphor);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.text-glow {
+  text-shadow: 0 0 8px rgb(77 255 154 / 0.45);
+}
+
+.cursor-blink::after {
+  content: "▌";
+  margin-left: 0.1em;
+  animation: purr-blink 1.1s steps(1) infinite;
+}
+
+@keyframes purr-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Native <dialog> used by EarthLimitsSheet: bottom sheet on phones, centered modal on desktop. */
+dialog.purr-sheet::backdrop {
+  background: rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
