@@ -2,7 +2,7 @@
 
 /**
  * "Rejected by your mission specs": cards with a hard-failed constraint, each with the reason
- * (e.g. "HISS: 34% trafficable terrain, your heavy rovers need ≥ 60%"). The Analog Score is shown
+ * (e.g. "34% trafficable terrain, your heavy rovers need ≥ 60%"). The Analog Score is shown
  * unchanged — a mission rejection says nothing about planetary similarity.
  */
 

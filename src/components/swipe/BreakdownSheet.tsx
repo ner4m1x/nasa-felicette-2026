@@ -20,7 +20,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { breakdownFor } from "@/lib/deck";
 import { HONESTY_NOTE_KEY } from "@/lib/missionFit";
 import type { RankedCard } from "@/lib/types";
-import { agrees, shouldCelebrate, type Agreement, type FelicetteVerdict, type SwipeRecord } from "@/lib/verdict";
+import { shouldCelebrate, verdictHeadlineKey, type Agreement, type FelicetteVerdict, type SwipeRecord } from "@/lib/verdict";
 import { useMission } from "@/state/MissionContext";
 import { CONFETTI_COLOR_VARS } from "@/theme/tokens";
 import { KindBadge, reasonText, SourceList, to100 } from "./parts";
@@ -78,15 +78,8 @@ export function BreakdownSheet({
 
   const { ranked, record, verdict } = decision;
   const { card, analog, missionFit } = ranked;
-  const agreed = record ? agrees(record) : null;
   const rec = verdict.recommendation;
-  const headline = !record
-    ? t(rec === "purr" ? "verdict.recommendPurr" : rec === "hiss" ? "verdict.recommendHiss" : "verdict.abstain")
-    : agreed === null
-      ? t("verdict.abstain")
-      : agreed
-        ? t(record.verdict === "purr" ? "verdict.agreePurr" : "verdict.agreeHiss")
-        : t(record.verdict === "purr" ? "verdict.purrVsHiss" : "verdict.hissVsPurr");
+  const headline = t(verdictHeadlineKey(rec, record));
   const tone = record ? record.verdict : rec === "abstain" ? null : rec;
   const toneColor = tone === "purr" ? "var(--purr)" : tone === "hiss" ? "var(--hiss)" : "var(--line)";
 

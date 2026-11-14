@@ -121,3 +121,24 @@ export function agreementScore(records: readonly SwipeRecord[]): Agreement {
 export function shouldCelebrate(record: Pick<SwipeRecord, "verdict" | "recommendation">): boolean {
   return record.verdict === "purr" && record.recommendation === "purr";
 }
+
+/**
+ * i18n key of the bold headline in front of Félicette's reason ("I recommend HISS:",
+ * "We agree: HISS.", …). The headline carries the PURR/HISS word; reason texts never do.
+ */
+export function verdictHeadlineKey(
+  recommendation: Recommendation,
+  record: Pick<SwipeRecord, "verdict" | "recommendation"> | null,
+): I18nKey {
+  if (!record) {
+    return recommendation === "purr"
+      ? "verdict.recommendPurr"
+      : recommendation === "hiss"
+        ? "verdict.recommendHiss"
+        : "verdict.abstain";
+  }
+  const agreed = agrees(record);
+  if (agreed === null) return "verdict.abstain";
+  if (agreed) return record.verdict === "purr" ? "verdict.agreePurr" : "verdict.agreeHiss";
+  return record.verdict === "purr" ? "verdict.purrVsHiss" : "verdict.hissVsPurr";
+}

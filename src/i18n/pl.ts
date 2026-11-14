@@ -120,7 +120,7 @@ export const pl: Dictionary = {
     hiss: "HISS",
     skip: "Pomiń",
     purrAria: "PURR: akceptuj to miejsce",
-    hissAria: "HISS: odrzuć to miejsce",
+    hissAria: "odrzuć to miejsce",
     skipAria: "Pomiń: przenieś kartę na spód talii",
     cardAria: "{name}, {kind}. Przeciągnij w prawo dla PURR, w lewo dla HISS albo użyj przycisków poniżej.",
   },
@@ -278,19 +278,19 @@ export const pl: Dictionary = {
   fit: {
     constraint: {
       trafficabilityFail:
-        "HISS: {pct}% terenu przejezdnego, twoje ciężkie łaziki potrzebują ≥ {minPct}% (najlepiej ≥ {fullPct}%)",
+        "{pct}% terenu przejezdnego, twoje ciężkie łaziki potrzebują ≥ {minPct}% (najlepiej ≥ {fullPct}%)",
       trafficabilityLow:
         "{pct}% terenu przejezdnego; ciężkie łaziki dostają pełną ocenę dopiero przy ≥ {fullPct}%",
       footprintFail:
-        "HISS: ~{areaKm2} km² terenu przejezdnego, twoja baza potrzebuje ≥ {minKm2} km²",
+        "~{areaKm2} km² terenu przejezdnego, twoja baza potrzebuje ≥ {minKm2} km²",
       footprintTight:
         "~{areaKm2} km² terenu przejezdnego; komfortowo dopiero przy ≥ {fullKm2} km²",
       iceMissing:
-        "HISS: brak pomiaru wskaźnika lodu, stała załoga potrzebuje lokalnego lodu (ISRU)",
-      iceLow: "HISS: wskaźnik lodu {value}, stała załoga potrzebuje ≥ {min}",
+        "brak pomiaru wskaźnika lodu, stała załoga potrzebuje lokalnego lodu (ISRU)",
+      iceLow: "wskaźnik lodu {value}, stała załoga potrzebuje ≥ {min}",
       basaltMissing:
-        "HISS: brak pomiaru podłoża bazaltowego, stała załoga potrzebuje osłony tunelu lawowego",
-      basaltLow: "HISS: udział bazaltu {value}, stała załoga potrzebuje ≥ {min}",
+        "brak pomiaru podłoża bazaltowego, stała załoga potrzebuje osłony tunelu lawowego",
+      basaltLow: "udział bazaltu {value}, stała załoga potrzebuje ≥ {min}",
     },
     note: {
       footprintBelowGrid:

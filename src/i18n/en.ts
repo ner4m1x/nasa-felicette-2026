@@ -124,7 +124,7 @@ export const en = {
     hiss: "HISS",
     skip: "Skip",
     purrAria: "PURR: accept this site",
-    hissAria: "HISS: reject this site",
+    hissAria: "reject this site",
     skipAria: "Skip: move this card to the back of the deck",
     cardAria: "{name}, {kind}. Drag right to PURR, left to HISS, or use the buttons below.",
   },
@@ -283,19 +283,19 @@ export const en = {
   fit: {
     constraint: {
       trafficabilityFail:
-        "HISS: {pct}% trafficable terrain, your heavy rovers need ≥ {minPct}% (ideally ≥ {fullPct}%)",
+        "{pct}% trafficable terrain, your heavy rovers need ≥ {minPct}% (ideally ≥ {fullPct}%)",
       trafficabilityLow:
         "{pct}% trafficable terrain; heavy rovers get full credit only at ≥ {fullPct}%",
       footprintFail:
-        "HISS: ~{areaKm2} km² of trafficable terrain, your base needs ≥ {minKm2} km²",
+        "~{areaKm2} km² of trafficable terrain, your base needs ≥ {minKm2} km²",
       footprintTight:
         "~{areaKm2} km² of trafficable terrain; comfortable only at ≥ {fullKm2} km²",
       iceMissing:
-        "HISS: no ice proxy measured here, a permanent crew needs local ice (ISRU)",
-      iceLow: "HISS: ice proxy {value}, a permanent crew needs ≥ {min}",
+        "no ice proxy measured here, a permanent crew needs local ice (ISRU)",
+      iceLow: "ice proxy {value}, a permanent crew needs ≥ {min}",
       basaltMissing:
-        "HISS: no basalt substrate measured here, a permanent crew needs lava-tube shielding",
-      basaltLow: "HISS: basalt fraction {value}, a permanent crew needs ≥ {min}",
+        "no basalt substrate measured here, a permanent crew needs lava-tube shielding",
+      basaltLow: "basalt fraction {value}, a permanent crew needs ≥ {min}",
     },
     note: {
       footprintBelowGrid:
