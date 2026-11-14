@@ -4,7 +4,8 @@
  *
  * Pure functions. Reads the Analog Score and the Mission Fit of a RankedCard but never changes
  * either. The thresholds below are UX/ENGINEERING ASSUMPTIONS of this app, stated openly — not
- * planetary data. (They belong next to the mission-fit constants in docs/MISSION_FIT.md.)
+ * planetary data, and not part of the frozen Analog Score method. Documented in docs/MISSION_FIT.md
+ * ("Félicette's verdict — UI assumptions").
  */
 import { CREW_OPTIONS } from "@/data/missionOptions";
 import type { I18nKey } from "@/i18n/types";

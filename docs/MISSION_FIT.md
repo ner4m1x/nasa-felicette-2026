@@ -69,6 +69,33 @@ Robotic and short-stay crews have no resource requirement.
   the deck for `short` and `permanent` crews.
 - Pipeline cards without a score for the selected target are omitted.
 
+## Félicette's verdict (`src/lib/verdict.ts`) — UI assumptions
+
+> **These thresholds are UI/UX assumptions of this app. They are NOT part of the frozen Analog
+> Score method** (`scripts/config/targets.json`, pre-registered and committed as
+> `freeze scoring config v1`) and they are not planetary data. They only decide whether Félicette
+> *recommends* a card, for the "Félicette's verdict vs yours" comparison and the agreement score.
+> They never change the Analog Score, the Mission Fit or the deck order.
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `FELICETTE_MIN_ANALOG` | 0.6 | Minimum Analog Score (0..1) for a recommendation: clearly better than "half-desirable" on balance |
+| `FELICETTE_MIN_FIT` | 0.75 | Minimum Mission Fit (0..1): at most a mild soft penalty is acceptable |
+
+Decision order (the first rule that applies wins):
+
+1. Any **hard-failed** mission constraint → HISS, with that constraint's reason.
+2. `kind: "trap"` → HISS ("it only looks like an analog from orbit").
+3. `kind: "operational"` → PURR for crewed missions (`short`, `permanent`), HISS for `robotic`.
+4. `analog: null` (unscored, e.g. a mineralogy-only curated site) → **abstain**; abstentions are not
+   counted in the agreement score.
+5. `analog.total < FELICETTE_MIN_ANALOG` → HISS, naming the limiting dimension.
+6. `fit < FELICETTE_MIN_FIT` → HISS, with the first soft-penalty reason.
+7. Otherwise → PURR.
+
+Agreement score = agreed swipes / swipes where Félicette had an opinion (PURR or HISS). Confetti
+fires only when the user PURRs a card Félicette also recommends.
+
 ## Honesty note (shown in the UI)
 
 Bearing capacity and local slopes are not measured by global data; regional slopes underestimate
