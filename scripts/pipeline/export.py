@@ -48,6 +48,11 @@ def png_overlay(total: np.ndarray, path):
 
 
 # ------------------------------------------------------------------ 0.5 deg click grid
+FLAGS = ("ndvi_imputed",)
+NON_FEATURES = ("land_mask", *FLAGS)
+FLAG_LABEL = {"ndvi_imputed": "NDVI imputed (no MODIS coverage)"}
+
+
 def _quantize(a: np.ndarray, lo: float, hi: float):
     scale = (hi - lo) / 254.0 if hi > lo else 1.0
     q = np.where(np.isfinite(a), np.clip(np.round((a - lo) / scale), 0, 254), 255).astype(np.uint8)
@@ -61,7 +66,7 @@ def build_grid(F, land, S, cfg, encoding: str):
     def agg(a):
         return block_reduce(np.where(land, a, np.nan), f, "mean")
 
-    feat_names = [k for k in F if k not in ("land_mask",)]
+    feat_names = [k for k in F if k not in NON_FEATURES]
     for k in feat_names:
         a = agg(F[k])
         v = a[np.isfinite(a)]
@@ -87,6 +92,12 @@ def build_grid(F, land, S, cfg, encoding: str):
         lim = np.where(ok, np.argmin(np.where(np.isfinite(st), np.maximum(st, floor), np.inf), axis=0), 255).astype(np.uint8)
         bands.append({"name": f"{t}.limiting", "kind": "limiting", "target": t, "categories": dims, "scale": 1.0, "offset": 0.0})
         arrays.append(lim)
+    for fl in FLAGS:
+        if fl in F:
+            # 1 if any land 0.25 deg cell inside the 0.5 deg cell is flagged
+            a = block_reduce(np.where(land, F[fl], np.nan), f, "max")
+            bands.append({"name": fl, "kind": "flag", "description": FLAG_LABEL.get(fl), "scale": 1.0, "offset": 0.0})
+            arrays.append(np.where(np.isfinite(a), a > 0, 255).astype(np.uint8))
     lm = (block_reduce(land.astype(np.float32), f, "max") > 0).astype(np.uint8)
     bands.append({"name": "land", "kind": "mask", "scale": 1.0, "offset": 0.0})
     arrays.append(lm)
@@ -196,12 +207,13 @@ def build_deck(F, S, cfg, man):
             p = ft["properties"]
             rows, cols = _cells_of(ft["geometry"])
             an = region_analog(rows, cols)
-            values = {k: float(np.nanmean(F[k][rows, cols])) for k in F if k != "land_mask"}
+            values = {k: float(np.nanmean(F[k][rows, cols])) for k in F if k not in NON_FEATURES}
             cards.append({
                 "id": p["id"], "kind": "benchmark" if p["known"] else "discovery", "name": p["name"],
                 "country": p["country"], "lat": p["centroid"]["lat"], "lon": p["centroid"]["lon"], "scale": "regional",
                 "regionAreaKm2": p["area_km2"], "analog": an, "mission": mission_at(rows, cols),
                 "stability": p["stability"], "known": bool(p["known"]),
+                "ndviImputed": bool(np.any(F["ndvi_imputed"][rows, cols] > 0)) if "ndvi_imputed" in F else False,
                 "breakdown": {tt: breakdown(tt, cfg, T, e["dims"], values, e["limiting"]) for tt, e in an.items()},
                 "sourceIds": source_ids(list(an), cfg, man),
             })
@@ -226,13 +238,15 @@ def build_deck(F, S, cfg, man):
         for tt, e in an.items():
             # feature values at the cell that produced this target's site score
             ri, ci = latlon_to_idx(a[tt]["cell"]["lat"], a[tt]["cell"]["lon"])
-            values = {k: float(F[k][ri, ci]) for k in F if k != "land_mask"}
+            values = {k: float(F[k][ri, ci]) for k in F if k not in NON_FEATURES}
             bd[tt] = breakdown(tt, cfg, T, e["dims"], values, e["limiting"])
         cards.append({
             "id": f"site-{s['id']}", "kind": s["category"], "name": s["name"], "country": country,
             "lat": s["lat"], "lon": s["lon"], "scale": "regional", "regionAreaKm2": None,
             "analog": an or None, "mission": mission_at(rows, cols), "stability": None,
             "known": s["category"] == "benchmark", "breakdown": bd,
+            # true if the cell behind any target's site score had its NDVI imputed
+            "ndviImputed": any(v.get("ndvi_imputed", False) for v in a.values() if v),
             "sourceIds": source_ids(list(an), cfg, man),
         })
     return {"generatedAt": now_iso(), "configId": f"targets-v{cfg['version']}@{(config_git_state()['commit'] or 'uncommitted')[:12]}",
@@ -287,7 +301,8 @@ def curated_values(F, S, cfg):
             "lat": s["lat"], "lon": s["lon"], "containing_cell_is_land": land,
             "analog": {t: v for t, v in a.items() if v},
             "features_containing_cell": {k: (float(F[k][i, j]) if np.isfinite(F[k][i, j]) else None)
-                                         for k in F if k != "land_mask"} if land else None,
+                                         for k in F if k not in NON_FEATURES} if land else None,
+            "ndvi_imputed": bool(F["ndvi_imputed"][i, j] > 0) if ("ndvi_imputed" in F and land) else False,
         }
     return out
 
@@ -401,6 +416,6 @@ def run(publish: bool = False, grid_encoding: str = "gzip"):
 
 
 def _strip(Fd):
-    out = type(Fd)({k: v for k, v in Fd.items() if k != "land_mask"})
+    out = type(Fd)({k: v for k, v in Fd.items() if k != "land_mask"})  # flags stay: build_grid adds them as flag bands
     out.attrs_units = Fd.attrs_units
     return out

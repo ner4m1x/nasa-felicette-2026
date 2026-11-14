@@ -159,3 +159,33 @@ def earthdata_login():
 
 def log(msg: str):
     print(f"[global_scan] {msg}", flush=True)
+
+
+# ---------------------------------------------------------------- memory accounting (Linux /proc)
+def _status_kb(key: str) -> float:
+    try:
+        with open("/proc/self/status") as fh:
+            for line in fh:
+                if line.startswith(key + ":"):
+                    return float(line.split()[1])
+    except OSError:
+        pass
+    return float("nan")
+
+
+def mem_reset_peak() -> None:
+    """Reset the kernel's peak-RSS counter (VmHWM) so the next mem_peak_mb() covers one stage only."""
+    try:
+        with open("/proc/self/clear_refs", "w") as fh:
+            fh.write("5")
+    except OSError:
+        pass
+
+
+def mem_peak_mb() -> float:
+    """Peak resident set size since the last mem_reset_peak() (or process start), in MB."""
+    return _status_kb("VmHWM") / 1024.0
+
+
+def mem_rss_mb() -> float:
+    return _status_kb("VmRSS") / 1024.0

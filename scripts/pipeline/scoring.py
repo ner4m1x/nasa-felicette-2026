@@ -79,6 +79,11 @@ def load_config() -> dict:
     return cfg
 
 
+def flag_vars(ds) -> list[str]:
+    """Per-cell provenance flags in features_0p25.nc (e.g. ndvi_imputed); never scoring inputs."""
+    return [k for k in ds.data_vars if ds[k].attrs.get("flag") == "yes"]
+
+
 def load_features():
     import xarray as xr
 
@@ -96,6 +101,10 @@ def run():
     cfg = load_config()
     floor = float(cfg["scoring"]["floor"])
     F, land, fds = load_features()
+    fv = fds.attrs.get("imputation_config_version")
+    if fv is None or int(fv) != int(cfg["version"]):
+        raise SystemExit(f"features_0p25.nc applied the missing-data rules of config v{fv}, but targets.json is "
+                         f"v{cfg['version']}; re-run `features` (assembly only) first")
     out = {}
     for t in TARGET_IDS:
         tc = cfg["targets"][t]
@@ -112,6 +121,8 @@ def run():
             out[f"{t}__dim__{k}"] = (("lat", "lon"), np.where(land, v, np.nan).astype(np.float32), {"target": t, "dim": k})
         n = int(np.isfinite(total).sum())
         log(f"{t}: scored land cells {n} / {int(land.sum())}")
+    for fl in flag_vars(fds):
+        out[f"flag__{fl}"] = (("lat", "lon"), fds[fl].values.astype(np.uint8), dict(fds[fl].attrs))
     ds = xr.Dataset(out, coords={"lat": fds["lat"], "lon": fds["lon"]})
     ds.attrs.update({"config_version": cfg["version"], "created": now_iso()})
     ds.to_netcdf(SCORES_NC)

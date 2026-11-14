@@ -32,3 +32,78 @@ Chronological log of methodological decisions (pre-registration, frozen configs,
     text as the `str` dtype, so the full-resolution loader fell back to the 0.5 deg grid on the first
     features run. That run was stopped before scoring; detection now accepts string dtypes and finds
     column `xx`. features was re-run from scratch with full-resolution GLiM.
+- 2026-11-14 — **Memory refactor, no change to feature definitions.** The first full `features` run
+  ran the laptop out of memory (14 GB RAM + 8 GB swap). Cause: `glim_fractions_full` loaded all
+  1,235,259 GLiM MultiPolygons into one GeoDataFrame and reprojected them in one go (Eckert IV → EPSG:4326).
+  `scripts/config/` is untouched (still v1 from 4cfc24a). Code changes:
+  - `regrid.glim_fractions_full`: polygons are streamed from the FileGDB in chunks of 20,000 features
+    (pyogrio `skip_features`/`max_features`), reprojected per chunk and burnt in file order into one
+    uint8 class raster at 0.025° (`rasterize(..., out=...)`). Later polygons overwrite earlier ones,
+    as in the former single `rasterize` call. vb/pb/land pixels are then counted per 0.25° cell in
+    latitude bands (integer counts; fraction = 100 · count_class / count_land, the same quantity as
+    before, up to float32 rounding).
+  - `regrid.dem_features`: ETOPO processed in latitude bands of 24 output rows (+1-pixel halo for the
+    N–S gradient) instead of one row at a time; per-cell pixels and gradients unchanged.
+  - `regrid.apply_scale` scales in float64 blocks of 600 rows into a float32 output; `regrid.cmg_to_grid`
+    block-aggregates in 600-row bands. Each 0.05° granule is aggregated to 0.25° immediately and
+    dropped; only 0.25° monthly grids are stacked. `features.landcover` keeps the 0.05° water
+    percentage only as a running sum/count and stores the thresholded mask (water ≥ 50 %) for the DEM.
+  - `features.run`: each source (`landcover ndvi lst precip dust dem glim`) is cached separately in
+    `scripts/out/features_parts/<source>.npz` + `.json` (atomic write), with runtime and peak RSS
+    (`/proc/self/status` VmHWM, reset per stage). `features --sources <s>` computes one part;
+    `features` with no `--sources` computes missing parts and assembles `features_0p25.nc`.
+    `--force` recomputes. Stage resources are written to `sanity_checks.json` (`stage_resources`).
+  - Heavy commands now run in a memory-capped scope: `systemd-run --user --scope -p MemoryMax=7G -p MemorySwapMax=1G`.
+  - Equivalence check: landcover, NDVI, LST, MERRA-2 precip/dust and all DEM features from the
+    refactored code were compared with the pre-refactor code (HEAD fc3d146) on the real 2023 data:
+    **bit-identical** (max abs diff 0.0, identical NaN masks). New unit tests check banded
+    `apply_scale` and `cmg_to_grid` against whole-array results.
+  - Result: all seven parts plus the assembly ran under the cap. Largest stage was GLiM, at 1.46 GB peak RSS and 115 s.
+    All 8 sanity checks PASS, and `score` ran. GLiM was not compared with the pre-refactor code, because that code
+    ran out of memory; its Iceland check passes (basalt_frac median 100 %).
+- 2026-11-14 — **Observation (no change made):** MOD13C2 NDVI is missing for every land cell south of
+  60° S (96,802 cells, all of them Antarctic). So `mars_jezero`, `mars_arcadia` and `moon_tranquillitatis_pit`,
+  which use `ndvi_max`, leave all of Antarctica unscored (NaN). Only `moon_shackleton` scores it.
+  This is how v1 behaves when a feature is missing, and it is reported before any validation run.
+- 2026-11-14 — **Config v2 (pre-validation).** `scripts/config/targets.json` goes from `version` 1 to 2
+  (`config_id` `targets-v2`). It is frozen by the commit `freeze scoring config v2`.
+  - **Reason:** MOD13C2 NDVI is missing for all 96,802 land cells south of 60° S (see the observation above).
+    Under v1, `mars_jezero`, `mars_arcadia` and `moon_tranquillitatis_pit` left all of Antarctica unscored.
+  - **Rule** (`scoring.missing_data_imputation`, id `ndvi_no_modis_coverage`; generic, not region-specific):
+    on a land cell, if `ndvi_mean`/`ndvi_max` is missing AND the MCD12C1 non-vegetated share of the cell's
+    LAND part, `nonveg_land_share = (barren_frac + snowice_frac) / (100 - water_frac)`, is >= 0.95, then
+    `ndvi_mean` = `ndvi_max` = 0.0 and the cell is flagged `ndvi_imputed`. The share is undefined (no
+    imputation) where `water_frac` >= 100 or an input is missing. Otherwise the cell stays unscored, as
+    before. Present NDVI values are never changed, and no other feature is imputed. `missing_feature_policy`
+    now points to this rule.
+  - **Rationale:** MOD13C2 is not produced over Antarctica. A missing product is not evidence of vegetation,
+    and land cover independently shows a non-vegetated surface. The share is taken over land only because
+    open water is not vegetation and must not block imputation in coastal cells.
+  - **Refinement before the freeze:** a first draft of v2, never committed, used `unvegetated_frac` >= 95 %
+    over the whole cell. That draft imputed 94,565 cells and left 2,237 Antarctic coastal cells without NDVI,
+    because their remainder was water, not vegetation. The condition was changed to the land-only share
+    before `freeze scoring config v2`. Nothing beyond land-cell counts had been looked at.
+  - **Unchanged:** every target, dimension, weight, threshold and rationale, plus `method` and `not_captured`
+    (checked by a diff of the parsed JSON: only `scoring.missing_feature_policy` and
+    `scoring.missing_data_imputation` differ).
+  - **Effect:** all 96,802 land cells without NDVI are imputed. All lie south of 60° S, 4,114 of them
+    coastal (water_frac > 0), and the lowest `nonveg_land_share` among them is 0.9555. No land cell
+    remains without NDVI.
+    Scored land cells (of 341,212), v1 → v2: `moon_shackleton` 341,204 → 341,204;
+    `moon_tranquillitatis_pit` 244,243 → 340,922; `mars_jezero` 244,402 → 341,204; `mars_arcadia` 244,402 → 341,204.
+    The rest are unscored for other missing inputs: 8 cells without MOD11C3 night LST, and on the pit
+    target also cells without GLiM lithology. The McMurdo Dry Valleys site now has scored cells within its
+    25 km radius for both relevant targets (`mars_arcadia`, `moon_shackleton`): 15 of 15, all imputed.
+    Only cell presence was checked; no score or percentile was looked at.
+  - **Provenance in outputs:** `ndvi_imputed` (uint8) is stored in `features_0p25.nc` and copied to
+    `scores_0p25.nc` (`flag__ndvi_imputed`). It is carried as follows:
+    - `validation_report.json`: per site and target (`ndvi_imputed`), per site, and as a cell count;
+    - `deck.json`: optional `ndviImputed` on each card, added to `deck.schema.json` (the TS type needs
+      `ndviImputed?: boolean`);
+    - `curated_grid_values.json`;
+    - `scan_grid.bin`: a `flag` band.
+    UI label: "NDVI imputed (no MODIS coverage)".
+  - **Guard:** `score` refuses to run if `features_0p25.nc` was assembled under a different config version.
+  - **At the time of this change, no validation, percentile, sensitivity or candidate result had been
+    computed under v1 or v2.** `validate` had never run. Only the feature sanity checks and the
+    land-cell counts per target had been seen.

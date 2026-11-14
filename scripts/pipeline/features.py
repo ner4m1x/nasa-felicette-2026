@@ -2,18 +2,22 @@
 from __future__ import annotations
 
 import calendar
+import os
 import re
+import time
 import warnings
 import zipfile
 from pathlib import Path
 
 import numpy as np
 
-from .common import CONFIG, LATS, LONS, NLAT, NLON, OUT, RAW, latlon_to_idx, load_json, log, now_iso, save_json
-from .regrid import (apply_scale, cmg_to_grid, dem_features, glim_fractions_0p5, glim_fractions_full, list_sds,
+from .common import (CONFIG, LATS, LONS, NLAT, NLON, OUT, RAW, latlon_to_idx, load_json, log, mem_peak_mb,
+                     mem_reset_peak, now_iso, save_json)
+from .regrid import (cmg_to_grid, dem_features, glim_fractions_0p5, glim_fractions_full, list_sds,
                      merra_to_grid, read_modis_sds)
 
 FEATURES_NC = OUT / "features_0p25.nc"
+PARTS = OUT / "features_parts"
 SANITY_JSON = OUT / "sanity_checks.json"
 
 UNITS = {
@@ -89,7 +93,12 @@ def _nanmin(stack, axis=0):
 
 # ------------------------------------------------------------------ per-dataset
 def landcover(years, meta_log):
-    water, snow, barren, water005 = [], [], [], []
+    """IGBP percent layers -> 0.25 deg fractions, plus the 0.05 deg water >= 50 % mask used by the DEM.
+
+    Memory: each 0.05 deg class layer is read, block-aggregated and dropped immediately; the 0.05 deg
+    water percentage is kept only as a running (sum, count) for the multi-year nanmean."""
+    water, snow, barren = [], [], []
+    w_sum = w_cnt = None
     for f in _files("MCD12C1", years):
         sds = list_sds(f)
         name = "Land_Cover_Type_1_Percent"  # IGBP scheme, one percent layer per class value 0..16
@@ -98,26 +107,31 @@ def landcover(years, meta_log):
         shape = sds[name][1]
         if len(shape) != 3 or shape[2] != 17:
             raise SystemExit(f"{f.name}: {name} has shape {shape}, expected (3600, 7200, 17)")
-        layers = {}
-        for cls in (0, 15, 16):
+        for cls, dest in ((0, water), (15, snow), (16, barren)):
             a, m = read_modis_sds(f, name, layer=cls)
-            layers[cls] = a
+            dest.append(cmg_to_grid(a))
+            if cls == 0:
+                fin = np.isfinite(a)
+                if w_sum is None:
+                    w_sum, w_cnt = np.zeros(a.shape, np.float64), np.zeros(a.shape, np.uint16)
+                w_sum += np.where(fin, a, 0.0)
+                w_cnt += fin
+            del a
         meta_log["MCD12C1"] = {"sds": name, **{k: m[k] for k in ("scale_factor", "add_offset", "fill", "valid_range", "units", "convention")}}
-        water005.append(layers[0])
-        water.append(cmg_to_grid(layers[0]))
-        snow.append(cmg_to_grid(layers[15]))
-        barren.append(cmg_to_grid(layers[16]))
         log(f"  MCD12C1 {f.name}: {name}")
-    return _nanmean(np.stack(water)), _nanmean(np.stack(snow)), _nanmean(np.stack(barren)), _nanmean(np.stack(water005))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        water005_ge50 = (w_cnt > 0) & (w_sum / np.maximum(w_cnt, 1) >= 50)
+    return _nanmean(np.stack(water)), _nanmean(np.stack(snow)), _nanmean(np.stack(barren)), water005_ge50
 
 
 def ndvi(years, meta_log):
     per_year_mean, per_year_max = [], []
     for y in years:
-        months = []
+        months = []  # 0.25 deg monthly grids only (12 x 4 MB); each 0.05 deg granule is dropped at once
         for f in _files("MOD13C2", [y]):
             a, m = read_modis_sds(f, "CMG 0.05 Deg Monthly NDVI")
             months.append(cmg_to_grid(a))
+            del a
         meta_log["MOD13C2"] = {"sds": "CMG 0.05 Deg Monthly NDVI", **{k: m[k] for k in ("scale_factor", "add_offset", "fill", "valid_range", "units", "convention")}}
         st = np.stack(months)
         log(f"  MOD13C2 {y}: {len(months)} months")
@@ -149,6 +163,7 @@ def lst(years, meta_log):
                     raise SystemExit(f"MOD11C3 LST units are {mm['units']!r}, expected Kelvin")
             days.append(cmg_to_grid(d) - 273.15)
             nights.append(cmg_to_grid(n) - 273.15)
+            del d, n
         meta_log["MOD11C3"] = {"sds": ["LST_Day_CMG", "LST_Night_CMG"], **{k: md[k] for k in ("scale_factor", "add_offset", "fill", "valid_range", "units", "convention")}}
         D, N = np.stack(days), np.stack(nights)
         log(f"  MOD11C3 {y}: {len(days)} months")
@@ -243,6 +258,49 @@ def ice_proxy(lst_day_c, snowice_pct, cfg) -> np.ndarray:
     return out.astype(np.float32)
 
 
+_OPS = {">=": np.greater_equal, ">": np.greater, "<=": np.less_equal, "<": np.less}
+
+
+def nonveg_land_share(F: dict) -> np.ndarray:
+    """(barren + snow/ice) / (100 - water): non-vegetated share of the LAND part of a cell (0..1).
+
+    NaN where water_frac >= 100 or any input is missing (targets.json condition_definition)."""
+    b, s, w = (np.asarray(F[k], np.float64) for k in ("barren_frac", "snowice_frac", "water_frac"))
+    with np.errstate(invalid="ignore", divide="ignore"):
+        out = (b + s) / (100.0 - w)
+    return np.where(np.isfinite(w) & (w < 100.0), out, np.nan)
+
+
+# condition quantities that are derived on the fly rather than stored as features
+DERIVED_CONDITIONS = {"nonveg_land_share": nonveg_land_share}
+
+
+def apply_imputation(F: dict, land: np.ndarray, rules: list[dict]) -> tuple[dict, dict]:
+    """Apply the pre-registered missing-data rules of targets.json (scoring.missing_data_imputation).
+
+    For each rule: on land cells where any of rule["features"] is NaN and the condition holds,
+    every feature of the rule is set to rule["set_to"] and the cell is flagged. Cells that miss the
+    feature but fail the condition stay NaN (unscored). Present values are never changed.
+    Returns (flags {flag_name: bool array}, counts {rule id: n_cells}). F is modified in place."""
+    flags, counts = {}, {}
+    for r in rules:
+        feats = r["features"]
+        missing = np.zeros(land.shape, bool)
+        for f in feats:
+            missing |= ~np.isfinite(F[f])
+        c = r["condition"]
+        cv = (DERIVED_CONDITIONS[c["feature"]](F) if c["feature"] in DERIVED_CONDITIONS
+              else np.asarray(F[c["feature"]], np.float64))
+        with np.errstate(invalid="ignore"):
+            cond = np.isfinite(cv) & _OPS[c["op"]](cv, float(c["value"]))
+        hit = land & missing & cond
+        for f in feats:
+            F[f] = np.where(hit, np.float32(r["set_to"]), F[f]).astype(np.float32)
+        flags[r["flag"]] = flags.get(r["flag"], np.zeros(land.shape, bool)) | hit
+        counts[r["id"]] = int(hit.sum())
+    return flags, counts
+
+
 # ------------------------------------------------------------------ sanity checks
 def _box(feat, lat0, lat1, lon0, lon1, land):
     rows = (LATS >= lat0) & (LATS <= lat1)
@@ -270,38 +328,145 @@ def sanity_checks(F: dict, land: np.ndarray, cfg: dict) -> list[dict]:
     return res
 
 
+# ------------------------------------------------------------------ per-source parts (cached)
+# Each source's 0.25 deg result is cached in scripts/out/features_parts/<source>.npz (+ .json meta),
+# written atomically, so a crash never redoes a finished source. Order matters only for "dem",
+# which needs the 0.05 deg water mask from "landcover".
+SOURCES = ["landcover", "ndvi", "lst", "precip", "dust", "dem", "glim"]
+
+
+def _part_paths(name: str) -> tuple[Path, Path]:
+    return PARTS / f"{name}.npz", PARTS / f"{name}.json"
+
+
+def load_part(name: str, years: list[int]) -> tuple[dict, dict] | None:
+    npz, js = _part_paths(name)
+    if not (npz.exists() and js.exists()):
+        return None
+    meta = load_json(js)
+    if name not in ("dem", "glim") and meta.get("years") != list(years):
+        log(f"  part {name}: cached for years {meta.get('years')}, need {years} -> recompute")
+        return None
+    with np.load(npz) as z:
+        arrays = {k: z[k] for k in z.files}
+    return arrays, meta
+
+
+def _save_part(name: str, arrays: dict, meta: dict):
+    PARTS.mkdir(parents=True, exist_ok=True)
+    npz, js = _part_paths(name)
+    tmp = npz.with_name(npz.stem + ".tmp.npz")
+    np.savez(tmp, **{k: np.asarray(v) for k, v in arrays.items()})
+    os.replace(tmp, npz)
+    save_json(js.with_suffix(".tmp.json"), meta)
+    os.replace(js.with_suffix(".tmp.json"), js)
+
+
+def _compute_part(name: str, years: list[int]) -> tuple[dict, dict]:
+    ml: dict = {}
+    if name == "landcover":
+        log("land cover (MCD12C1) ...")
+        water, snowice, barren, w005 = landcover(years, ml)
+        arrays = {"water_frac": water, "snowice_frac": snowice, "barren_frac": barren, "water005_ge50": w005}
+    elif name == "ndvi":
+        log("NDVI (MOD13C2) ...")
+        m, x = ndvi(years, ml)
+        arrays = {"ndvi_mean": m, "ndvi_max": x}
+    elif name == "lst":
+        log("LST (MOD11C3) ...")
+        L = lst(years, ml)
+        arrays = {"lst_day_mean_c": L["day"], "lst_night_mean_c": L["night"], "lst_diurnal_range_k": L["range"],
+                  "lst_night_min_c": L["nmin"], "lst_allmonth_mean_c": L["allmonth"]}
+    elif name == "precip":
+        log("MERRA-2 precipitation ...")
+        arrays = {"precip_mm_yr": merra("M2TMNXFLX", "PRECTOTCORR", years, ml, "precip")}
+    elif name == "dust":
+        log("MERRA-2 dust ...")
+        arrays = {"dust_aod": merra("M2TMNXAER", "DUEXTTAU", years, ml, "mean")}
+    elif name == "dem":
+        lc = load_part("landcover", years)
+        if lc is None:
+            raise SystemExit("features: 'dem' needs the 'landcover' part (0.05 deg water mask); run it first")
+        w005 = lc[0]["water005_ge50"].astype(bool)
+        del lc
+        log("DEM (ETOPO 2022 60s) ...")
+        mcfg = load_json(CONFIG / "mission_features.json")
+        etopo = RAW / "ETOPO_2022_60s" / "ETOPO_2022_v1_60s_N90W180_surface.nc"
+        arrays = dem_features(etopo, w005, slope_flat_deg=mcfg["trafficable_frac"]["slope_threshold_deg"])
+    elif name == "glim":
+        log("GLiM lithology ...")
+        gl = glim(ml)
+        arrays = {"basalt_frac": gl["vb"], "pb_frac": gl["pb"]}
+    else:
+        raise ValueError(name)
+    arrays = {k: (v if v.dtype == bool else np.asarray(v, np.float32)) for k, v in arrays.items()}
+    return arrays, ml
+
+
+def run_part(name: str, years: list[int], force: bool = False) -> dict:
+    if not force:
+        cached = load_part(name, years)
+        if cached is not None:
+            m = cached[1]
+            log(f"part {name}: cached ({m.get('runtime_s')} s, peak RSS {m.get('peak_rss_mb')} MB when computed)")
+            return m
+    mem_reset_peak()
+    t0 = time.time()
+    arrays, ml = _compute_part(name, years)
+    meta = {"source": name, "years": list(years), "created": now_iso(), "runtime_s": round(time.time() - t0, 1),
+            "peak_rss_mb": round(mem_peak_mb(), 1), "read_metadata": ml, "arrays": sorted(arrays)}
+    _save_part(name, arrays, meta)
+    log(f"part {name}: done in {meta['runtime_s']} s, peak RSS {meta['peak_rss_mb']} MB -> {_part_paths(name)[0]}")
+    return meta
+
+
 # ------------------------------------------------------------------ main
-def run(years: list[int]):
+def run(years: list[int], sources: list[str] | None = None, force: bool = False):
+    """Compute the requested sources (default: all missing ones), then assemble features_0p25.nc.
+
+    With an explicit `sources` list only those parts are computed and nothing is assembled; run
+    without `sources` afterwards to assemble from the cache."""
     import xarray as xr
 
     OUT.mkdir(parents=True, exist_ok=True)
+    if sources:
+        bad = [s for s in sources if s not in SOURCES]
+        if bad:
+            raise SystemExit(f"unknown feature sources {bad}; choose from {SOURCES}")
+        for s in sources:
+            run_part(s, years, force=force)
+        return None
+    part_meta = {s: run_part(s, years, force=force) for s in SOURCES}
+
+    mem_reset_peak()
+    t0 = time.time()
+    log("assembling features from cached parts ...")
+    P = {}
     meta_log: dict = {}
+    for s in SOURCES:
+        arrays, m = load_part(s, years)
+        P.update(arrays)
+        meta_log.update(m.get("read_metadata") or {})
     mcfg = load_json(CONFIG / "mission_features.json")
-    log("land cover (MCD12C1) ...")
-    water, snowice, barren, water005 = landcover(years, meta_log)
-    log("NDVI (MOD13C2) ...")
-    ndvi_mean, ndvi_max = ndvi(years, meta_log)
-    log("LST (MOD11C3) ...")
-    L = lst(years, meta_log)
-    log("MERRA-2 precipitation / dust ...")
-    precip = merra("M2TMNXFLX", "PRECTOTCORR", years, meta_log, "precip")
-    dust = merra("M2TMNXAER", "DUEXTTAU", years, meta_log, "mean")
-    log("DEM (ETOPO 2022 60s) ...")
-    etopo = RAW / "ETOPO_2022_60s" / "ETOPO_2022_v1_60s_N90W180_surface.nc"
-    dem = dem_features(etopo, water005, slope_flat_deg=mcfg["trafficable_frac"]["slope_threshold_deg"])
-    log("GLiM lithology ...")
-    gl = glim(meta_log)
+    water, snowice, barren = P["water_frac"], P["snowice_frac"], P["barren_frac"]
 
     F = {
-        "precip_mm_yr": precip, "ndvi_mean": ndvi_mean, "ndvi_max": ndvi_max,
-        "lst_day_mean_c": L["day"], "lst_night_mean_c": L["night"], "lst_diurnal_range_k": L["range"],
-        "lst_night_min_c": L["nmin"], "lst_allmonth_mean_c": L["allmonth"], "barren_frac": barren, "snowice_frac": snowice, "water_frac": water,
-        "unvegetated_frac": barren + snowice, "dust_aod": dust, **dem,
-        "basalt_frac": gl["vb"], "pb_frac": gl["pb"],
+        "precip_mm_yr": P["precip_mm_yr"], "ndvi_mean": P["ndvi_mean"], "ndvi_max": P["ndvi_max"],
+        "lst_day_mean_c": P["lst_day_mean_c"], "lst_night_mean_c": P["lst_night_mean_c"],
+        "lst_diurnal_range_k": P["lst_diurnal_range_k"], "lst_night_min_c": P["lst_night_min_c"],
+        "lst_allmonth_mean_c": P["lst_allmonth_mean_c"], "barren_frac": barren, "snowice_frac": snowice, "water_frac": water,
+        "unvegetated_frac": barren + snowice, "dust_aod": P["dust_aod"],
+        **{k: P[k] for k in ("relief_std_m", "slope_mean_deg", "slope_p90_deg", "trafficable_frac", "elev_mean_m")},
+        "basalt_frac": P["basalt_frac"], "pb_frac": P["pb_frac"],
         "polar_day_frac": np.repeat(polar_day_fraction()[:, None], NLON, axis=1),
     }
     F["ice_proxy"] = ice_proxy(F["lst_day_mean_c"], F["snowice_frac"], mcfg["ice_proxy"])
     land = np.isfinite(water) & (water < 50)
+    tcfg = load_json(CONFIG / "targets.json")
+    rules = tcfg["scoring"].get("missing_data_imputation", [])
+    flags, imputed = apply_imputation(F, land, rules)
+    for r in rules:
+        log(f"imputation {r['id']} (targets.json v{tcfg['version']}): {imputed[r['id']]} land cells -> {r['flag']}")
 
     ds = xr.Dataset(
         {k: (("lat", "lon"), np.asarray(v, np.float32),
@@ -311,6 +476,14 @@ def run(years: list[int]):
         coords={"lat": ("lat", LATS, {"units": "degrees_north"}), "lon": ("lon", LONS, {"units": "degrees_east"})},
     )
     ds["land_mask"] = (("lat", "lon"), land.astype(np.uint8), {"description": "1 where MCD12C1 water fraction < 50 %"})
+    for r in rules:
+        ds[r["flag"]] = (("lat", "lon"), flags[r["flag"]].astype(np.uint8),
+                         {"description": f"1 where {', '.join(r['features'])} were imputed by rule {r['id']} "
+                                         f"(scripts/config/targets.json scoring.missing_data_imputation)",
+                          "rule": r["id"], "set_to": float(r["set_to"]), "flag": "yes"})
+    ds.attrs.update({"imputation_config_version": int(tcfg["version"]),
+                     "imputation_rules": ",".join(r["id"] for r in rules) or "none",
+                     "imputed_cells": str(imputed)})
     ds.attrs.update({"title": "Felicette global scan features, 0.25 deg", "years": ",".join(map(str, years)),
                      "created": now_iso(), "read_metadata": str(meta_log)})
     ds.to_netcdf(FEATURES_NC)
@@ -321,8 +494,12 @@ def run(years: list[int]):
     checks = sanity_checks(F, land, load_json(CONFIG / "sanity_checks.json"))
     for c in checks:
         log(f"  [{c['result']}] {c['region']}: {c['feature']} = {c['value']:.4g} ({c['condition']}; {c['where']})")
+    part_stats = {s: {"runtime_s": m.get("runtime_s"), "peak_rss_mb": m.get("peak_rss_mb")} for s, m in part_meta.items()}
+    part_stats["assemble"] = {"runtime_s": round(time.time() - t0, 1), "peak_rss_mb": round(mem_peak_mb(), 1)}
+    log(f"assemble: {part_stats['assemble']['runtime_s']} s, peak RSS {part_stats['assemble']['peak_rss_mb']} MB")
     save_json(SANITY_JSON, {"generated": now_iso(), "years": years, "checks": checks, "land_coverage": cov,
-                            "read_metadata": meta_log})
+                            "read_metadata": meta_log, "stage_resources": part_stats,
+                            "imputation": {"config_version": tcfg["version"], "cells": imputed}})
     if any(c["result"] == "FAIL" for c in checks):
         raise SystemExit("sanity check FAILED: stop and inspect (likely a unit/scale bug)")
     return ds

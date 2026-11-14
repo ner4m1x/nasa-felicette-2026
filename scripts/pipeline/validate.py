@@ -53,8 +53,17 @@ def cells_within(lat: float, lon: float, radius_km: float):
     return np.array(out_r), np.array(out_c)
 
 
+def cell_flag(S, name: str, r: int, c: int) -> bool:
+    """Provenance flag (e.g. ndvi_imputed) of one cell; False if the scores file has no such flag."""
+    k = f"flag__{name}"
+    return bool(S[k].values[r, c]) if k in S.data_vars else False
+
+
 def site_analog(S, cfg, pct: Percentiles, lat, lon, radius_km) -> dict:
-    """Per target: max total score within the radius, its dims, limiting dimension and percentile."""
+    """Per target: max total score within the radius, its dims, limiting dimension and percentile.
+
+    `ndvi_imputed` says whether the cell that produced the site score had its NDVI imputed under the
+    missing-data policy of targets.json (v2)."""
     rr, cc = cells_within(lat, lon, radius_km)
     res = {}
     for t in TARGET_IDS:
@@ -74,6 +83,7 @@ def site_analog(S, cfg, pct: Percentiles, lat, lon, radius_km) -> dict:
             "cell": {"lat": float(LATS[r]), "lon": float(LONS[c]),
                      "dist_km": float(haversine_km(lat, lon, LATS[r], LONS[c]))},
             "n_cells_considered": int(np.isfinite(tot).sum()),
+            "ndvi_imputed": cell_flag(S, "ndvi_imputed", r, c),
         }
     return res
 
@@ -90,7 +100,8 @@ def run():
     rows = []
     for s in sites:
         a = site_analog(S, cfg, pct, s["lat"], s["lon"], radius)
-        rows.append({**{k: s[k] for k in ("id", "name", "lat", "lon", "category", "relevant_targets")}, "analog": a})
+        rows.append({**{k: s[k] for k in ("id", "name", "lat", "lon", "category", "relevant_targets")},
+                     "ndvi_imputed": any(v["ndvi_imputed"] for v in a.values() if v), "analog": a})
     summary = {}
     for t in TARGET_IDS:
         def med(cat):
@@ -106,6 +117,10 @@ def run():
                       "percentile": "100 * (n_below + 0.5 * n_equal) / n over scored land cells of the 0.25 deg grid",
                       "site_score": "maximum total score among cells whose centre lies within the radius"},
            "n_land_scored": {t: int(pct.sorted[t].size) for t in TARGET_IDS},
+           "missing_data_imputation": {
+               "rules": [r["id"] for r in cfg["scoring"].get("missing_data_imputation", [])],
+               "ndvi_imputed_land_cells": int(S["flag__ndvi_imputed"].values.sum()) if "flag__ndvi_imputed" in S.data_vars else 0,
+               "ui_label": "NDVI imputed (no MODIS coverage)"},
            "sites": rows, "summary": summary}
     save_json(REPORT_JSON, rep)
     write_markdown(rep, cfg)
@@ -133,19 +148,28 @@ def write_markdown(rep: dict, cfg: dict):
     for t, s in rep["summary"].items():
         L.append(f"| `{t}` | {_f(s['benchmarks']['median_percentile'])} ({s['benchmarks']['n']}) | "
                  f"{_f(s['traps']['median_percentile'])} ({s['traps']['n']}) | {'yes' if s['pattern_holds'] else '**no**'} |")
-    L += ["", "Benchmarks count only for the targets listed in their `relevant_targets`.", "",
+    mi = rep.get("missing_data_imputation") or {}
+    L += ["", "Benchmarks count only for the targets listed in their `relevant_targets`.", ""]
+    for ru in cfg["scoring"].get("missing_data_imputation", []):
+        c = ru["condition"]
+        n = mi.get("ndvi_imputed_land_cells", 0) if ru["flag"] == "ndvi_imputed" else "?"
+        L += [f"Missing-data policy (targets.json v{rep['config_version']}, rule `{ru['id']}`): "
+              f"{', '.join(ru['features'])} set to {ru['set_to']} where missing and `{c['feature']}` {c['op']} "
+              f"{c['value']} ({n} land cells, flagged `{ru['flag']}`).", ""]
+    L += [
           "## All sites × relevant targets", "",
-          "| site | category | target | score | percentile | limiting dimension | cell used (lat, lon, km) |",
-          "|---|---|---|---|---|---|---|"]
+          "| site | category | target | score | percentile | limiting dimension | cell used (lat, lon, km) | NDVI imputed |",
+          "|---|---|---|---|---|---|---|---|"]
     for r in rep["sites"]:
         for t in r["relevant_targets"]:
             a = r["analog"].get(t)
             if not a:
-                L.append(f"| {r['name']} | {r['category']} | `{t}` | — | — | not scorable | — |")
+                L.append(f"| {r['name']} | {r['category']} | `{t}` | — | — | not scorable | — | — |")
                 continue
             c = a["cell"]
             L.append(f"| {r['name']} | {r['category']} | `{t}` | {a['total']:.3f} | {a['percentile']:.1f} | "
-                     f"`{a['limiting']}` | {c['lat']:.3f}, {c['lon']:.3f}, {c['dist_km']:.0f} |")
+                     f"`{a['limiting']}` | {c['lat']:.3f}, {c['lon']:.3f}, {c['dist_km']:.0f} | "
+                     f"{'yes (no MODIS coverage)' if a.get('ndvi_imputed') else 'no'} |")
     L += ["", "## All sites × all targets (percentiles)", "", "| site | " + " | ".join(f"`{t}`" for t in TARGET_IDS) + " |",
           "|---|" + "---|" * len(TARGET_IDS)]
     for r in rep["sites"]:

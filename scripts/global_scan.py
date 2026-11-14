@@ -34,6 +34,9 @@ def main(argv=None):
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--grid-encoding", choices=["raw", "gzip"], default="gzip")
     ap.add_argument("--only", nargs="*", help="download only these dataset keys")
+    ap.add_argument("--sources", nargs="*", help="features: compute only these cached parts "
+                    "(landcover ndvi lst precip dust dem glim); omit to compute missing parts and assemble")
+    ap.add_argument("--force", action="store_true", help="features: recompute parts even if cached")
     a = ap.parse_args(argv)
     years = parse_years(a.years)
     t0 = time.time()
@@ -49,7 +52,7 @@ def main(argv=None):
     if a.command in ("download", "all"):
         download.run(years, yes=a.yes, only=a.only)
     if a.command in ("features", "all"):
-        features.run(years)
+        features.run(years, sources=a.sources, force=a.force)
     if a.command in ("score", "all"):
         scoring.run()
     if a.command in ("validate", "all"):
@@ -60,7 +63,9 @@ def main(argv=None):
         candidates.run()
     if a.command in ("export", "all"):
         export.run(publish=a.publish, grid_encoding=a.grid_encoding)
-    log(f"done: {a.command} in {time.time() - t0:.0f} s")
+    from pipeline.common import mem_peak_mb
+
+    log(f"done: {a.command} in {time.time() - t0:.0f} s (peak RSS of last stage {mem_peak_mb():.0f} MB)")
 
 
 if __name__ == "__main__":
