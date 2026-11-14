@@ -2,17 +2,18 @@
 
 /**
  * "Scan with whiskers": fetches the live NASA POWER climatology for the card's coordinates, then
- * reveals the per-dimension DimensionRadar. Every POWER value is shown with the units and long
- * name read from the response itself.
+ * reveals the per-dimension DimensionRadar. POWER values use the units read from the response,
+ * mapped to display units; the full parameter name stays in a tooltip.
  */
 
 import { Loader2, RotateCcw, ScanSearch } from "lucide-react";
 import { useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { Lang } from "@/i18n/types";
-import { fetchPowerClimatology, POWER_PARAMETERS, type PowerClimatology } from "@/lib/power";
+import { fetchPowerClimatology, type PowerClimatology } from "@/lib/power";
 import type { AnalogEntry } from "@/lib/types";
 import { DimensionRadar } from "./DimensionRadar";
+import { PowerValueList } from "./PowerValueList";
 
 type ScanState =
   | { status: "idle" }
@@ -77,27 +78,13 @@ export function WhiskerScan({ lat, lon, entry, interactive }: WhiskerScanProps) 
   }
 
   const { data } = state;
-  const params = POWER_PARAMETERS.filter((id) => data.parameters[id]);
   return (
     <div className="space-y-4" role="status">
       <section className="rounded-control border border-line bg-panel-2 p-3">
         <h4 className="text-[11px] font-bold uppercase tracking-wider text-phosphor">{t("scan.title")}</h4>
-        <dl className="mt-2 space-y-1.5">
-          {params.map((id) => {
-            const p = data.parameters[id];
-            return (
-              <div key={id} className="flex items-baseline justify-between gap-2 text-xs">
-                <dt className="min-w-0 text-dim">{p.longname}</dt>
-                <dd className="shrink-0 font-bold tabular-nums">
-                  {p.annual === null ? "—" : fmt(lang, p.annual)}{" "}
-                  <span className="font-normal text-dim">
-                    {p.units} · {t("scan.annual")}
-                  </span>
-                </dd>
-              </div>
-            );
-          })}
-        </dl>
+        <div className="mt-2">
+          <PowerValueList data={data} />
+        </div>
         <p className="mt-2 text-[10px] leading-snug text-dim">
           {t("scan.queried", { lat: fmt(lang, data.lat), lon: fmt(lang, data.lon) })}
           {data.range && (

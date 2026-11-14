@@ -8,9 +8,10 @@
 
 import { MapPin, Star } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
+import { formatPercentile } from "@/lib/format";
 import type { RankedCard } from "@/lib/types";
 import { NdviImputedNote } from "./NdviImputedNote";
-import { formatCoords, KindBadge, ScoreBar } from "./parts";
+import { formatCoords, KindBadge, ScoreBar, to100 } from "./parts";
 import { WhiskerScan } from "./WhiskerScan";
 
 interface CardFaceProps {
@@ -23,8 +24,16 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
   const { t, lang, dim } = useI18n();
   const { card, analog, missionFit } = ranked;
 
+  const pct = analog ? formatPercentile(analog.percentile, lang) : null;
+  const pctText =
+    pct?.kind === "top" ? t("card.percentileTop") : pct?.kind === "value" ? t("card.percentile", { p: pct.text }) : null;
   const analogDetail = analog
-    ? `${t("card.percentile", { p: Math.round(analog.percentile) })} · ${t("card.limiting", { dim: dim(analog.limiting).sci })}`
+    ? [
+        pctText ? t("card.scoreAndPct", { score: to100(analog.total), pct: pctText }) : null,
+        t("card.limiting", { dim: dim(analog.limiting).sci }),
+      ]
+        .filter(Boolean)
+        .join(" · ")
     : t("card.unscored");
 
   return (
@@ -62,7 +71,9 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
             outOf={t("card.outOf")}
             color="var(--score-analog)"
             detail={analogDetail}
+            detailTitle={pctText ? t("card.tieNote") : undefined}
           />
+          {pctText && <p className="-mt-2 text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
           <ScoreBar
             label={t("card.fit")}
             hint={t("card.fitHint")}

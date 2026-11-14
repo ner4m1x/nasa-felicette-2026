@@ -5,7 +5,7 @@
  * 1. Analog & Mission Fit "from global scan": read from the pipeline grid (src/lib/scanGrid.ts);
  *    "pending" until scan_grid_meta.json + scan_grid.bin.gz are published.
  * 2. Live NASA POWER climatology (src/lib/power.ts): annual values with the units read from the
- *    response, plus a small monthly chart. Debounced; stale requests are aborted; cached.
+ *    response (mapped to display units), plus a small monthly chart. Debounced; stale requests are aborted; cached.
  * 3. Cross-check: "POWER: X mm/yr, our grid: Y mm/yr" — shown side by side, never blended.
  */
 
@@ -14,16 +14,17 @@ import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
 import { formatCoords, reasonText, ScoreBar } from "@/components/swipe/parts";
+import { PowerValueList } from "@/components/swipe/PowerValueList";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { Lang } from "@/i18n/types";
 import { precipCrossCheck } from "@/lib/crossCheck";
+import { displayUnit } from "@/lib/format";
 import { HONESTY_NOTE_KEY, missionFit } from "@/lib/missionFit";
 import { analogFromSample, cardFromSample } from "@/lib/pointCard";
 import {
   cachedPowerClimatology,
   fetchPowerClimatology,
-  POWER_PARAMETERS,
   type PowerClimatology,
   type PowerParameterId,
 } from "@/lib/power";
@@ -264,7 +265,6 @@ function PowerSection({
   onChartParam: (p: PowerParameterId) => void;
 }) {
   const { t, lang } = useI18n();
-  const params = POWER_PARAMETERS.filter((id) => data.parameters[id]);
   const chartable = CHART_PARAMS.filter((id) => data.parameters[id]);
   const active = data.parameters[chartParam] ? chartParam : chartable[0];
   const series = active ? data.parameters[active] : null;
@@ -275,22 +275,7 @@ function PowerSection({
 
   return (
     <div className="mt-2 space-y-3">
-      <dl className="space-y-1.5">
-        {params.map((id) => {
-          const p = data.parameters[id];
-          return (
-            <div key={id} className="flex items-baseline justify-between gap-2 text-xs">
-              <dt className="min-w-0 text-dim">{p.longname}</dt>
-              <dd className="shrink-0 font-bold tabular-nums">
-                {p.annual === null ? "—" : fmt(lang, p.annual)}{" "}
-                <span className="font-normal text-dim">
-                  {p.units} · {t("scan.annual")}
-                </span>
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
+      <PowerValueList data={data} />
 
       {series && (
         <div className="rounded-control border border-line bg-panel-2 p-2">
@@ -311,7 +296,7 @@ function PowerSection({
             ))}
           </div>
           <p className="mt-1 text-[10px] text-dim">
-            {series.longname} ({series.units}) · {t("map.inspector.monthly")}
+            {t(`scan.param.${active}`)} ({displayUnit(series.units)}) · {t("map.inspector.monthly")}
           </p>
           <div className="purr-radar mt-1 h-28">
             <ResponsiveContainer width="100%" height="100%">
@@ -322,7 +307,7 @@ function PowerSection({
                   cursor={{ fill: "rgb(77 255 154 / 0.08)" }}
                   contentStyle={{ background: "var(--panel)", border: "1px solid var(--line)", fontSize: 11 }}
                   labelStyle={{ color: "var(--dim)" }}
-                  formatter={(v) => [typeof v === "number" ? `${fmt(lang, v)} ${series.units}` : "—", series.longname]}
+                  formatter={(v) => [typeof v === "number" ? `${fmt(lang, v)} ${displayUnit(series.units)}` : "—", t(`scan.param.${active}`)]}
                 />
                 <Bar dataKey="v" fill="var(--phosphor)" radius={[2, 2, 0, 0]} isAnimationActive={false} />
               </BarChart>

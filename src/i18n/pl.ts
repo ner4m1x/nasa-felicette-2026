@@ -131,6 +131,9 @@ export const pl: Dictionary = {
     fitHint: "specyfikacja twojej misji",
     outOf: "/100",
     percentile: "percentyl {p} wśród komórek lądu",
+    percentileTop: "górne 0,1% komórek lądu (≥ 99,9)",
+    scoreAndPct: "wynik {score} · {pct}",
+    tieNote: "Percentyl wśród wszystkich ocenionych komórek lądu; wiele komórek ma ex aequo wartość minimalną.",
     limiting: "Najsłabszy wymiar: {dim}",
     unscored: "Nie do ocenienia przez globalną siatkę",
     noCountry: "—",
@@ -141,7 +144,7 @@ export const pl: Dictionary = {
       "NDVI imputowane – brak pokrycia MODIS w tym miejscu, pokrycie terenu wskazuje na powierzchnię bez roślinności",
     teaser: {
       benchmark: "Znany analog: miarka, którą mierzę każdą inną kuwetę.",
-      discovery: "Świeżo z globalnego skanu. Nikt tu jeszcze nie węszył.",
+      discovery: "Nie ma tego miejsca na naszej liście znanych analogów – świeżo ze skanu globalnego.",
       trap: "Z orbity pachnie dobrze… ale wąsy mi drgają.",
       curated: "Wybrane ręcznie: to, co tu wyjątkowe, jest niewidoczne dla mojej siatki.",
       operational: "Nie chodzi o skały: tu załogi uczą się żyć jak astronauci.",
@@ -156,6 +159,13 @@ export const pl: Dictionary = {
     period: "Okres: {range}",
     unavailable: "NASA POWER niedostępne. Spróbuj później.",
     annual: "rocznie",
+    param: {
+      TS: "Temp. powierzchni (średnia)",
+      TS_MAX: "Temp. powierzchni (maks.)",
+      TS_MIN: "Temp. powierzchni (min.)",
+      PRECTOTCORR: "Opady",
+      ALLSKY_SFC_SW_DWN: "Nasłonecznienie",
+    },
     source: "Źródło: API klimatologii NASA POWER (na żywo)",
     radarTitle: "Wymiary analogii",
     radarHint:

@@ -23,6 +23,7 @@ import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { I18nKey, Lang } from "@/i18n/types";
 import { breakdownFor } from "@/lib/deck";
+import { formatPercentile } from "@/lib/format";
 import type { RankedCard, TargetId } from "@/lib/types";
 import { validationTally, type ValidationReport } from "@/lib/validationReport";
 import { useMission } from "@/state/MissionContext";
@@ -273,7 +274,10 @@ function ValidationBadge({ report }: { report: ValidationReport | null | undefin
   }
   const { holds, total } = validationTally(report);
   const all = total > 0 && holds === total;
-  const fmtPct = (v: number | null) => (v === null ? "—" : new Intl.NumberFormat(lang, { maximumFractionDigits: 1 }).format(v));
+  const fmtPct = (v: number | null) => {
+    const d = formatPercentile(v, lang);
+    return d.kind === "top" ? "≥ 99.9" : d.kind === "value" ? d.text : "—";
+  };
   return (
     <div className="rounded-control border p-3" style={{ borderColor: all ? "var(--phosphor)" : "var(--amber)" }}>
       <div className="flex items-start gap-3">

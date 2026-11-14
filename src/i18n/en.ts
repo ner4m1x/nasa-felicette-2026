@@ -135,6 +135,9 @@ export const en = {
     fitHint: "your mission specs",
     outOf: "/100",
     percentile: "percentile {p} among land cells",
+    percentileTop: "top 0.1% of land cells (≥ 99.9)",
+    scoreAndPct: "score {score} · {pct}",
+    tieNote: "Percentile among all scored land cells; many cells tie at the minimum.",
     limiting: "Weakest dimension: {dim}",
     unscored: "Not scorable by the global grid",
     noCountry: "—",
@@ -144,7 +147,7 @@ export const en = {
     ndviImputed: "NDVI imputed – no MODIS coverage here, land cover shows a non-vegetated surface",
     teaser: {
       benchmark: "A known analog: the yardstick I measure every other litterbox against.",
-      discovery: "Fresh off the global scan. Nobody has sniffed here yet.",
+      discovery: "Not on our list of established analog sites – fresh from the global scan.",
       trap: "Smells right from orbit… but my whiskers are twitching.",
       curated: "Hand-picked: what makes it special is invisible to my grid.",
       operational: "Not about rocks: this is where crews learn to live like astronauts.",
@@ -159,6 +162,13 @@ export const en = {
     period: "Period: {range}",
     unavailable: "NASA POWER unavailable. Try again later.",
     annual: "annual",
+    param: {
+      TS: "Surface temp (mean)",
+      TS_MAX: "Surface temp (max)",
+      TS_MIN: "Surface temp (min)",
+      PRECTOTCORR: "Precipitation",
+      ALLSKY_SFC_SW_DWN: "Solar irradiance",
+    },
     source: "Source: NASA POWER climatology API (live)",
     radarTitle: "Analog dimensions",
     radarHint:

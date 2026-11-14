@@ -47,9 +47,11 @@ interface ScoreBarProps {
   /** CSS color of the bar fill, e.g. "var(--score-analog)" */
   color: string;
   detail?: string | null;
+  /** tooltip on the detail line (e.g. how the percentile is computed) */
+  detailTitle?: string;
 }
 
-export function ScoreBar({ label, hint, value, outOf, color, detail }: ScoreBarProps) {
+export function ScoreBar({ label, hint, value, outOf, color, detail, detailTitle }: ScoreBarProps) {
   const v = value === null ? null : to100(value);
   return (
     <div>
@@ -75,7 +77,13 @@ export function ScoreBar({ label, hint, value, outOf, color, detail }: ScoreBarP
       </div>
       <p className="mt-1 text-[10px] leading-snug text-dim">
         {hint}
-        {detail && <span className="text-fg/80"> · {detail}</span>}
+        {detail && (
+          <span className="text-fg/80" title={detailTitle}>
+            {" "}
+            · {detail}
+            {detailTitle && "*"}
+          </span>
+        )}
       </p>
     </div>
   );
