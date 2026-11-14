@@ -6,6 +6,10 @@
  * Breakdown texts are qualitative and contain no numbers. They are keyed by target: Lake Salda is
  * written for Jezero only; the trap and operational narratives apply to every target (the traps'
  * relevant_targets in scripts/config/known_sites.json list all four).
+ *
+ * `pipelineSiteId` links a curated card to the pipeline's card for the same known site
+ * (`site-<id>` from scripts/config/known_sites.json). When both are loaded, mergeCurated keeps one
+ * card: curated text first, then the pipeline's numbers and generated lines.
  */
 import { TARGET_IDS, type DeckCard, type TargetBreakdown, type TargetId } from "@/lib/types";
 
@@ -61,6 +65,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
   {
     id: "curated-ostrzyca",
     kind: "trap",
+    pipelineSiteId: "site-ostrzyca",
     name: "Ostrzyca / Kaczawskie Foothills",
     country: "Poland",
     // OSM node 1200805353 ("Ostrzyca Proboszczowicka", natural=peak).
@@ -91,6 +96,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
   {
     id: "curated-central-amazon",
     kind: "trap",
+    pipelineSiteId: "site-central-amazon",
     name: "Central Amazon",
     country: "Brazil",
     // Representative point: OSM way 161393396 ("Reserva Florestal Adolpho Ducke", Manaus). TODO_VERIFY choice of point.

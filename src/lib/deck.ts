@@ -56,16 +56,19 @@ export function assertFixtureAllowed(what: string, nodeEnv: string | undefined =
   if (nodeEnv === "production") throw new FixtureInProductionError(what);
 }
 
+const FIXTURE_PATH = "src/data/fixtures/deck.dev.json";
+
 export async function loadFixtureDeck(nodeEnv: string | undefined = process.env.NODE_ENV): Promise<DeckFile> {
-  assertFixtureAllowed("src/data/fixtures/deck.dev.json", nodeEnv);
-  // Direct check on the inlined env var as well, so the bundler can drop the import in production.
-  if (process.env.NODE_ENV === "production") {
-    throw new FixtureInProductionError("src/data/fixtures/deck.dev.json");
+  assertFixtureAllowed(FIXTURE_PATH, nodeEnv);
+  // The dynamic import sits only inside this branch: Next inlines process.env.NODE_ENV, so in a
+  // production build the condition is the constant `false` and the fixture chunk is never emitted.
+  if (process.env.NODE_ENV !== "production") {
+    const mod = await import("@/data/fixtures/deck.dev.json");
+    const file = parseDeckFile(mod.default);
+    if (file.__fixture !== true) throw new DeckFormatError("fixture file must carry \"__fixture\": true");
+    return file;
   }
-  const mod = await import("@/data/fixtures/deck.dev.json");
-  const file = parseDeckFile(mod.default);
-  if (file.__fixture !== true) throw new DeckFormatError("fixture file must carry \"__fixture\": true");
-  return file;
+  throw new FixtureInProductionError(FIXTURE_PATH);
 }
 
 // ---------- Validation ----------
@@ -129,10 +132,57 @@ export function breakdownFor(card: Pick<DeckCard, "breakdown">, target: TargetId
   return card.breakdown[target] ?? null;
 }
 
-/** Pipeline/fixture cards first; curated cards appended unless a card with the same id exists. */
+const BREAKDOWN_SECTIONS = ["matches", "breaksDown", "utility"] as const;
+
+/** Curated text first, then the pipeline's generated lines, per target, section and language. */
+function mergeBreakdowns(curated: DeckCard["breakdown"], pipeline: DeckCard["breakdown"]): DeckCard["breakdown"] {
+  const out: DeckCard["breakdown"] = {};
+  for (const target of TARGET_IDS) {
+    const c = curated[target];
+    const p = pipeline[target];
+    if (!c && !p) continue;
+    out[target] = Object.fromEntries(
+      BREAKDOWN_SECTIONS.map((s) => [
+        s,
+        Object.fromEntries(LANGS.map((lang) => [lang, [...(c?.[s][lang] ?? []), ...(p?.[s][lang] ?? [])]])),
+      ]),
+    ) as unknown as TargetBreakdown;
+  }
+  return out;
+}
+
+/**
+ * One card for a site that is both curated and scanned by the pipeline: the curated id, kind, name,
+ * coordinates and narrative; the pipeline's measured numbers (analog, mission, stability, area).
+ * Sources are the union, so the pipeline's numeric lines stay cited.
+ */
+export function mergeCuratedWithPipeline(curated: DeckCard, pipeline: DeckCard): DeckCard {
+  return {
+    ...curated,
+    analog: pipeline.analog,
+    mission: pipeline.mission,
+    stability: pipeline.stability,
+    regionAreaKm2: pipeline.regionAreaKm2,
+    breakdown: mergeBreakdowns(curated.breakdown, pipeline.breakdown),
+    sourceIds: [...new Set([...curated.sourceIds, ...pipeline.sourceIds])],
+  };
+}
+
+/**
+ * Pipeline/fixture cards first; curated cards appended unless a card with the same id exists.
+ * A curated card whose `pipelineSiteId` matches a loaded pipeline card replaces that card in place
+ * (merged via mergeCuratedWithPipeline), so the site appears once.
+ */
 export function mergeCurated(cards: readonly DeckCard[], curated: readonly DeckCard[] = CURATED_CARDS): DeckCard[] {
   const ids = new Set(cards.map((c) => c.id));
-  return [...cards, ...curated.filter((c) => !ids.has(c.id))];
+  const toAdd = curated.filter((c) => !ids.has(c.id));
+  const linked = new Map(toAdd.filter((c) => c.pipelineSiteId).map((c) => [c.pipelineSiteId!, c]));
+  const merged = cards.map((card) => {
+    const cur = linked.get(card.id);
+    return cur ? mergeCuratedWithPipeline(cur, card) : card;
+  });
+  const used = new Set(cards.filter((c) => linked.has(c.id)).map((c) => linked.get(c.id)!.id));
+  return [...merged, ...toAdd.filter((c) => !used.has(c.id))];
 }
 
 // ---------- Loader ----------

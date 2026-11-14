@@ -81,6 +81,11 @@ export interface DeckCard {
    */
   breakdown: Partial<Record<TargetId, TargetBreakdown>>;
   sourceIds: string[];
+  /**
+   * Curated cards only: id of the pipeline card for the same site (`site-<known_sites id>`). When
+   * both are in the deck they are merged into one card (src/lib/deck.ts `mergeCurated`).
+   */
+  pipelineSiteId?: string;
 }
 
 /** Shape of /public/data/deck.json and of src/data/fixtures/deck.dev.json. */
@@ -118,7 +123,7 @@ export interface Constraint {
   id: ConstraintId;
   /** hard = the card is moved to the "Rejected by your mission specs" pile */
   hard: boolean;
-  /** i18n key of the human-readable reason ("HISS: 34% trafficable terrain, …") */
+  /** i18n key of the human-readable reason ("34% trafficable terrain, …"); no PURR/HISS prefix, the UI adds the verdict */
   reasonKey: I18nKey;
   params: Record<string, number | string>;
 }
