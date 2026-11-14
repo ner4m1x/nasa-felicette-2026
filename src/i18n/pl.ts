@@ -96,6 +96,25 @@ export const pl: Dictionary = {
     banner: "DANE TESTOWE (FIXTURE) — to nie są prawdziwe pomiary",
   },
   deck: {
+    strict: {
+      chip: "Surowe wymagania: {x} z {y} odpada – zobacz dlaczego",
+      groupedTitle: "Dlaczego miejsca odpadają – według ograniczenia",
+      count: { one: "1 miejsce", few: "{n} miejsca", many: "{n} miejsc", other: "{n} miejsca" },
+      relaxHint: "Jak to złagodzić: {hint}",
+      noRelax: "Żadna opcja konfiguratora tego nie łagodzi.",
+      rule: {
+        trafficability: "Ciężkie łaziki potrzebują ≥ {minPct}% przejezdnego terenu",
+        footprint: "Baza {base} potrzebuje ≥ {minKm2} km² przejezdnego terenu",
+        ice: "Stała załoga potrzebuje lokalnego lodu (wskaźnik lodu ≥ {min})",
+        basalt: "Stała załoga potrzebuje osłony tunelu lawowego (udział bazaltu ≥ {min})",
+      },
+      relax: {
+        mobility: "wybierz łazik {option} (nie potrzebuje przejezdnego terenu).",
+        footprint: "wybierz mniejszą bazę: {option} potrzebuje tylko ≥ {minKm2} km².",
+        crew: "wybierz {option} (bez lokalnych zasobów).",
+      },
+      sitesTitle: "Miejsca w tej grupie",
+    },
     scanNotPublished: "Globalny skan nie został jeszcze opublikowany",
     rejectedPile: "Odrzucone przez specyfikację misji",
     stackAria: "Talia Orbital Swipe",

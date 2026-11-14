@@ -100,6 +100,25 @@ export const en = {
     banner: "DEV FIXTURE DATA — not real measurements",
   },
   deck: {
+    strict: {
+      chip: "Strict specs: {x} of {y} fail – see why",
+      groupedTitle: "Why sites fail – grouped by constraint",
+      count: { one: "1 site", few: "{n} sites", many: "{n} sites", other: "{n} sites" },
+      relaxHint: "To relax it: {hint}",
+      noRelax: "No configurator option relaxes this one.",
+      rule: {
+        trafficability: "Heavy rovers need ≥ {minPct}% trafficable terrain",
+        footprint: "A {base} base needs ≥ {minKm2} km² of trafficable terrain",
+        ice: "A permanent crew needs local ice (ice proxy ≥ {min})",
+        basalt: "A permanent crew needs lava-tube shielding (basalt fraction ≥ {min})",
+      },
+      relax: {
+        mobility: "choose the {option} rover (it needs no trafficable terrain).",
+        footprint: "choose a smaller footprint: {option} needs only ≥ {minKm2} km².",
+        crew: "choose {option} (no local resource needed).",
+      },
+      sitesTitle: "Sites in this group",
+    },
     scanNotPublished: "Global scan not yet published",
     rejectedPile: "Rejected by your mission specs",
     stackAria: "Orbital Swipe deck",

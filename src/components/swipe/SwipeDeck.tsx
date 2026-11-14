@@ -8,7 +8,7 @@
  * Phone: deck fills the tab. Desktop (≥ lg): phone-width deck + info panel beside it.
  */
 
-import { Ban, RotateCcw, Settings2 } from "lucide-react";
+import { AlertTriangle, Ban, RotateCcw, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MissionBrief } from "@/components/configurator/MissionBrief";
 import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
@@ -17,6 +17,7 @@ import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { RankedCard } from "@/lib/types";
+import { strictSpecs } from "@/lib/rejections";
 import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
 import { STACK } from "@/theme/tokens";
@@ -49,6 +50,7 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
   const visible = swipe.queue.slice(0, STACK.visible);
   const total = swipe.visible?.deck.length ?? 0;
   const rejected = swipe.visible?.rejected ?? [];
+  const strict = strictSpecs(total, rejected.length);
   const purrs = swipe.records.filter((r) => r.verdict === "purr").length;
 
   const onDone = (ranked: RankedCard, action: SwipeAction) => {
@@ -131,6 +133,18 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
           {rejectedButton("lg:hidden")}
           {reconfigureButton("lg:hidden", true)}
         </div>
+
+        {strict.show && (
+          <button
+            type="button"
+            onClick={() => setRejectedOpen(true)}
+            aria-haspopup="dialog"
+            className="flex min-h-9 items-center gap-2 self-start rounded-pill border border-amber/60 px-3 text-left text-[11px] font-bold leading-tight text-amber hover:bg-amber/10"
+          >
+            <AlertTriangle aria-hidden size={13} className="shrink-0" />
+            {t("deck.strict.chip", { x: strict.rejected, y: strict.total })}
+          </button>
+        )}
 
         {swipe.hideIce && <ViewFilterNote onClear={() => swipe.setHideIce(false)} />}
 
