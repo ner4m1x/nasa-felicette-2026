@@ -41,3 +41,14 @@ yarn-error.log*
 next-env.d.ts
 
 .prompts/
+
+# data pipeline (Python) & large scientific files
+scripts/.venv/
+scripts/data_raw/
+scripts/out/
+*.hdf
+*.nc
+*.nc4
+*.h5
+.netrc
+.env*.local
