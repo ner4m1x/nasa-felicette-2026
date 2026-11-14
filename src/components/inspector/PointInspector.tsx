@@ -23,7 +23,9 @@ import { PowerValueList } from "@/components/swipe/PowerValueList";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { Lang } from "@/i18n/types";
+import { LowScoreNote } from "@/components/swipe/LowScoreNote";
 import { bestTarget, targetRows } from "@/lib/bestTarget";
+import { lowScoreFromSample } from "@/lib/lowScore";
 import { precipCrossCheck } from "@/lib/crossCheck";
 import { displayUnit } from "@/lib/format";
 import { HONESTY_NOTE_KEY, missionFit } from "@/lib/missionFit";
@@ -103,7 +105,8 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
   const targets = useMemo(() => {
     if (!point || !sample || sample.land === false || grid?.status !== "ready") return null;
     const rows = targetRows(sample, (tid) => grid.grid.percentile(tid, point.lat, point.lon));
-    return { rows, best: bestTarget(rows) };
+    const best = bestTarget(rows);
+    return { rows, best, bestLow: best ? lowScoreFromSample(sample, best) : null };
   }, [point, sample, grid]);
 
   if (!point) {
@@ -132,7 +135,7 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
         </h3>
         {targets && (
           <div className="mt-2">
-            <TargetComparison rows={targets.rows} best={targets.best} configured={config.target} />
+            <TargetComparison rows={targets.rows} best={targets.best} bestLow={targets.bestLow} configured={config.target} />
           </div>
         )}
         {grid?.status !== "pending" && (
@@ -140,7 +143,13 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
             <AddToDeck point={point} grid={grid?.status === "ready" ? grid.grid : null} sample={sample} config={config} />
           </div>
         )}
-        <GridSection grid={grid} sample={sample} point={point} config={config} />
+        <GridSection
+          grid={grid}
+          sample={sample}
+          point={point}
+          config={config}
+          lowShownAbove={targets?.best === config.target && targets.bestLow !== null}
+        />
         <div className="mt-3">
           <PlanetaryComparison
             target={targets?.best ?? config.target}
@@ -201,11 +210,14 @@ function GridSection({
   sample,
   point,
   config,
+  lowShownAbove,
 }: {
   grid: ScanGridState | undefined;
   sample: ScanGridSample | null;
   point: { lat: number; lon: number };
   config: MissionConfig;
+  /** the configured target is the best one and its low-score note is already shown above */
+  lowShownAbove: boolean;
 }) {
   const { t, lang, dim } = useI18n();
 
@@ -223,6 +235,7 @@ function GridSection({
   if (sample.land === false) return <p className="mt-2 text-xs text-dim">{t("map.inspector.noLand")}</p>;
 
   const analog = analogFromSample(sample, config.target);
+  const low = lowShownAbove ? null : lowScoreFromSample(sample, config.target);
   const fit = missionFit(cardFromSample(sample, point.lat, point.lon), config);
   const dims = analog ? Object.entries(analog.dims) : [];
 
@@ -239,6 +252,7 @@ function GridSection({
         color="var(--score-analog)"
         detail={analog && analog.limiting ? t("card.limiting", { dim: dim(analog.limiting).sci }) : t("map.inspector.unscored")}
       />
+      {low && <LowScoreNote reason={low} />}
       {dims.length > 0 && (
         <ul className="space-y-1">
           {dims.map(([id, v]) => (

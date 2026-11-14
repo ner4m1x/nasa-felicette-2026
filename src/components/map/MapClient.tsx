@@ -26,7 +26,7 @@ import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import { bestTarget, targetRows } from "@/lib/bestTarget";
 import { selectPins } from "@/lib/mapPins";
-import { DEFAULT_BASE, DEFAULT_OVERLAY_OPACITY, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
+import { DEFAULT_BASE, DEFAULT_OVERLAY_OPACITY, DEFAULT_SHOW_SCAN, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import { useMission } from "@/state/MissionContext";
 import { DESKTOP_QUERY, useMediaQuery } from "@/state/useMediaQuery";
 import { useSwipe } from "@/state/SwipeContext";
@@ -51,7 +51,7 @@ export function MapClient({ active }: { active: boolean }) {
 
   const [base, setBase] = useState<BaseLayerId>(DEFAULT_BASE);
   const [thematic, setThematic] = useState<GibsLayerId | null>(null);
-  const [showScan, setShowScan] = useState(true);
+  const [showScan, setShowScan] = useState(DEFAULT_SHOW_SCAN);
   const [opacity, setOpacity] = useState(DEFAULT_OVERLAY_OPACITY);
   const [point, setPoint] = useState<{ lat: number; lon: number } | null>(null);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
@@ -105,8 +105,11 @@ export function MapClient({ active }: { active: boolean }) {
   // Picking a point keeps the phone sheet at its peek: the summary shows there, the map stays visible.
   const onPick = useCallback((lat: number, lon: number) => setPoint({ lat, lon }), []);
 
+  const cutoff = grid?.status === "ready" ? grid.grid.meta.overlayTransparentBelow?.[config.target] : undefined;
   const peekText = !point
-    ? t("map.peek.hint")
+    ? cutoff !== undefined
+      ? t("map.peek.hintCutoff", { n: to100(cutoff) })
+      : t("map.peek.hint")
     : peek?.best && peek.score !== null
       ? t("map.peek.best", { target: t(TARGETS[peek.best].shortKey), score: to100(peek.score) })
       : peek
@@ -149,6 +152,7 @@ export function MapClient({ active }: { active: boolean }) {
             overlayAvailable={overlayAvailable}
             opacity={opacity}
             onOpacity={setOpacity}
+            transparentBelow={cutoff}
             showAll={showAll}
             onShowAll={setShowAll}
             hideIce={swipe.hideIce}

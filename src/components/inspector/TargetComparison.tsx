@@ -6,20 +6,24 @@
  */
 
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
+import { LowScoreNote } from "@/components/swipe/LowScoreNote";
 import { to100 } from "@/components/swipe/parts";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { TargetRow } from "@/lib/bestTarget";
 import { formatPercentile } from "@/lib/format";
+import type { LowScoreReason } from "@/lib/lowScore";
 import type { TargetId } from "@/lib/types";
 
 interface TargetComparisonProps {
   rows: readonly TargetRow[];
   best: TargetId | null;
+  /** why the best target's score is very low (null when it isn't) */
+  bestLow?: LowScoreReason | null;
   configured: TargetId;
 }
 
-export function TargetComparison({ rows, best, configured }: TargetComparisonProps) {
+export function TargetComparison({ rows, best, bestLow = null, configured }: TargetComparisonProps) {
   const { t, lang, dim } = useI18n();
   const bestRow = rows.find((r) => r.target === best) ?? null;
   const summary = bestRow
@@ -37,6 +41,7 @@ export function TargetComparison({ rows, best, configured }: TargetComparisonPro
     <div className="space-y-2">
       <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.inspector.allTitle")}</h4>
       <FelicetteSays key={summary} text={summary} />
+      {bestLow && <LowScoreNote reason={bestLow} />}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-[11px]">
           <thead>

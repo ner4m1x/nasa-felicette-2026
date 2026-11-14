@@ -11,7 +11,9 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { HAMMAGUIR_CARD_ID } from "@/data/curatedCards";
 import { formatPercentile } from "@/lib/format";
 import type { RankedCard } from "@/lib/types";
+import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
+import { LowScoreNote } from "./LowScoreNote";
 import { NdviImputedNote } from "./NdviImputedNote";
 import { formatCoords, KindBadge, ScoreBar, to100 } from "./parts";
 import { WhiskerScan } from "./WhiskerScan";
@@ -26,6 +28,7 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
   const { t, lang, dim } = useI18n();
   const { card, analog, missionFit } = ranked;
   const { removeUserCard } = useSwipe();
+  const { config } = useMission();
 
   const pct = analog ? formatPercentile(analog.percentile, lang) : null;
   const pctText =
@@ -76,8 +79,12 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
         </p>
       </header>
 
+      {/* The body is its own scroll container, so its touch-action alone decides who owns a touch
+          that starts here: pan-y = the browser scrolls vertically, horizontal drags reach the card's
+          Framer drag (one finger). Without it ("auto") the browser claims horizontal pans → pointercancel. */}
       <div
         className={`min-h-0 flex-1 space-y-4 px-4 py-3 ${interactive ? "overflow-y-auto overscroll-contain" : "overflow-hidden"}`}
+        style={{ touchAction: "pan-y" }}
       >
         <div className="space-y-3">
           <ScoreBar
@@ -98,6 +105,8 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
             color="var(--score-fit)"
           />
         </div>
+
+        {card.kind === "user" && card.lowScore?.[config.target] && <LowScoreNote reason={card.lowScore[config.target]!} />}
 
         <NdviImputedNote imputed={card.ndviImputed} label={t("card.ndviImputed")} />
 

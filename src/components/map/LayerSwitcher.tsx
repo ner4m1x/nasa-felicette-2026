@@ -25,6 +25,8 @@ interface LayerSwitcherProps {
   overlayAvailable: boolean | undefined;
   opacity: number;
   onOpacity: (v: number) => void;
+  /** overlay cutoff (0..1) from scan_grid_meta: lower scores are transparent but still scored */
+  transparentBelow?: number;
   showAll: boolean;
   onShowAll: (v: boolean) => void;
   hideIce: boolean;
@@ -138,6 +140,11 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
                 <span>{t("map.layers.legendLow")}</span>
                 <span>{t("map.layers.legendHigh")}</span>
               </div>
+              {props.transparentBelow !== undefined && (
+                <p className="mt-1 text-[10px] leading-snug text-dim">
+                  {t("map.layers.legendCutoff", { n: Math.round(props.transparentBelow * 100) })}
+                </p>
+              )}
             </div>
           )}
         </div>

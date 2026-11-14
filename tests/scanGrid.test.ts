@@ -163,3 +163,16 @@ describe("point card + cross-check", () => {
     expect(precipCrossCheck(power("mm/day", 1), null)).toBeNull();
   });
 });
+
+describe("overlay cutoff from the published meta", () => {
+  it("reads transparent_below per target", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { parseScanGridMeta } = await import("@/lib/scanGrid");
+    const meta = parseScanGridMeta(JSON.parse(readFileSync(new URL("../public/data/scan_grid_meta.json", import.meta.url), "utf8")))!;
+    for (const v of Object.values(meta.overlayTransparentBelow ?? {})) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(1);
+    }
+    expect(Object.keys(meta.overlayTransparentBelow ?? {}).length).toBe(4);
+  });
+});

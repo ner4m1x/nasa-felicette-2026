@@ -42,6 +42,8 @@ export interface ScanGridMeta {
   configVersion: number | null;
   generated: string | null;
   bands: ScanBand[];
+  /** overlays[target].transparent_below from the meta: scores below it are transparent in the PNG */
+  overlayTransparentBelow?: Partial<Record<TargetId, number>>;
 }
 
 export class ScanGridFormatError extends Error {
@@ -64,6 +66,16 @@ export function parseScanGridMeta(json: unknown): ScanGridMeta | null {
   const lonWest = num(origin.lon_west);
   const nodata = num(json.nodata);
   if (!file || !nlat || !nlon || !step || latNorth === null || lonWest === null || nodata === null) return null;
+
+  // Per-target overlay cutoff: scores below it are transparent in the PNG (still scored).
+  const overlayTransparentBelow: Partial<Record<TargetId, number>> = {};
+  if (isObj(json.overlays)) {
+    for (const t of TARGET_IDS) {
+      const o = json.overlays[t];
+      const v = isObj(o) ? num(o.transparent_below) : null;
+      if (v !== null) overlayTransparentBelow[t] = v;
+    }
+  }
 
   const bands: ScanBand[] = [];
   json.bands.forEach((b, i) => {
@@ -98,6 +110,7 @@ export function parseScanGridMeta(json: unknown): ScanGridMeta | null {
     configVersion: num(json.config_version),
     generated: str(json.generated),
     bands,
+    overlayTransparentBelow,
   };
 }
 

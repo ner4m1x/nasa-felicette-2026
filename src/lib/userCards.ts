@@ -13,6 +13,7 @@
  */
 import DECK_TEXT from "../../scripts/config/deck_text.json";
 import { cardFromGridCell } from "./gridCard";
+import { lowScoreFromSample } from "./lowScore";
 import type { ScanGrid, ScanGridSample } from "./scanGrid";
 import { TARGET_IDS, type DeckCard, type TargetBreakdown, type TargetId } from "./types";
 
@@ -51,6 +52,14 @@ function featureLine(tmpl: string, lang: Lang, feat: string, value: number | nul
   const v =
     value === null || !Number.isFinite(value) ? "n/a" : (value * (fm?.display_scale ?? 1)).toFixed(fm?.decimals ?? 2);
   return fill(tmpl, { label, value: v, unit: fm ? fm.unit[lang] : "", score: score.toFixed(2) });
+}
+
+/** "{label} {value}{unit}" with the pipeline's labels, units and decimals (e.g. "Peak NDVI 0.78"). */
+export function featureValueText(feat: string, value: number | null, lang: Lang): string {
+  const fm = T.features[feat];
+  const v =
+    value === null || !Number.isFinite(value) ? "n/a" : (value * (fm?.display_scale ?? 1)).toFixed(fm?.decimals ?? 2);
+  return `${fm ? fm[lang] : feat} ${v}${fm ? fm.unit[lang] : ""}`;
 }
 
 /** Breakdown for one target from a grid sample (null when the target is not scored here). */
@@ -129,11 +138,14 @@ export function createUserCard(grid: ScanGrid, lat: number, lon: number, regions
   const sample = grid.sample(lat, lon);
   if (sample.land === false) return null;
   const breakdown: DeckCard["breakdown"] = {};
+  const lowScore: NonNullable<DeckCard["lowScore"]> = {};
   for (const t of TARGET_IDS) {
     const b = breakdownFromSample(sample, t);
     if (b) breakdown[t] = b;
+    const low = lowScoreFromSample(sample, t);
+    if (low) lowScore[t] = low;
   }
-  return cardFromGridCell(grid, {
+  const card = cardFromGridCell(grid, {
     id: userCardId(sample),
     kind: "user",
     name: userCardName(lat, lon, regions),
@@ -145,6 +157,7 @@ export function createUserCard(grid: ScanGrid, lat: number, lon: number, regions
     breakdown,
     sourceIds: [],
   });
+  return card && Object.keys(lowScore).length ? { ...card, lowScore } : card;
 }
 
 // ---------- Persistence (per mission config) ----------

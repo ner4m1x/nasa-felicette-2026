@@ -7,6 +7,7 @@
  *  - Mission Fit (`MissionFitResult.fit`): engineering suitability, computed in the browser
  *    from the configurator settings (src/lib/missionFit.ts).
  */
+import type { LowScoreReason } from "./lowScore";
 import type { I18nKey, Lang } from "@/i18n/types";
 
 export type { Lang } from "@/i18n/types";
@@ -93,6 +94,11 @@ export interface DeckCard {
    * both are in the deck they are merged into one card (src/lib/deck.ts `mergeCurated`).
    */
   pipelineSiteId?: string;
+  /**
+   * User scans only: why the Analog Score is very low, per target (src/lib/lowScore.ts), built
+   * from the grid cell when the card was created.
+   */
+  lowScore?: Partial<Record<TargetId, LowScoreReason>>;
 }
 
 /** Shape of /public/data/deck.json and of src/data/fixtures/deck.dev.json. */

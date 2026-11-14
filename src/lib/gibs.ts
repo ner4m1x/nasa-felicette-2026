@@ -103,6 +103,9 @@ export const THEMATIC_LAYERS: readonly GibsLayerId[] = ["lstDay", "ndvi"];
 /** Default opacity of the thematic / scan overlays (UI tuning: readable over the dimmed base). */
 export const DEFAULT_OVERLAY_OPACITY = 0.7;
 
+/** The analog-score overlay is on when the map first opens, so every scored land cell is visible. */
+export const DEFAULT_SHOW_SCAN = true;
+
 /**
  * Leaflet URL template: {z}/{y}/{x} are filled by Leaflet (WMTS TileMatrix/TileRow/TileCol).
  * Static layers (time null) use the capabilities template without the {Time} segment.

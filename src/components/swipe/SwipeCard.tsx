@@ -4,7 +4,8 @@
  * One draggable card of the Orbital Swipe deck.
  * - Framer Motion drag="x": rotation follows the offset; PURR/HISS stamps fade in with distance.
  * - Release: commits on offset OR velocity (src/lib/swipe.ts), otherwise springs back.
- * - `touch-action: pan-y` keeps vertical page/card scrolling working on phones.
+ * - Touch: `touch-action: pan-y` on the card AND on the card body's scroll container (CardFace), plus
+ *   dragDirectionLock: one-finger horizontal drag anywhere = swipe; vertical drag = scroll the body.
  * - Buttons and keyboard use the imperative `fling()` handle, so every input path animates alike.
  * All tuning values come from src/theme/tokens.ts.
  */
@@ -99,6 +100,7 @@ export function SwipeCard({ ref, ranked, depth, onDone }: SwipeCardProps) {
       <motion.div
         ref={el}
         drag={isTop ? "x" : false}
+        dragDirectionLock
         dragMomentum={false}
         onDragEnd={onDragEnd}
         style={{ x, y, rotate, opacity, touchAction: "pan-y" }}
