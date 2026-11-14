@@ -113,3 +113,11 @@ Chronological log of methodological decisions (pre-registration, frozen configs,
   Lanzarote cannot be scored on the 0.25° grid: only two cell centres lie within 25 km, and both count as
   ocean (MCD12C1 water 50.2 % and 74.1 %, land mask < 50 %). It is reported as "not scorable", and the
   radius and land mask were not changed.
+- 2026-11-14 — **Known post-hoc limitation (not applied).** `unvegetated_frac` = barren + permanent
+  snow/ice (MCD12C1), so snow and ice count as bare ground. For `moon_tranquillitatis_pit` (mare basalt /
+  lava tubes) this favours ice-covered terrain: an ice-covered cell gets full credit on `unvegetated_frac`
+  even though the basalt surface is buried. Antarctic regions hold three of the top 10 pit candidates
+  (all NDVI-imputed). A possible future v3 would use `barren_frac` alone, or a land-only bare-rock share,
+  for that target. This was noticed only **after** seeing the v2 results, so it is deliberately **NOT
+  changed** in v2. Changing it now would be tuning to the outcome. Any v3 must be pre-registered, with
+  its own version bump and freeze commit, and its results reported alongside v2, not in place of it.
