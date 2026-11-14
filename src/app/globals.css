@@ -92,6 +92,32 @@ body::after {
   }
 }
 
+/* Card imagery skeleton (CardImagery): a slow sweep; static under reduced motion. */
+.imagery-skeleton {
+  background: linear-gradient(
+      100deg,
+      var(--imagery-skeleton) 30%,
+      var(--imagery-skeleton-shine) 50%,
+      var(--imagery-skeleton) 70%
+    )
+    var(--imagery-skeleton);
+  background-size: 200% 100%;
+  animation: imagery-shimmer var(--duration-shimmer) linear infinite;
+}
+@keyframes imagery-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .imagery-skeleton {
+    animation: none;
+  }
+}
+
 /* Native <dialog> used by EarthLimitsSheet: bottom sheet on phones, centered modal on desktop. */
 dialog.purr-sheet::backdrop {
   background: rgb(0 0 0 / 0.7);

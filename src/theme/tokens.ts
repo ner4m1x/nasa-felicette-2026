@@ -47,3 +47,11 @@ export const CONFETTI_COLOR_VARS = ["--phosphor", "--amber", "--sky", "--fg"] as
 
 /** Map pin diameters (px): rank 1 gets `max`, shrinking by `step` per rank down to `min`. Unranked pins use `base`. */
 export const PIN_SIZE = { max: 30, min: 14, step: 1.6, base: 18 } as const;
+
+/** Satellite thumbnail on each card (src/components/swipe/CardImagery.tsx); display tuning only. */
+export const IMAGERY = {
+  /** Regional cards: ground span (km) across the image width (target 150–300 km). */
+  regionalSpanKm: 220,
+  /** Footprint outline drawn on regional cards: the pipeline's grid step (degrees). */
+  cellSizeDeg: 0.25,
+} as const;

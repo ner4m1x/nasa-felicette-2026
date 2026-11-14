@@ -56,6 +56,19 @@
   --map-overlay-filter: saturate(1.25) contrast(1.1);
   --map-overlay-blend: normal;
 
+  /* ---- Card imagery (satellite thumbnail) ---- */
+  /* True-colour base: lighter dim than the map so the thumbnail reads; under NDVI/LST it is dimmed more. */
+  --imagery-base-filter: brightness(0.9) saturate(0.85) contrast(1.05);
+  --imagery-under-thematic-filter: brightness(0.45) saturate(0.4);
+  --imagery-thematic-opacity: 0.9;
+  --imagery-crosshair: var(--amber);
+  --imagery-cell: rgb(214 245 222 / 0.55);
+  --imagery-skeleton: var(--panel-2);
+  --imagery-skeleton-shine: rgb(77 255 154 / 0.07);
+  --imagery-scrim: rgb(5 10 7 / 0.72);
+  --duration-shimmer: 1.4s;
+  --imagery-aspect: 16 / 9;
+
   /* ---- Radii ---- */
   --card-radius: 1rem;
   --sheet-radius: 1rem;

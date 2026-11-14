@@ -140,6 +140,17 @@ export const pl: Dictionary = {
     regional: "Regionalna · siatka 0,25°",
     site: "Punktowa · poniżej rozdzielczości siatki",
     known: "Znany analog",
+    imagery: {
+      group: "Warstwa zobrazowania",
+      layer: { blueMarble: "Kolory naturalne", ndvi: "NDVI", lstDay: "Temp. powierzchni" },
+      composite: "kompozycja bez chmur",
+      source: "NASA GIBS",
+      alt: "Zdjęcie satelitarne wyśrodkowane na {name}",
+      cell: "~0,25° komórka siatki",
+      unavailable: "Zobrazowanie niedostępne",
+      loading: "Ładowanie zobrazowania…",
+      trapHint: "Wygląda na skały? Sprawdź NDVI →",
+    },
     ndviImputed:
       "NDVI imputowane – brak pokrycia MODIS w tym miejscu, pokrycie terenu wskazuje na powierzchnię bez roślinności",
     teaser: {

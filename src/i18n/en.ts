@@ -144,6 +144,17 @@ export const en = {
     regional: "Regional · 0.25° grid",
     site: "Site · below grid resolution",
     known: "Known analog site",
+    imagery: {
+      group: "Imagery layer",
+      layer: { blueMarble: "True colour", ndvi: "NDVI", lstDay: "Surface temp" },
+      composite: "cloud-free composite",
+      source: "NASA GIBS",
+      alt: "Satellite image centred on {name}",
+      cell: "~0.25° grid cell",
+      unavailable: "Imagery unavailable",
+      loading: "Loading imagery…",
+      trapHint: "Looks rocky? Check NDVI →",
+    },
     ndviImputed: "NDVI imputed – no MODIS coverage here, land cover shows a non-vegetated surface",
     teaser: {
       benchmark: "A known analog: the yardstick I measure every other litterbox against.",

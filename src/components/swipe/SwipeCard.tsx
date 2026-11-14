@@ -111,7 +111,7 @@ export function SwipeCard({ ref, ranked, depth, onDone }: SwipeCardProps) {
           isTop ? "cursor-grab shadow-card-top active:cursor-grabbing" : "pointer-events-none shadow-card"
         }`}
       >
-        <CardFace ranked={ranked} interactive={isTop} />
+        <CardFace ranked={ranked} interactive={isTop} loadImagery={depth <= 1} />
 
         {isTop && (
           <>

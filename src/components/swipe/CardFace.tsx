@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Card front: name, country, kind badge, both scores as separate labelled bars (Analog Score from
+ * Card front: satellite thumbnail (CardImagery), name, country, kind badge, both scores as separate labelled bars (Analog Score from
  * the frozen pipeline; Mission Fit from the configurator — never mixed), a one-line teaser from
  * Félicette and the "Scan with whiskers" cross-check.
  */
@@ -15,6 +15,7 @@ import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
 import { LowScoreNote } from "./LowScoreNote";
 import { NdviImputedNote } from "./NdviImputedNote";
+import { CardImagery } from "./CardImagery";
 import { formatCoords, KindBadge, ScoreBar, to100 } from "./parts";
 import { WhiskerScan } from "./WhiskerScan";
 
@@ -22,9 +23,11 @@ interface CardFaceProps {
   ranked: RankedCard;
   /** the top card: its controls are focusable and its body scrolls */
   interactive: boolean;
+  /** fetch the satellite thumbnail (top card and the next one, as a prefetch) */
+  loadImagery: boolean;
 }
 
-export function CardFace({ ranked, interactive }: CardFaceProps) {
+export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
   const { t, lang, dim } = useI18n();
   const { card, analog, missionFit } = ranked;
   const { removeUserCard } = useSwipe();
@@ -44,6 +47,7 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
 
   return (
     <div className="flex h-full flex-col">
+      <CardImagery card={card} load={loadImagery} interactive={interactive} />
       <header className="border-b border-line px-4 pb-3 pt-4">
         <div className="flex flex-wrap items-center gap-1.5">
           <KindBadge kind={card.kind} label={t(`kinds.${card.kind}`)} />
