@@ -1,7 +1,7 @@
 {
-  "version": 1,
-  "config_id": "targets-v1",
-  "description": "Pre-registered Analog Score config. Frozen by the commit 'freeze scoring config v1' before the first validation run. Any later change bumps 'version' and is logged in docs/METHOD_LOG.md.",
+  "version": 2,
+  "config_id": "targets-v2",
+  "description": "Pre-registered Analog Score config. v1 was frozen by the commit 'freeze scoring config v1'; v2 (missing-data policy only, every weight and threshold unchanged) is frozen by the commit 'freeze scoring config v2', both before the first validation run. Any later change bumps 'version' and is logged in docs/METHOD_LOG.md.",
   "scoring": {
     "desirability_types": {
       "lower_better": "1 at value <= full, 0 at value >= zero, linear in between",
@@ -11,7 +11,21 @@
     "aggregation": "weighted geometric mean of the dimension scores",
     "floor": 0.01,
     "limiting_dimension": "argmin of the floored dimension scores; ties go to the first dimension in config order",
-    "missing_feature_policy": "a land cell with any missing input feature is left unscored for that target",
+    "missing_feature_policy": "a land cell with any missing input feature is left unscored for that target, after applying the rules in missing_data_imputation (v2). No other feature is ever imputed.",
+    "missing_data_imputation": [
+      {
+        "id": "ndvi_no_modis_coverage",
+        "added_in_version": 2,
+        "features": ["ndvi_mean", "ndvi_max"],
+        "applies_when": "the land cell lacks NDVI (ndvi_mean or ndvi_max is NaN) AND condition holds",
+        "condition": {"feature": "nonveg_land_share", "op": ">=", "value": 0.95},
+        "condition_definition": {"nonveg_land_share": "(barren_frac + snowice_frac) / (100 - water_frac), i.e. the MCD12C1 barren + permanent snow/ice share of the LAND part of the cell (0..1); undefined (no imputation) where water_frac >= 100 or any input is missing"},
+        "set_to": 0.0,
+        "flag": "ndvi_imputed",
+        "otherwise": "the cell stays unscored for every target that uses an NDVI feature",
+        "rationale": "MOD13C2 is not produced over Antarctica. Absence of the product is not evidence of vegetation, and MCD12C1 land cover (barren + permanent snow/ice >= 95 %) independently shows a non-vegetated surface. The share is taken over the land part of the cell because open water is not vegetation and must not block imputation in coastal cells. Generic rule, not region-specific."
+      }
+    ],
     "land_mask": "MCD12C1 IGBP water fraction < 50 %",
     "forbidden_features": ["trafficable_frac", "slope_p90_deg", "ice_proxy"],
     "forbidden_features_note": "Mission-only features; they feed the browser Mission Fit and never the Analog Score."

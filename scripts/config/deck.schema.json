@@ -82,7 +82,8 @@
             "mars_arcadia": {"$ref": "#/$defs/targetBreakdown"}
           }
         },
-        "sourceIds": {"type": "array", "items": {"type": "string"}}
+        "sourceIds": {"type": "array", "items": {"type": "string"}},
+        "ndviImputed": {"type": "boolean", "$comment": "true if any grid cell behind this card had NDVI imputed (targets.json v2 rule ndvi_no_modis_coverage). UI label: 'NDVI imputed (no MODIS coverage)'. Optional; TS: ndviImputed?: boolean"}
       }
     }
   }
