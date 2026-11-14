@@ -1,0 +1,13 @@
+{
+  "description": "Feature sanity checks run at the end of 'features'. Any FAIL stops the pipeline (usually a unit or scale bug). Box checks use the median of land cells in the box.",
+  "checks": [
+    {"region": "Central Sahara", "feature": "ndvi_mean", "lt": 0.15, "box": {"lat": [21, 25], "lon": [9, 13]}},
+    {"region": "Central Sahara", "feature": "barren_frac", "gt": 80, "box": {"lat": [21, 25], "lon": [9, 13]}},
+    {"region": "Central Amazon", "feature": "ndvi_mean", "gt": 0.7, "box": {"lat": [-5, -2], "lon": [-66, -60]}},
+    {"region": "Central Amazon", "feature": "precip_mm_yr", "gt": 1500, "box": {"lat": [-5, -2], "lon": [-66, -60]}},
+    {"region": "Atacama around Yungay", "feature": "precip_mm_yr", "lt": 50, "point": {"lat": -24.08, "lon": -70.0}},
+    {"region": "East Antarctic plateau", "feature": "lst_night_mean_c", "lt": -40, "box": {"lat": [-82, -75], "lon": [100, 140]}},
+    {"region": "East Antarctic plateau", "feature": "snowice_frac", "gt": 90, "box": {"lat": [-82, -75], "lon": [100, 140]}},
+    {"region": "Iceland interior", "feature": "basalt_frac", "gt": 50, "box": {"lat": [64.4, 65.2], "lon": [-19.5, -16.5]}}
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "description": "Mission-only features. They feed the browser Mission Fit and NEVER the Analog Score (see targets.json scoring.forbidden_features).",
+  "trafficable_frac": {
+    "slope_threshold_deg": 5,
+    "definition": "fraction of land DEM pixels (ETOPO 2022, 60 arc-second) with slope < slope_threshold_deg inside each 0.25 deg cell",
+    "caveat": "60 arc-second pixels (~1.85 km) smooth out local slopes, so this overestimates trafficability at rover scale"
+  },
+  "slope_p90_deg": {
+    "definition": "90th-percentile slope of land DEM pixels inside each 0.25 deg cell"
+  },
+  "ice_proxy": {
+    "definition": "product of two desirability components: cold (annual mean daytime LST below 0 degC) x patchy snow/ice (low but non-zero IGBP snow-and-ice percentage)",
+    "is": "a coarse indicator of cold ground with some but not total perennial snow/ice cover, i.e. where ground ice is plausible",
+    "is_not": "a measurement of subsurface ice, ice depth or ice content; no global dataset used here observes subsurface ice",
+    "components": [
+      {"feature": "lst_day_mean_c", "type": "lower_better", "full": -5, "zero": 0},
+      {"feature": "snowice_frac", "type": "band", "zero_low": 0, "full_low": 1, "full_high": 30, "zero_high": 70}
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "description": "Text templates for deck.json breakdowns (EN/PL). Contains NO numbers about places: every number in a generated sentence is filled in from the pipeline data.",
+  "rules": {"match_min_score": 0.5, "weak_below_score": 0.5},
+  "templates": {
+    "match": {"en": "{label}: {value}{unit} (dimension score {score})", "pl": "{label}: {value}{unit} (wynik wymiaru {score})"},
+    "limiting": {"en": "Limiting factor, {label}: {value}{unit} (score {score})", "pl": "Czynnik ograniczający, {label}: {value}{unit} (wynik {score})"},
+    "weak": {"en": "Also weak, {label}: {value}{unit} (score {score})", "pl": "Również słabo, {label}: {value}{unit} (wynik {score})"},
+    "not_captured_prefix": {"en": "Not visible to the global scan: ", "pl": "Niewidoczne dla globalnego skanu: "}
+  },
+  "features": {
+    "precip_mm_yr": {"en": "Precipitation", "pl": "Opady", "unit": {"en": " mm/yr", "pl": " mm/rok"}, "decimals": 0},
+    "ndvi_mean": {"en": "Mean NDVI", "pl": "Średnie NDVI", "unit": {"en": "", "pl": ""}, "decimals": 2},
+    "ndvi_max": {"en": "Peak NDVI", "pl": "Maksymalne NDVI", "unit": {"en": "", "pl": ""}, "decimals": 2},
+    "lst_day_mean_c": {"en": "Mean daytime surface temperature", "pl": "Średnia dzienna temperatura powierzchni", "unit": {"en": " °C", "pl": " °C"}, "decimals": 1},
+    "lst_night_mean_c": {"en": "Mean night-time surface temperature", "pl": "Średnia nocna temperatura powierzchni", "unit": {"en": " °C", "pl": " °C"}, "decimals": 1},
+    "lst_diurnal_range_k": {"en": "Day-night surface temperature swing", "pl": "Dobowa amplituda temperatury powierzchni", "unit": {"en": " K", "pl": " K"}, "decimals": 1},
+    "lst_allmonth_mean_c": {"en": "Mean annual surface temperature (all months)", "pl": "Średnia roczna temperatura powierzchni (wszystkie miesiące)", "unit": {"en": " °C", "pl": " °C"}, "decimals": 1},
+    "lst_night_min_c": {"en": "Coldest monthly night-time surface temperature", "pl": "Najzimniejsza miesięczna temperatura nocna powierzchni", "unit": {"en": " °C", "pl": " °C"}, "decimals": 1},
+    "barren_frac": {"en": "Barren land", "pl": "Teren jałowy", "unit": {"en": "%", "pl": " %"}, "decimals": 0},
+    "snowice_frac": {"en": "Permanent snow and ice", "pl": "Wieczny śnieg i lód", "unit": {"en": "%", "pl": " %"}, "decimals": 0},
+    "unvegetated_frac": {"en": "Unvegetated surface (barren + snow/ice)", "pl": "Powierzchnia bez roślin (jałowa + śnieg/lód)", "unit": {"en": "%", "pl": " %"}, "decimals": 0},
+    "dust_aod": {"en": "Dust aerosol optical depth", "pl": "Grubość optyczna pyłu", "unit": {"en": "", "pl": ""}, "decimals": 2},
+    "relief_std_m": {"en": "Relief (elevation std. dev.)", "pl": "Rzeźba terenu (odch. std. wysokości)", "unit": {"en": " m", "pl": " m"}, "decimals": 0},
+    "basalt_frac": {"en": "Basic volcanic rock (basalt) cover", "pl": "Udział skał wulkanicznych zasadowych (bazalt)", "unit": {"en": "%", "pl": " %"}, "decimals": 0},
+    "polar_day_frac": {"en": "Days of polar day (24 h sunlight)", "pl": "Dni dnia polarnego (24 h słońca)", "unit": {"en": "% of the year", "pl": " % roku"}, "decimals": 0, "display_scale": 100},
+    "slope_mean_deg": {"en": "Mean slope", "pl": "Średnie nachylenie", "unit": {"en": "°", "pl": "°"}, "decimals": 1},
+    "slope_p90_deg": {"en": "90th-percentile slope", "pl": "90. percentyl nachylenia", "unit": {"en": "°", "pl": "°"}, "decimals": 1},
+    "trafficable_frac": {"en": "Trafficable terrain (slope < 5°)", "pl": "Teren przejezdny (nachylenie < 5°)", "unit": {"en": "%", "pl": " %"}, "decimals": 0, "display_scale": 100},
+    "ice_proxy": {"en": "Ground-ice proxy", "pl": "Wskaźnik zastępczy lodu gruntowego", "unit": {"en": "", "pl": ""}, "decimals": 2},
+    "water_frac": {"en": "Water", "pl": "Woda", "unit": {"en": "%", "pl": " %"}, "decimals": 0},
+    "elev_mean_m": {"en": "Mean elevation", "pl": "Średnia wysokość", "unit": {"en": " m", "pl": " m"}, "decimals": 0},
+    "pb_frac": {"en": "Basic plutonic rock cover", "pl": "Udział skał głębinowych zasadowych", "unit": {"en": "%", "pl": " %"}, "decimals": 0}
+  },
+  "feature_sources": {
+    "precip_mm_yr": ["M2TMNXFLX"], "ndvi_mean": ["MOD13C2"], "ndvi_max": ["MOD13C2"],
+    "lst_day_mean_c": ["MOD11C3"], "lst_night_mean_c": ["MOD11C3"], "lst_diurnal_range_k": ["MOD11C3"], "lst_night_min_c": ["MOD11C3"], "lst_allmonth_mean_c": ["MOD11C3"],
+    "barren_frac": ["MCD12C1"], "snowice_frac": ["MCD12C1"], "unvegetated_frac": ["MCD12C1"], "water_frac": ["MCD12C1"],
+    "dust_aod": ["M2TMNXAER"], "relief_std_m": ["ETOPO_2022_60s"], "slope_mean_deg": ["ETOPO_2022_60s"],
+    "basalt_frac": ["GLiM", "GLiM_0p5"], "polar_day_frac": []
+  },
+  "not_captured": {
+    "mars_jezero": {
+      "en": ["carbonate and clay mineralogy of the delta", "fluvial and lacustrine deposits as such", "Martian atmospheric pressure and radiation"],
+      "pl": ["mineralogia węglanów i iłów delty", "same osady rzeczne i jeziorne", "ciśnienie atmosfery i promieniowanie na Marsie"]
+    },
+    "mars_arcadia": {
+      "en": ["buried excess ice and its depth", "regolith properties above the ice", "Martian atmospheric pressure and radiation"],
+      "pl": ["zakopany lód i głębokość jego zalegania", "właściwości regolitu nad lodem", "ciśnienie atmosfery i promieniowanie na Marsie"]
+    },
+    "moon_shackleton": {
+      "en": ["permanently shadowed cold traps and their ice", "vacuum and lunar surface temperatures (far outside Earth's range)", "lunar regolith and dust properties"],
+      "pl": ["stale zacienione pułapki zimna i ich lód", "próżnia i temperatury powierzchni Księżyca (daleko poza zakresem ziemskim)", "właściwości regolitu i pyłu księżycowego"]
+    },
+    "moon_tranquillitatis_pit": {
+      "en": ["pits, caves and lava tubes themselves", "thermal stability inside caves", "vacuum and radiation shielding requirements"],
+      "pl": ["same zapadliska, jaskinie i tunele lawowe", "stabilność termiczna wewnątrz jaskiń", "próżnia i wymagania osłony przed promieniowaniem"]
+    }
+  },
+  "utility": {
+    "moon_shackleton": {
+      "en": ["Thermal and illumination operations under long polar days", "Cold-trap drilling and sampling rehearsal", "Power and thermal design tests in persistent low-angle sunlight"],
+      "pl": ["Operacje termiczne i oświetleniowe podczas długiego dnia polarnego", "Próby wiercenia i pobierania próbek w pułapkach zimna", "Testy zasilania i termiki przy stałym, niskim słońcu"]
+    },
+    "moon_tranquillitatis_pit": {
+      "en": ["Cave and lava-tube mapping with lidar", "Autonomous navigation in GNSS-denied, low-light terrain", "Testing natural shielding concepts for habitats"],
+      "pl": ["Mapowanie jaskiń i tuneli lawowych lidarem", "Autonomiczna nawigacja bez GNSS i przy słabym oświetleniu", "Testy koncepcji naturalnej osłony dla habitatów"]
+    },
+    "mars_jezero": {
+      "en": ["Sample caching and sample-selection workflows", "Spectrometer tests on carbonates and clays (where present locally)", "Rover traverse planning in dusty, arid terrain"],
+      "pl": ["Procedury doboru i składowania próbek", "Testy spektrometrów na węglanach i iłach (tam, gdzie występują lokalnie)", "Planowanie tras łazika w zapylonym, suchym terenie"]
+    },
+    "mars_arcadia": {
+      "en": ["Ground-penetrating radar surveys for buried ice", "Ice drilling and extraction (ISRU) trials", "Cold-regolith excavation and construction tests"],
+      "pl": ["Badania georadarem w poszukiwaniu zakopanego lodu", "Próby wiercenia i pozyskiwania lodu (ISRU)", "Testy wykopów i budowy w zimnym regolicie"]
+    }
+  }
+}

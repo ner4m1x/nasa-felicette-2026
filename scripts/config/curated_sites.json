@@ -1,0 +1,11 @@
+{
+  "description": "Coordinates of the app's curated cards, mirrored from src/data/curatedCards.ts so the pipeline can attach grid values. export warns if they drift apart.",
+  "mirror_of": "src/data/curatedCards.ts",
+  "note": "Grid values at 0.25 deg resolution. Curated sites are smaller than a grid cell; these numbers describe the surrounding region, not the site itself.",
+  "sites": [
+    {"card_id": "curated-lake-salda", "lat": 37.5476, "lon": 29.6816},
+    {"card_id": "curated-ostrzyca", "lat": 51.056, "lon": 15.7633},
+    {"card_id": "curated-central-amazon", "lat": -2.9489, "lon": -59.9299},
+    {"card_id": "curated-lunares", "lat": 53.1511, "lon": 16.738}
+  ]
+}

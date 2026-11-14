@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "config_id": "targets-v1",
+  "description": "Pre-registered Analog Score config. Frozen by the commit 'freeze scoring config v1' before the first validation run. Any later change bumps 'version' and is logged in docs/METHOD_LOG.md.",
+  "scoring": {
+    "desirability_types": {
+      "lower_better": "1 at value <= full, 0 at value >= zero, linear in between",
+      "higher_better": "1 at value >= full, 0 at value <= zero, linear in between",
+      "band": "trapezoid: 0 at <= zero_low, 1 between full_low and full_high, 0 at >= zero_high, linear in between"
+    },
+    "aggregation": "weighted geometric mean of the dimension scores",
+    "floor": 0.01,
+    "limiting_dimension": "argmin of the floored dimension scores; ties go to the first dimension in config order",
+    "missing_feature_policy": "a land cell with any missing input feature is left unscored for that target",
+    "land_mask": "MCD12C1 IGBP water fraction < 50 %",
+    "forbidden_features": ["trafficable_frac", "slope_p90_deg", "ice_proxy"],
+    "forbidden_features_note": "Mission-only features; they feed the browser Mission Fit and never the Analog Score."
+  },
+  "method": {
+    "grid_deg": 0.25,
+    "site_radius_km": 25,
+    "known_radius_km": 150,
+    "top_fraction": 0.01,
+    "min_region_cells": 4,
+    "connectivity": 8,
+    "export_top_regions": 25,
+    "sensitivity": {
+      "runs": 200,
+      "weight_rel": 0.25,
+      "threshold_rel": 0.15,
+      "threshold_mode": "each breakpoint shifted by U(-threshold_rel, +threshold_rel) x the span of its function (|full - zero| or zero_high - zero_low)",
+      "retain_cell_frac": 0.5,
+      "seed": 20261114
+    }
+  },
+  "targets": {
+    "mars_jezero": {
+      "note": "Present-day arid, barren, thermally swinging sedimentary terrain. Mineralogy (carbonates/clays of the delta) is NOT captured globally.",
+      "dims": [
+        {"feature": "precip_mm_yr", "type": "lower_better", "full": 25, "zero": 250, "weight": 0.25, "rationale": "hyperarid ~<25 mm/yr"},
+        {"feature": "ndvi_max", "type": "lower_better", "full": 0.10, "zero": 0.30, "weight": 0.20, "rationale": "bare soil NDVI ~<0.1"},
+        {"feature": "barren_frac", "type": "higher_better", "full": 80, "zero": 20, "weight": 0.20, "rationale": "Mars has no vegetated surface: most of the cell should be mapped as barren land"},
+        {"feature": "lst_diurnal_range_k", "type": "higher_better", "full": 30, "zero": 10, "weight": 0.20, "rationale": "large thermal swing"},
+        {"feature": "relief_std_m", "type": "band", "zero_low": 5, "full_low": 20, "full_high": 300, "zero_high": 1000, "weight": 0.10, "rationale": "moderate relief: crater/delta scale, not alpine"},
+        {"feature": "dust_aod", "type": "higher_better", "full": 0.15, "zero": 0.02, "weight": 0.05, "rationale": "aeolian dust activity; weak dimension because column AOD is largely transported dust, not a local surface property"}
+      ]
+    },
+    "mars_arcadia": {
+      "note": "Mid-latitude plains with buried excess ice under dry regolith. Ice-sheet surfaces are NOT analogs, hence the snowice penalty.",
+      "dims": [
+        {"feature": "lst_allmonth_mean_c", "type": "lower_better", "full": -10, "zero": 0, "weight": 0.25, "rationale": "permafrost-supporting cold: mean annual surface temperature < 0 degC over all 12 months (no warm bias from missing polar-night daytime LST)"},
+        {"feature": "relief_std_m", "type": "lower_better", "full": 20, "zero": 150, "weight": 0.20, "rationale": "flat plains"},
+        {"feature": "precip_mm_yr", "type": "lower_better", "full": 100, "zero": 400, "weight": 0.15, "rationale": "polar desert"},
+        {"feature": "ndvi_max", "type": "lower_better", "full": 0.10, "zero": 0.35, "weight": 0.15, "rationale": "no vegetation in any month, as on the Martian plains"},
+        {"feature": "unvegetated_frac", "type": "higher_better", "full": 80, "zero": 20, "weight": 0.15, "rationale": "surface dominated by bare ground or snow/ice rather than plant cover"},
+        {"feature": "snowice_frac", "type": "lower_better", "full": 10, "zero": 60, "weight": 0.10, "rationale": "exclude glaciers/ice sheets: ice must be buried"}
+      ]
+    },
+    "moon_shackleton": {
+      "note": "Polar, extremely cold, rugged crater-rim relief, near-persistent illumination in season, no vegetation. Vacuum/temperatures far beyond Earth range.",
+      "dims": [
+        {"feature": "lst_night_min_c", "type": "lower_better", "full": -50, "zero": -10, "weight": 0.25, "rationale": "extreme cold; lunar polar temperatures lie far outside Earth's range, so this scale only ranks Earth's coldest surfaces"},
+        {"feature": "polar_day_frac", "type": "higher_better", "full": 0.25, "zero": 0.0, "weight": 0.20, "rationale": "seasonal persistent sunlight"},
+        {"feature": "relief_std_m", "type": "higher_better", "full": 500, "zero": 50, "weight": 0.20, "rationale": "rim-like rugged relief"},
+        {"feature": "unvegetated_frac", "type": "higher_better", "full": 90, "zero": 30, "weight": 0.15, "rationale": "no vegetation or soil cover, as on the lunar surface"},
+        {"feature": "precip_mm_yr", "type": "lower_better", "full": 100, "zero": 500, "weight": 0.10, "rationale": "polar-desert dryness: the Moon has no precipitation"},
+        {"feature": "snowice_frac", "type": "band", "zero_low": -5, "full_low": 5, "full_high": 60, "zero_high": 95, "weight": 0.10, "rationale": "some ice in cold traps, not a full ice sheet: partial ice = full, ice-free = neutral (0.5 at 0 %), ice sheet = 0"}
+      ]
+    },
+    "moon_tranquillitatis_pit": {
+      "note": "Mare-basalt lava plains, where pits/lava tubes occur. Caves themselves and their thermal stability are NOT visible in global data; candidates need cross-checking with cave inventories.",
+      "dims": [
+        {"feature": "basalt_frac", "type": "higher_better", "full": 60, "zero": 5, "weight": 0.35, "rationale": "basaltic volcanic substrate"},
+        {"feature": "unvegetated_frac", "type": "higher_better", "full": 80, "zero": 20, "weight": 0.20, "rationale": "bare lava surfaces rather than plant cover"},
+        {"feature": "precip_mm_yr", "type": "lower_better", "full": 100, "zero": 600, "weight": 0.15, "rationale": "limits weathering/soil"},
+        {"feature": "ndvi_max", "type": "lower_better", "full": 0.15, "zero": 0.40, "weight": 0.15, "rationale": "little or no vegetation over the lava in any month"},
+        {"feature": "relief_std_m", "type": "lower_better", "full": 50, "zero": 400, "weight": 0.15, "rationale": "mare = plains"}
+      ]
+    }
+  },
+  "not_captured": [
+    "Mineralogy (e.g. carbonates and clays at Jezero; hydromagnesite at Lake Salda)",
+    "Caves, pits and lava tubes, and their thermal stability",
+    "Subsurface ice depth and excess ground ice",
+    "Vacuum, atmospheric pressure, gravity and radiation environment",
+    "Features smaller than a 0.25 deg cell (~28 km at the equator)"
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Mirror of DeckFile / DeckCard in src/lib/types.ts. Keep in sync by hand when the TS type changes.",
+  "type": "object",
+  "required": ["cards"],
+  "additionalProperties": false,
+  "properties": {
+    "__fixture": {"type": "boolean"},
+    "generatedAt": {"type": ["string", "null"]},
+    "configId": {"type": ["string", "null"]},
+    "cards": {"type": "array", "items": {"$ref": "#/$defs/card"}}
+  },
+  "$defs": {
+    "unit": {"type": "number", "minimum": 0, "maximum": 1},
+    "numOrNull": {"type": ["number", "null"]},
+    "langList": {
+      "type": "object", "required": ["en", "pl"], "additionalProperties": false,
+      "properties": {"en": {"type": "array", "items": {"type": "string"}}, "pl": {"type": "array", "items": {"type": "string"}}}
+    },
+    "targetBreakdown": {
+      "type": "object", "required": ["matches", "breaksDown", "utility"], "additionalProperties": false,
+      "properties": {
+        "matches": {"$ref": "#/$defs/langList"},
+        "breaksDown": {"$ref": "#/$defs/langList"},
+        "utility": {"$ref": "#/$defs/langList"}
+      }
+    },
+    "analogEntry": {
+      "type": "object", "required": ["total", "dims", "limiting", "percentile"], "additionalProperties": false,
+      "properties": {
+        "total": {"$ref": "#/$defs/unit"},
+        "dims": {"type": "object", "additionalProperties": {"$ref": "#/$defs/unit"}},
+        "limiting": {"type": "string"},
+        "percentile": {"type": "number", "minimum": 0, "maximum": 100}
+      }
+    },
+    "card": {
+      "type": "object",
+      "required": ["id", "kind", "name", "country", "lat", "lon", "scale", "regionAreaKm2", "analog", "mission", "stability", "known", "breakdown", "sourceIds"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["benchmark", "discovery", "trap", "curated", "operational"]},
+        "name": {"type": "string"},
+        "country": {"type": ["string", "null"]},
+        "lat": {"type": "number", "minimum": -90, "maximum": 90},
+        "lon": {"type": "number", "minimum": -180, "maximum": 180},
+        "scale": {"enum": ["regional", "site"]},
+        "regionAreaKm2": {"$ref": "#/$defs/numOrNull"},
+        "analog": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "object", "additionalProperties": false,
+             "properties": {
+               "moon_shackleton": {"$ref": "#/$defs/analogEntry"},
+               "moon_tranquillitatis_pit": {"$ref": "#/$defs/analogEntry"},
+               "mars_jezero": {"$ref": "#/$defs/analogEntry"},
+               "mars_arcadia": {"$ref": "#/$defs/analogEntry"}
+             }}
+          ]
+        },
+        "mission": {
+          "type": "object", "additionalProperties": false,
+          "required": ["slopeMeanDeg", "trafficableFrac", "reliefStdM", "iceProxy", "basaltFrac"],
+          "properties": {
+            "slopeMeanDeg": {"$ref": "#/$defs/numOrNull"},
+            "trafficableFrac": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/unit"}]},
+            "reliefStdM": {"$ref": "#/$defs/numOrNull"},
+            "iceProxy": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/unit"}]},
+            "basaltFrac": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/unit"}]}
+          }
+        },
+        "stability": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/unit"}]},
+        "known": {"type": "boolean"},
+        "breakdown": {
+          "$comment": "Partial<Record<TargetId, TargetBreakdown>> (changed in pre-freeze review d; frontend type to follow)",
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "moon_shackleton": {"$ref": "#/$defs/targetBreakdown"},
+            "moon_tranquillitatis_pit": {"$ref": "#/$defs/targetBreakdown"},
+            "mars_jezero": {"$ref": "#/$defs/targetBreakdown"},
+            "mars_arcadia": {"$ref": "#/$defs/targetBreakdown"}
+          }
+        },
+        "sourceIds": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
