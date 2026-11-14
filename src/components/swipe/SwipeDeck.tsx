@@ -12,6 +12,7 @@ import { Ban, RotateCcw, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MissionBrief } from "@/components/configurator/MissionBrief";
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
+import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { RankedCard } from "@/lib/types";
@@ -45,8 +46,8 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
   const [rejectedOpen, setRejectedOpen] = useState(false);
 
   const visible = swipe.queue.slice(0, STACK.visible);
-  const total = swipe.ranked?.deck.length ?? 0;
-  const rejected = swipe.ranked?.rejected ?? [];
+  const total = swipe.visible?.deck.length ?? 0;
+  const rejected = swipe.visible?.rejected ?? [];
   const purrs = swipe.records.filter((r) => r.verdict === "purr").length;
 
   const onDone = (ranked: RankedCard, action: SwipeAction) => {
@@ -129,6 +130,8 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
           {rejectedButton("lg:hidden")}
           {reconfigureButton("lg:hidden", true)}
         </div>
+
+        {swipe.hideIce && <ViewFilterNote onClear={() => swipe.setHideIce(false)} />}
 
         {swipe.notice && (
           <p role="status" className="rounded-control border border-amber/50 px-3 py-2 text-xs text-amber">

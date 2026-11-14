@@ -358,6 +358,22 @@ export const en = {
       legendLow: "lower analog score",
       legendHigh: "higher",
       opacity: "Overlay opacity",
+      pins: "Pins",
+      showAll: "Show all candidates",
+      showAllHint: "Default: top {n} candidate regions + benchmarks, traps and curated sites",
+      hideIce: "Hide ice-sheet candidates",
+      hideIceHint: "Antarctic or NDVI-imputed candidate regions; applies to the deck and the map",
+    },
+    viewFilter: {
+      note: "Display filter – scores unchanged. See METHOD_LOG: known limitation.",
+      clear: "Show them again",
+    },
+    peek: {
+      hint: "Tap the map to inspect a point",
+      best: "Best: {target} · {score}/100",
+      none: "No analog score for this cell",
+      expand: "Expand point inspector",
+      collapse: "Collapse point inspector",
     },
     inspector: {
       title: "Point inspector",

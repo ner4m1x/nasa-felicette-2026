@@ -44,3 +44,6 @@ export const STACK = {
 
 /** CSS variable names read at runtime for canvas-confetti (it needs literal colors). */
 export const CONFETTI_COLOR_VARS = ["--phosphor", "--amber", "--sky", "--fg"] as const;
+
+/** Map pin diameters (px): rank 1 gets `max`, shrinking by `step` per rank down to `min`. Unranked pins use `base`. */
+export const PIN_SIZE = { max: 30, min: 14, step: 1.6, base: 18 } as const;

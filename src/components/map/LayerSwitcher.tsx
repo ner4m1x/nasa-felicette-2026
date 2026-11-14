@@ -3,13 +3,15 @@
 /**
  * Terminal-style layer switcher: base map radio group (cloud-free Blue Marble by default, or the
  * single-day VIIRS mosaic), thematic GIBS layer (none / LST / NDVI) on top, the pipeline scan
- * overlay toggle, and one opacity slider for the overlays (the base is never made transparent).
+ * overlay toggle, one opacity slider for the overlays (the base is never made transparent), and the
+ * display-only pin controls ("Show all candidates", "Hide ice-sheet candidates").
  * Phone: collapsed behind a "Layers" button. Desktop: always open.
  */
 
 import { Layers, X } from "lucide-react";
 import { useId, useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
+import { DEFAULT_TOP_N } from "@/lib/mapPins";
 import { BASE_LAYERS, GIBS_LAYERS, THEMATIC_LAYERS, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 
 interface LayerSwitcherProps {
@@ -23,6 +25,10 @@ interface LayerSwitcherProps {
   overlayAvailable: boolean | undefined;
   opacity: number;
   onOpacity: (v: number) => void;
+  showAll: boolean;
+  onShowAll: (v: boolean) => void;
+  hideIce: boolean;
+  onHideIce: (v: boolean) => void;
 }
 
 /**
@@ -135,6 +141,34 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
             </div>
           )}
         </div>
+
+        <fieldset className="mt-2 border-t border-line pt-2">
+          <legend className="mb-1 text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.layers.pins")}</legend>
+          <label className="flex min-h-9 cursor-pointer items-start gap-2 px-1 pt-1">
+            <input
+              type="checkbox"
+              checked={props.showAll}
+              onChange={(e) => props.onShowAll(e.target.checked)}
+              className="mt-0.5 accent-[var(--phosphor)]"
+            />
+            <span>
+              {t("map.layers.showAll")}
+              <span className="block text-[10px] text-dim">{t("map.layers.showAllHint", { n: DEFAULT_TOP_N })}</span>
+            </span>
+          </label>
+          <label className="flex min-h-9 cursor-pointer items-start gap-2 px-1 pt-1">
+            <input
+              type="checkbox"
+              checked={props.hideIce}
+              onChange={(e) => props.onHideIce(e.target.checked)}
+              className="mt-0.5 accent-[var(--phosphor)]"
+            />
+            <span>
+              {t("map.layers.hideIce")}
+              <span className="block text-[10px] text-dim">{t("map.layers.hideIceHint")}</span>
+            </span>
+          </label>
+        </fieldset>
 
         <div className="mt-2 border-t border-line pt-2">
           <label htmlFor={sliderId} className="flex justify-between px-1 text-[11px] uppercase tracking-wider text-dim">

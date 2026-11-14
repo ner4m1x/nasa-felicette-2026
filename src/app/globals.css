@@ -138,7 +138,7 @@ dialog.purr-sheet::backdrop {
 /* the phone inspector sheet covers the bottom of the map: lift Leaflet's bottom controls above it */
 @media (max-width: 63.99rem) {
   .leaflet-container .leaflet-bottom {
-    bottom: 132px;
+    bottom: 96px; /* = PEEK_PX in MapClient.tsx */
   }
 }
 /* Base tile layer only (TileLayer className in ScanMap); see --map-base-filter in tokens.css. */
@@ -147,27 +147,31 @@ dialog.purr-sheet::backdrop {
 }
 .purr-scan-overlay {
   image-rendering: pixelated;
+  /* Lift the overlay off the dimmed base: a touch more contrast/saturation, and "screen" so the
+     dark viridis end does not muddy the relief underneath. Tuned in tokens.css. */
+  filter: var(--map-overlay-filter);
+  mix-blend-mode: var(--map-overlay-blend);
 }
 
 /* Candidate pins (CandidateMarkers): colour from --pin (a --kind-* token). */
 .purr-pin-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: 0;
 }
 .purr-pin {
   display: block;
-  width: 16px;
-  height: 16px;
-  margin: 6px;
+  width: var(--pin-size, 16px);
+  height: var(--pin-size, 16px);
+  flex: none;
   border-radius: 9999px;
   background: var(--pin);
   border: 2px solid var(--bg);
   box-shadow: 0 0 0 1.5px var(--pin), 0 0 10px var(--pin);
 }
 .purr-pin--purred {
-  width: 22px;
-  height: 22px;
-  margin: 3px;
   border-color: var(--purr);
   box-shadow: 0 0 0 2px var(--purr), 0 0 16px var(--purr);
 }

@@ -353,7 +353,23 @@ export const pl: Dictionary = {
       scanPending: "Nakładka globalnego skanu nie jest jeszcze opublikowana (oczekuje).",
       legendLow: "niższy wynik analogii",
       legendHigh: "wyższy",
+      pins: "Pinezki",
+      showAll: "Pokaż wszystkich kandydatów",
+      showAllHint: "Domyślnie: {n} najlepszych regionów-kandydatów + benchmarki, pułapki i miejsca wybrane ręcznie",
+      hideIce: "Ukryj kandydatów z lądolodów",
+      hideIceHint: "Regiony-kandydaci na Antarktydzie lub z imputowanym NDVI; dotyczy talii i mapy",
       opacity: "Krycie nakładki",
+    },
+    viewFilter: {
+      note: "Filtr wyświetlania – wyniki bez zmian. Zob. METHOD_LOG: znane ograniczenie.",
+      clear: "Pokaż je ponownie",
+    },
+    peek: {
+      hint: "Dotknij mapy, aby zbadać punkt",
+      best: "Najlepszy: {target} · {score}/100",
+      none: "Brak wyniku analogii dla tej komórki",
+      expand: "Rozwiń inspektor punktu",
+      collapse: "Zwiń inspektor punktu",
     },
     inspector: {
       title: "Inspektor punktu",

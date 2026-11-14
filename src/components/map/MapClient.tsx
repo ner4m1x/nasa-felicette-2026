@@ -5,19 +5,27 @@
  * - ScanMap (Leaflet) is loaded with next/dynamic and `ssr: false`, and only after the tab is
  *   first opened (Leaflet must not initialise inside a display:none panel). After that it stays
  *   mounted; ScanMap calls invalidateSize() whenever the tab becomes visible again.
- * - Phone: full-screen map, inspector in a draggable bottom sheet (peek / expanded).
+ * - Phone: full-screen map, inspector in a draggable bottom sheet. It starts at a low "peek" with a
+ *   one-line summary (best target + score) and expands on tap/drag; collapsed, the map stays visible.
  *   Desktop (≥ lg): map + side inspector panel with Félicette's eyes.
- * - Pins = the ranked deck for the configured target; tapping one opens its breakdown.
+ * - Pins (src/lib/mapPins.ts): top candidate regions + benchmark/trap/curated cards, sized by rank;
+ *   "Show all candidates" lifts the cap. The ice-sheet view filter (SwipeContext) applies here too.
+ *   Tapping a pin opens its breakdown.
  */
 
 import { motion, useDragControls } from "framer-motion";
+import { ChevronUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FelicetteEyes } from "@/components/felicette/FelicetteEyes";
 import { PointInspector } from "@/components/inspector/PointInspector";
+import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
+import { formatCoords, to100 } from "@/components/swipe/parts";
 import { BreakdownSheet, type Decision } from "@/components/swipe/BreakdownSheet";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
+import { bestTarget, targetRows } from "@/lib/bestTarget";
+import { selectPins } from "@/lib/mapPins";
 import { DEFAULT_BASE, DEFAULT_OVERLAY_OPACITY, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import { useMission } from "@/state/MissionContext";
 import { DESKTOP_QUERY, useMediaQuery } from "@/state/useMediaQuery";
@@ -32,10 +40,10 @@ const ScanMap = dynamic(() => import("./ScanMap"), {
 });
 
 /** Visible height (px) of the collapsed inspector sheet on phones (UI tuning). */
-const PEEK_PX = 132;
+const PEEK_PX = 96;
 
 export function MapClient({ active }: { active: boolean }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { config } = useMission();
   const swipe = useSwipe();
   const [visited, setVisited] = useState(active);
@@ -48,19 +56,33 @@ export function MapClient({ active }: { active: boolean }) {
   const [point, setPoint] = useState<{ lat: number; lon: number } | null>(null);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   const desktop = useMediaQuery(DESKTOP_QUERY);
   const grid = useScanGrid(visited);
   const overlayAvailable = useOverlayAvailable(config.target);
 
   const markers = useMemo<MarkerItem[]>(() => {
-    if (!swipe.ranked) return [];
+    if (!swipe.visible) return [];
     const purred = new Set(swipe.records.filter((r) => r.verdict === "purr").map((r) => r.cardId));
-    return [
-      ...swipe.ranked.deck.map((ranked) => ({ ranked, purred: purred.has(ranked.card.id), rejected: false })),
-      ...swipe.ranked.rejected.map((ranked) => ({ ranked, purred: purred.has(ranked.card.id), rejected: true })),
-    ];
-  }, [swipe.ranked, swipe.records]);
+    return selectPins(
+      [
+        ...swipe.visible.deck.map((ranked) => ({ ranked, purred: purred.has(ranked.card.id), rejected: false })),
+        ...swipe.visible.rejected.map((ranked) => ({ ranked, purred: purred.has(ranked.card.id), rejected: true })),
+      ],
+      showAll,
+    );
+  }, [swipe.visible, swipe.records, showAll]);
+
+  // One-line peek summary for the phone sheet: best of the four targets at the clicked cell.
+  const peek = useMemo(() => {
+    if (!point || grid?.status !== "ready") return null;
+    const sample = grid.grid.sample(point.lat, point.lon);
+    if (sample.land === false) return { best: null, score: null };
+    const rows = targetRows(sample, (tid) => grid.grid.percentile(tid, point.lat, point.lon));
+    const best = bestTarget(rows);
+    return { best, score: rows.find((r) => r.target === best)?.total ?? null };
+  }, [point, grid]);
 
   const markerTitle = useCallback(
     (m: MarkerItem) =>
@@ -80,10 +102,16 @@ export function MapClient({ active }: { active: boolean }) {
     };
   }, [markers, openCardId, swipe]);
 
-  const onPick = useCallback((lat: number, lon: number) => {
-    setPoint({ lat, lon });
-    setExpanded(true);
-  }, []);
+  // Picking a point keeps the phone sheet at its peek: the summary shows there, the map stays visible.
+  const onPick = useCallback((lat: number, lon: number) => setPoint({ lat, lon }), []);
+
+  const peekText = !point
+    ? t("map.peek.hint")
+    : peek?.best && peek.score !== null
+      ? t("map.peek.best", { target: t(TARGETS[peek.best].shortKey), score: to100(peek.score) })
+      : peek
+        ? t("map.peek.none")
+        : formatCoords(lang, point.lat, point.lon);
 
   const inspector = <PointInspector point={point} grid={grid} config={config} />;
 
@@ -121,7 +149,12 @@ export function MapClient({ active }: { active: boolean }) {
             overlayAvailable={overlayAvailable}
             opacity={opacity}
             onOpacity={setOpacity}
+            showAll={showAll}
+            onShowAll={setShowAll}
+            hideIce={swipe.hideIce}
+            onHideIce={swipe.setHideIce}
           />
+          {swipe.hideIce && <ViewFilterNote className="pointer-events-auto mt-2 max-w-64" />}
         </div>
       </div>
 
@@ -133,7 +166,13 @@ export function MapClient({ active }: { active: boolean }) {
           {inspector}
         </aside>
       ) : (
-        <MobileSheet expanded={expanded} onExpanded={setExpanded} label={t("map.inspector.title")}>
+        <MobileSheet
+          expanded={expanded}
+          onExpanded={setExpanded}
+          label={t("map.inspector.title")}
+          summary={peekText}
+          toggleLabel={t(expanded ? "map.peek.collapse" : "map.peek.expand")}
+        >
           {inspector}
         </MobileSheet>
       )}
@@ -153,11 +192,16 @@ function MobileSheet({
   expanded,
   onExpanded,
   label,
+  summary,
+  toggleLabel,
   children,
 }: {
   expanded: boolean;
   onExpanded: (v: boolean) => void;
   label: string;
+  /** one-line summary shown in the peek (best target + score) */
+  summary: string;
+  toggleLabel: string;
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -201,11 +245,16 @@ function MobileSheet({
         onPointerDown={(e) => controls.start(e)}
         onClick={() => onExpanded(!expanded)}
         aria-expanded={expanded}
-        className="flex min-h-11 w-full shrink-0 cursor-grab items-center justify-center"
+        aria-label={`${toggleLabel}: ${summary}`}
+        className="flex min-h-[72px] w-full shrink-0 cursor-grab flex-col items-center gap-2 px-4 pt-2"
         style={{ touchAction: "none" }}
       >
         <span aria-hidden className="block h-1.5 w-12 rounded-pill bg-line" />
-        <span className="sr-only">{label}</span>
+        <span aria-live="polite" className="flex w-full items-center gap-2 text-left text-xs font-bold text-fg">
+          <span aria-hidden className="text-amber">=^.^=</span>
+          <span className="min-w-0 flex-1 truncate">{summary}</span>
+          <ChevronUp aria-hidden size={16} className={`shrink-0 text-dim transition-transform ${expanded ? "rotate-180" : ""}`} />
+        </span>
       </button>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain" style={{ touchAction: "pan-y" }}>
         {children}

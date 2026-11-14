@@ -48,6 +48,10 @@
   /* Terminal-style dim on the BASE tile layer only (thematic layers, scan overlay and pins are not
      filtered, so they stay readable on top). Set to "none" to show the base unaltered. */
   --map-base-filter: brightness(0.75) saturate(0.7) contrast(1.05);
+  /* Scan overlay (pipeline PNG, never edited): display-only CSS. "normal" + a mild contrast lift
+     keeps the colours true to the legend; set the blend to "screen" for a brighter, glowier look. */
+  --map-overlay-filter: saturate(1.25) contrast(1.1);
+  --map-overlay-blend: normal;
 
   /* ---- Radii ---- */
   --card-radius: 1rem;

@@ -15,6 +15,7 @@
 import { createContext, use, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { browser } from "react-dom";
 import { loadDeck, withGridCards, type DeckLoadResult } from "@/lib/deck";
+import { applyIceFilter } from "@/lib/mapPins";
 import { rankDeck } from "@/lib/ranking";
 import type { MissionConfig, RankedCard, RankedDeck } from "@/lib/types";
 import {
@@ -46,8 +47,13 @@ interface SwipeValue {
   error: string | null;
   isFixture: boolean;
   notice: DeckLoadResult["notice"];
-  /** the ranked deck for the current mission (null while loading) */
+  /** the ranked deck for the current mission (null while loading), unfiltered */
   ranked: RankedDeck | null;
+  /** `ranked` after the display-only view filter (what the deck and the map show) */
+  visible: RankedDeck | null;
+  /** display filter: hide ice-sheet candidates (never changes scores) */
+  hideIce: boolean;
+  setHideIce: (v: boolean) => void;
   /** cards still to judge, in order (skipped cards at the back) */
   queue: RankedCard[];
   /** PURR/HISS records for the current mission, in swipe order */
@@ -129,18 +135,20 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
   }, [deck, grid]);
 
   const ranked = useMemo(() => (cards ? rankDeck(cards, config) : null), [cards, config]);
+  const [hideIce, setHideIce] = useState(false);
+  const visible = useMemo(() => (ranked ? applyIceFilter(ranked, hideIce) : null), [ranked, hideIce]);
 
   const queue = useMemo(() => {
-    if (!ranked) return [];
+    if (!visible) return [];
     const decided = new Set(records.map((r) => r.cardId));
-    const open = ranked.deck.filter((r) => !decided.has(r.card.id));
+    const open = visible.deck.filter((r) => !decided.has(r.card.id));
     const skipOrder = new Map(skipped.map((id, i) => [id, i]));
     const fresh = open.filter((r) => !skipOrder.has(r.card.id));
     const later = open
       .filter((r) => skipOrder.has(r.card.id))
       .sort((a, b) => skipOrder.get(a.card.id)! - skipOrder.get(b.card.id)!);
     return [...fresh, ...later];
-  }, [ranked, records, skipped]);
+  }, [visible, records, skipped]);
 
   const verdictFor = useCallback((card: RankedCard) => felicetteVerdict(card, config), [config]);
 
@@ -179,6 +187,9 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
       isFixture: deck.status === "ready" && deck.result.isFixture,
       notice: deck.status === "ready" ? deck.result.notice : null,
       ranked,
+      visible,
+      hideIce,
+      setHideIce,
       queue,
       records,
       agreement: agreementScore(records),
@@ -187,7 +198,7 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
       skip,
       reset,
     }),
-    [deck, ranked, queue, records, verdictFor, decide, skip, reset],
+    [deck, ranked, visible, hideIce, queue, records, verdictFor, decide, skip, reset],
   );
 
   return <SwipeContext.Provider value={value}>{children}</SwipeContext.Provider>;
