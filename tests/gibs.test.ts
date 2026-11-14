@@ -1,0 +1,41 @@
+import { describe, expect, it } from "vitest";
+import {
+  BASE_LAYERS,
+  DEFAULT_BASE,
+  DEFAULT_OVERLAY_OPACITY,
+  GIBS_LAYERS,
+  gibsLayerLabel,
+  gibsTileUrl,
+  THEMATIC_LAYERS,
+} from "@/lib/gibs";
+
+describe("GIBS layers", () => {
+  it("defaults to the cloud-free Blue Marble base, VIIRS daily stays optional", () => {
+    expect(DEFAULT_BASE).toBe("blueMarble");
+    expect(BASE_LAYERS[0]).toBe(DEFAULT_BASE);
+    expect(BASE_LAYERS).toContain("trueColor");
+    for (const id of BASE_LAYERS) expect(THEMATIC_LAYERS).not.toContain(id);
+  });
+
+  it("builds a time-less URL for the static Blue Marble layer (capabilities template)", () => {
+    expect(gibsTileUrl(GIBS_LAYERS.blueMarble)).toBe(
+      "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg",
+    );
+  });
+
+  it("keeps the pinned date in time-enabled layer URLs", () => {
+    expect(gibsTileUrl(GIBS_LAYERS.trueColor)).toBe(
+      "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2026-09-22/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpeg",
+    );
+  });
+
+  it("labels attribution per layer: no date / day / month", () => {
+    expect(gibsLayerLabel(GIBS_LAYERS.blueMarble)).toBe("Blue Marble Shaded Relief (MODIS)");
+    expect(gibsLayerLabel(GIBS_LAYERS.trueColor)).toMatch(/2026-09-22$/);
+    expect(gibsLayerLabel(GIBS_LAYERS.ndvi)).toMatch(/ 2026-10$/);
+  });
+
+  it("overlay opacity defaults to 70 %", () => {
+    expect(DEFAULT_OVERLAY_OPACITY).toBe(0.7);
+  });
+});

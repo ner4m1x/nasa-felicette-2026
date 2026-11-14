@@ -18,7 +18,7 @@ import { PointInspector } from "@/components/inspector/PointInspector";
 import { BreakdownSheet, type Decision } from "@/components/swipe/BreakdownSheet";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
-import type { GibsLayerId } from "@/lib/gibs";
+import { DEFAULT_BASE, DEFAULT_OVERLAY_OPACITY, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import { useMission } from "@/state/MissionContext";
 import { DESKTOP_QUERY, useMediaQuery } from "@/state/useMediaQuery";
 import { useSwipe } from "@/state/SwipeContext";
@@ -41,9 +41,10 @@ export function MapClient({ active }: { active: boolean }) {
   const [visited, setVisited] = useState(active);
   if (active && !visited) setVisited(true);
 
+  const [base, setBase] = useState<BaseLayerId>(DEFAULT_BASE);
   const [thematic, setThematic] = useState<GibsLayerId | null>(null);
   const [showScan, setShowScan] = useState(true);
-  const [opacity, setOpacity] = useState(0.75);
+  const [opacity, setOpacity] = useState(DEFAULT_OVERLAY_OPACITY);
   const [point, setPoint] = useState<{ lat: number; lon: number } | null>(null);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -93,6 +94,7 @@ export function MapClient({ active }: { active: boolean }) {
           <ScanMap
             active={active}
             target={config.target}
+            base={base}
             thematic={thematic}
             showScan={showScan}
             overlayAvailable={overlayAvailable === true}
@@ -110,6 +112,8 @@ export function MapClient({ active }: { active: boolean }) {
             {t(TARGETS[config.target].catKey)}
           </p>
           <LayerSwitcher
+            base={base}
+            onBase={setBase}
             thematic={thematic}
             onThematic={setThematic}
             showScan={showScan}

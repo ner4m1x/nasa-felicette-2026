@@ -44,6 +44,11 @@
   --score-fit: var(--amber);
   --score-track: var(--line);
 
+  /* ---- Map ---- */
+  /* Terminal-style dim on the BASE tile layer only (thematic layers, scan overlay and pins are not
+     filtered, so they stay readable on top). Set to "none" to show the base unaltered. */
+  --map-base-filter: brightness(0.75) saturate(0.7) contrast(1.05);
+
   /* ---- Radii ---- */
   --card-radius: 1rem;
   --sheet-radius: 1rem;

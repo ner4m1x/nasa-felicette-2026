@@ -141,6 +141,7 @@ export const en = {
     regional: "Regional · 0.25° grid",
     site: "Site · below grid resolution",
     known: "Known analog site",
+    ndviImputed: "NDVI imputed – no MODIS coverage here, land cover shows a non-vegetated surface",
     teaser: {
       benchmark: "A known analog: the yardstick I measure every other litterbox against.",
       discovery: "Fresh off the global scan. Nobody has sniffed here yet.",
@@ -323,8 +324,10 @@ export const en = {
     rejectedTag: "rejected by your mission specs",
     layers: {
       title: "Layers",
-      base: "Base",
-      trueColor: "True colour (VIIRS SNPP)",
+      base: "Base map",
+      blueMarble: "Blue Marble shaded relief (cloud-free composite)",
+      trueColor: "Satellite view (single day, may show clouds)",
+      thematic: "Thematic layer",
       none: "No thematic layer",
       lstDay: "Land surface temperature, day (monthly)",
       ndvi: "Vegetation index NDVI (monthly)",

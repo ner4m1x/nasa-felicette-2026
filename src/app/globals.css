@@ -141,6 +141,10 @@ dialog.purr-sheet::backdrop {
     bottom: 132px;
   }
 }
+/* Base tile layer only (TileLayer className in ScanMap); see --map-base-filter in tokens.css. */
+.leaflet-container .purr-base-tiles {
+  filter: var(--map-base-filter);
+}
 .purr-scan-overlay {
   image-rendering: pixelated;
 }

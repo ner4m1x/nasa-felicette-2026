@@ -2,8 +2,9 @@
 
 /**
  * The Leaflet map (client-only; loaded through next/dynamic with ssr: false by MapClient).
- * - Base: GIBS true colour; optional thematic GIBS layer (LST / NDVI) and the pipeline scan
- *   overlay on top, both with the user's opacity.
+ * - Base: cloud-free GIBS Blue Marble by default, or the single-day VIIRS true colour; the base
+ *   tile layer alone gets the terminal dim (--map-base-filter). Optional thematic GIBS layer
+ *   (LST / NDVI) and the pipeline scan overlay on top, both unfiltered with the user's opacity.
  * - The map sits in a tab panel that is hidden, not unmounted: when the tab becomes visible again
  *   `invalidateSize()` re-measures the container.
  * - Click/tap anywhere → onPick(lat, lon). The selected point gets a pulse marker (this is the
@@ -14,7 +15,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useRef } from "react";
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
-import { GIBS_ATTRIBUTION, GIBS_LAYERS, gibsTileUrl, type GibsLayerId } from "@/lib/gibs";
+import { GIBS_ATTRIBUTION, GIBS_LAYERS, gibsLayerLabel, gibsTileUrl, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import type { TargetId } from "@/lib/types";
 import { CandidateMarkers, type MarkerItem } from "./CandidateMarkers";
 import { LaserCursor } from "./LaserCursor";
@@ -23,6 +24,7 @@ import { ScanOverlay } from "./ScanOverlay";
 export interface ScanMapProps {
   active: boolean;
   target: TargetId;
+  base: BaseLayerId;
   thematic: GibsLayerId | null;
   showScan: boolean;
   overlayAvailable: boolean;
@@ -76,9 +78,9 @@ function ClickHandler({ onPick }: { onPick: (lat: number, lon: number) => void }
 }
 
 export default function ScanMap(props: ScanMapProps) {
-  const { active, target, thematic, showScan, overlayAvailable, opacity, markers, markerTitle, selected } = props;
+  const { active, target, base: baseId, thematic, showScan, overlayAvailable, opacity, markers, markerTitle, selected } = props;
   const wrap = useRef<HTMLDivElement>(null);
-  const base = GIBS_LAYERS.trueColor;
+  const base = GIBS_LAYERS[baseId];
   const theme = thematic ? GIBS_LAYERS[thematic] : null;
 
   return (
@@ -95,13 +97,16 @@ export default function ScanMap(props: ScanMapProps) {
         className="h-full w-full"
         attributionControl
       >
+        {/* key: remount on switch so Leaflet's attribution control drops the old base's line */}
         <TileLayer
+          key={base.id}
           url={gibsTileUrl(base)}
           maxNativeZoom={base.maxZoom}
           maxZoom={9}
           noWrap
           bounds={WORLD}
-          attribution={`${GIBS_ATTRIBUTION} · ${base.product} ${base.time}`}
+          className="purr-base-tiles"
+          attribution={`${GIBS_ATTRIBUTION} · ${gibsLayerLabel(base)}`}
         />
         {theme && (
           <TileLayer
@@ -113,7 +118,7 @@ export default function ScanMap(props: ScanMapProps) {
             bounds={WORLD}
             opacity={opacity}
             zIndex={10}
-            attribution={`${theme.product} ${theme.time.slice(0, 7)}`}
+            attribution={gibsLayerLabel(theme)}
           />
         )}
         {showScan && overlayAvailable && <ScanOverlay target={target} opacity={opacity} />}

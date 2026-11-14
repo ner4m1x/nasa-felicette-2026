@@ -137,6 +137,8 @@ export const pl: Dictionary = {
     regional: "Regionalna · siatka 0,25°",
     site: "Punktowa · poniżej rozdzielczości siatki",
     known: "Znany analog",
+    ndviImputed:
+      "NDVI imputowane – brak pokrycia MODIS w tym miejscu, pokrycie terenu wskazuje na powierzchnię bez roślinności",
     teaser: {
       benchmark: "Znany analog: miarka, którą mierzę każdą inną kuwetę.",
       discovery: "Świeżo z globalnego skanu. Nikt tu jeszcze nie węszył.",
@@ -318,8 +320,10 @@ export const pl: Dictionary = {
     rejectedTag: "odrzucone przez wymogi misji",
     layers: {
       title: "Warstwy",
-      base: "Podkład",
-      trueColor: "Barwy naturalne (VIIRS SNPP)",
+      base: "Mapa podkładowa",
+      blueMarble: "Blue Marble z cieniowaniem rzeźby (kompozyt bez chmur)",
+      trueColor: "Widok satelitarny (jeden dzień, mogą być chmury)",
+      thematic: "Warstwa tematyczna",
       none: "Bez warstwy tematycznej",
       lstDay: "Temperatura powierzchni lądu, dzień (miesięczna)",
       ndvi: "Wskaźnik roślinności NDVI (miesięczny)",

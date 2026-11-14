@@ -9,6 +9,7 @@
 import { MapPin, Star } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { RankedCard } from "@/lib/types";
+import { NdviImputedNote } from "./NdviImputedNote";
 import { formatCoords, KindBadge, ScoreBar } from "./parts";
 import { WhiskerScan } from "./WhiskerScan";
 
@@ -70,6 +71,8 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
             color="var(--score-fit)"
           />
         </div>
+
+        <NdviImputedNote imputed={card.ndviImputed} label={t("card.ndviImputed")} />
 
         <p className="flex gap-2 text-xs italic leading-relaxed text-fg/90">
           <span aria-hidden className="not-italic text-amber">

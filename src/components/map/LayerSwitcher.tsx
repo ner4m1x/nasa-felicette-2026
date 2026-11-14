@@ -1,17 +1,20 @@
 "use client";
 
 /**
- * Terminal-style layer switcher: thematic GIBS layer (none / LST / NDVI) over the true-colour
- * base, the pipeline scan overlay toggle, and one opacity slider for the overlays.
+ * Terminal-style layer switcher: base map radio group (cloud-free Blue Marble by default, or the
+ * single-day VIIRS mosaic), thematic GIBS layer (none / LST / NDVI) on top, the pipeline scan
+ * overlay toggle, and one opacity slider for the overlays (the base is never made transparent).
  * Phone: collapsed behind a "Layers" button. Desktop: always open.
  */
 
 import { Layers, X } from "lucide-react";
 import { useId, useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
-import { GIBS_LAYERS, THEMATIC_LAYERS, type GibsLayerId } from "@/lib/gibs";
+import { BASE_LAYERS, GIBS_LAYERS, THEMATIC_LAYERS, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 
 interface LayerSwitcherProps {
+  base: BaseLayerId;
+  onBase: (id: BaseLayerId) => void;
   thematic: GibsLayerId | null;
   onThematic: (id: GibsLayerId | null) => void;
   showScan: boolean;
@@ -32,6 +35,7 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const name = useId();
+  const baseName = useId();
   const sliderId = useId();
 
   const options: { id: GibsLayerId | null; label: string }[] = [
@@ -58,10 +62,34 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
       >
         <fieldset>
           <legend className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
-            {t("map.layers.title")}
+            {t("map.layers.base")}
           </legend>
-          <p className="mb-1.5 text-[10px] text-dim">
-            {t("map.layers.base")}: {t("map.layers.trueColor")} ({GIBS_LAYERS.trueColor.time})
+          <div className="space-y-0.5">
+            {BASE_LAYERS.map((id) => (
+              <label
+                key={id}
+                className="flex min-h-9 cursor-pointer items-center gap-2 rounded px-1 hover:bg-phosphor/5"
+              >
+                <input
+                  type="radio"
+                  name={baseName}
+                  checked={props.base === id}
+                  onChange={() => props.onBase(id)}
+                  className="accent-[var(--phosphor)]"
+                />
+                <span className="leading-tight">{t(`map.layers.${id}`)}</span>
+                {GIBS_LAYERS[id].time && (
+                  <span className="ml-auto text-[10px] tabular-nums text-dim">{GIBS_LAYERS[id].time}</span>
+                )}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="mt-2 border-t border-line pt-2">
+          <legend className="sr-only">{t("map.layers.thematic")}</legend>
+          <p aria-hidden className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
+            {t("map.layers.thematic")}
           </p>
           <div className="space-y-0.5">
             {options.map((o) => (
@@ -78,7 +106,7 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
                 />
                 <span>{o.label}</span>
                 {o.id && (
-                  <span className="ml-auto text-[10px] tabular-nums text-dim">{GIBS_LAYERS[o.id].time.slice(0, 7)}</span>
+                  <span className="ml-auto text-[10px] tabular-nums text-dim">{GIBS_LAYERS[o.id].time?.slice(0, 7)}</span>
                 )}
               </label>
             ))}

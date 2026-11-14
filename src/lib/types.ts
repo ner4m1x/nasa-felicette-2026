@@ -82,6 +82,12 @@ export interface DeckCard {
   breakdown: Partial<Record<TargetId, TargetBreakdown>>;
   sourceIds: string[];
   /**
+   * true if any grid cell behind this card had NDVI imputed (targets.json rule
+   * `ndvi_no_modis_coverage`: no MODIS coverage, land cover shows a non-vegetated surface).
+   * Optional; mirrors `ndviImputed` in scripts/config/deck.schema.json.
+   */
+  ndviImputed?: boolean;
+  /**
    * Curated cards only: id of the pipeline card for the same site (`site-<known_sites id>`). When
    * both are in the deck they are merged into one card (src/lib/deck.ts `mergeCurated`).
    */

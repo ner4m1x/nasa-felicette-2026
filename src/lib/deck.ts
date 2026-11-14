@@ -115,6 +115,7 @@ function cardProblem(c: unknown): string | null {
     if (!isTargetBreakdown(b)) return `${c.id}: bad breakdown for ${target}`;
   }
   if (!Array.isArray(c.sourceIds)) return `${c.id}: missing sourceIds`;
+  if (c.ndviImputed !== undefined && typeof c.ndviImputed !== "boolean") return `${c.id}: bad ndviImputed`;
   return null;
 }
 
@@ -153,7 +154,8 @@ function mergeBreakdowns(curated: DeckCard["breakdown"], pipeline: DeckCard["bre
 
 /**
  * One card for a site that is both curated and scanned by the pipeline: the curated id, kind, name,
- * coordinates and narrative; the pipeline's measured numbers (analog, mission, stability, area).
+ * coordinates and narrative; the pipeline's measured numbers (analog, mission, stability, area,
+ * ndviImputed).
  * Sources are the union, so the pipeline's numeric lines stay cited.
  */
 export function mergeCuratedWithPipeline(curated: DeckCard, pipeline: DeckCard): DeckCard {
@@ -165,6 +167,8 @@ export function mergeCuratedWithPipeline(curated: DeckCard, pipeline: DeckCard):
     regionAreaKm2: pipeline.regionAreaKm2,
     breakdown: mergeBreakdowns(curated.breakdown, pipeline.breakdown),
     sourceIds: [...new Set([...curated.sourceIds, ...pipeline.sourceIds])],
+    // a property of the pipeline's measured cells, like analog/mission
+    ...(pipeline.ndviImputed !== undefined && { ndviImputed: pipeline.ndviImputed }),
   };
 }
 

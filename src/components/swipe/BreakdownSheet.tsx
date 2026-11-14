@@ -23,6 +23,7 @@ import type { RankedCard } from "@/lib/types";
 import { shouldCelebrate, verdictHeadlineKey, type Agreement, type FelicetteVerdict, type SwipeRecord } from "@/lib/verdict";
 import { useMission } from "@/state/MissionContext";
 import { CONFETTI_COLOR_VARS } from "@/theme/tokens";
+import { NdviImputedNote } from "./NdviImputedNote";
 import { KindBadge, reasonText, SourceList, to100 } from "./parts";
 
 export interface Decision {
@@ -153,6 +154,8 @@ export function BreakdownSheet({
                 })}
           </p>
         </section>
+
+        <NdviImputedNote imputed={card.ndviImputed} label={t("card.ndviImputed")} />
 
         {!breakdown && (
           <p className="rounded-control border border-dashed border-line px-3 py-2 text-sm text-dim">
