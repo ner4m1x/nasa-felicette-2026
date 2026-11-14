@@ -139,6 +139,7 @@ export const en = {
     scoreAndPct: "score {score} · {pct}",
     tieNote: "Percentile among all scored land cells; many cells tie at the minimum.",
     limiting: "Weakest dimension: {dim}",
+    radarShort: "0–100 per dimension · the weakest (amber) holds the score back",
     unscored: "Not scorable by the global grid",
     noCountry: "—",
     regional: "Regional · 0.25° grid",

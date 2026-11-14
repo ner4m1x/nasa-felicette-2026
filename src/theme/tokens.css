@@ -69,6 +69,13 @@
   --duration-shimmer: 1.4s;
   --imagery-aspect: 16 / 9;
 
+  /* ---- Compact dimension radar (card front) ---- */
+  --radar-size: 7rem;
+  --radar-line: var(--score-analog);
+  --radar-limiting: var(--amber);
+  --radar-grid: var(--line);
+  --radar-fill-opacity: 0.22;
+
   /* ---- Radii ---- */
   --card-radius: 1rem;
   --sheet-radius: 1rem;

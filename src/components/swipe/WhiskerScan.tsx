@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * "Scan with whiskers": fetches the live NASA POWER climatology for the card's coordinates, then
- * reveals the per-dimension DimensionRadar. POWER values use the units read from the response,
- * mapped to display units; the full parameter name stays in a tooltip.
+ * "Scan with whiskers": fetches the live NASA POWER climatology for the card's coordinates as an
+ * independent cross-check. (The per-dimension radar is always on the card front; this no longer
+ * gates it.) POWER values use the units read from the response, mapped to display units; the full
+ * parameter name stays in a tooltip.
  */
 
 import { Loader2, RotateCcw, ScanSearch } from "lucide-react";
@@ -11,8 +12,6 @@ import { useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { Lang } from "@/i18n/types";
 import { fetchPowerClimatology, type PowerClimatology } from "@/lib/power";
-import type { AnalogEntry } from "@/lib/types";
-import { DimensionRadar } from "./DimensionRadar";
 import { PowerValueList } from "./PowerValueList";
 
 type ScanState =
@@ -24,14 +23,13 @@ type ScanState =
 interface WhiskerScanProps {
   lat: number;
   lon: number;
-  entry: AnalogEntry | null;
   /** only the top card's controls are focusable */
   interactive: boolean;
 }
 
 const fmt = (lang: Lang, v: number) => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }).format(v);
 
-export function WhiskerScan({ lat, lon, entry, interactive }: WhiskerScanProps) {
+export function WhiskerScan({ lat, lon, interactive }: WhiskerScanProps) {
   const { t, lang } = useI18n();
   const [state, setState] = useState<ScanState>({ status: "idle" });
 
@@ -72,14 +70,13 @@ export function WhiskerScan({ lat, lon, entry, interactive }: WhiskerScanProps) 
           <RotateCcw aria-hidden size={14} />
           {t("card.retry")}
         </button>
-        <DimensionRadar entry={entry} />
       </div>
     );
   }
 
   const { data } = state;
   return (
-    <div className="space-y-4" role="status">
+    <div role="status">
       <section className="rounded-control border border-line bg-panel-2 p-3">
         <h4 className="text-[11px] font-bold uppercase tracking-wider text-phosphor">{t("scan.title")}</h4>
         <div className="mt-2">
@@ -97,7 +94,6 @@ export function WhiskerScan({ lat, lon, entry, interactive }: WhiskerScanProps) 
           {t("scan.source")}
         </p>
       </section>
-      <DimensionRadar entry={entry} />
     </div>
   );
 }

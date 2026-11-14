@@ -1,9 +1,11 @@
 "use client";
 
 /**
- * Card front: satellite thumbnail (CardImagery), name, country, kind badge, both scores as separate labelled bars (Analog Score from
- * the frozen pipeline; Mission Fit from the configurator — never mixed), a one-line teaser from
- * Félicette and the "Scan with whiskers" cross-check.
+ * Card front: satellite thumbnail (CardImagery), name, country, kind badge, both scores as separate
+ * labelled bars (Analog Score from the frozen pipeline; Mission Fit from the configurator — never
+ * mixed) with the compact per-dimension radar for the active target (always shown when the card has
+ * dims; a short text block otherwise), a one-line teaser from Félicette and the "Scan with whiskers"
+ * live NASA POWER cross-check.
  */
 
 import { MapPin, Star, Trash2 } from "lucide-react";
@@ -16,6 +18,7 @@ import { useSwipe } from "@/state/SwipeContext";
 import { LowScoreNote } from "./LowScoreNote";
 import { NdviImputedNote } from "./NdviImputedNote";
 import { CardImagery } from "./CardImagery";
+import { DimensionLegend, DimensionNone, DimensionRadar, hasDims, MIN_RADAR_AXES } from "./DimensionRadar";
 import { formatCoords, KindBadge, ScoreBar, to100 } from "./parts";
 import { WhiskerScan } from "./WhiskerScan";
 
@@ -44,6 +47,28 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
         .filter(Boolean)
         .join(" · ")
     : t("card.unscored");
+
+  const bars = (
+    <div className="space-y-3">
+      <ScoreBar
+        label={t("card.analog")}
+        hint={t("card.analogHint")}
+        value={analog?.total ?? null}
+        outOf={t("card.outOf")}
+        color="var(--score-analog)"
+        detail={analogDetail}
+        detailTitle={pctText ? t("card.tieNote") : undefined}
+      />
+      {pctText && <p className="-mt-2 text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
+      <ScoreBar
+        label={t("card.fit")}
+        hint={t("card.fitHint")}
+        value={missionFit.fit}
+        outOf={t("card.outOf")}
+        color="var(--score-fit)"
+      />
+    </div>
+  );
 
   return (
     <div className="flex h-full flex-col">
@@ -90,25 +115,20 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
         className={`min-h-0 flex-1 space-y-4 px-4 py-3 ${interactive ? "overflow-y-auto overscroll-contain" : "overflow-hidden"}`}
         style={{ touchAction: "pan-y" }}
       >
-        <div className="space-y-3">
-          <ScoreBar
-            label={t("card.analog")}
-            hint={t("card.analogHint")}
-            value={analog?.total ?? null}
-            outOf={t("card.outOf")}
-            color="var(--score-analog)"
-            detail={analogDetail}
-            detailTitle={pctText ? t("card.tieNote") : undefined}
-          />
-          {pctText && <p className="-mt-2 text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
-          <ScoreBar
-            label={t("card.fit")}
-            hint={t("card.fitHint")}
-            value={missionFit.fit}
-            outOf={t("card.outOf")}
-            color="var(--score-fit)"
-          />
-        </div>
+        {/* Scores + compact radar. Phone: radar and its legend first (right under the image and
+            title), bars below. Desktop (lg): bars with the radar beside them, legend underneath. */}
+        {hasDims(analog) && Object.keys(analog.dims).length >= MIN_RADAR_AXES ? (
+          <div className="grid grid-cols-[var(--radar-size)_minmax(0,1fr)] items-center gap-x-3 gap-y-3 [grid-template-areas:'radar_legend'_'bars_bars'] lg:grid-cols-[minmax(0,1fr)_var(--radar-size)] lg:[grid-template-areas:'bars_radar'_'legend_legend']">
+            <DimensionRadar entry={analog} className="[grid-area:radar]" />
+            <DimensionLegend entry={analog} className="[grid-area:legend]" />
+            <div className="[grid-area:bars]">{bars}</div>
+          </div>
+        ) : (
+          <>
+            {bars}
+            {hasDims(analog) ? <DimensionLegend entry={analog} /> : <DimensionNone />}
+          </>
+        )}
 
         {card.kind === "user" && card.lowScore?.[config.target] && <LowScoreNote reason={card.lowScore[config.target]!} />}
 
@@ -123,7 +143,7 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
 
         {card.id === HAMMAGUIR_CARD_ID && <HammaguirStory ranked={ranked} />}
 
-        <WhiskerScan lat={card.lat} lon={card.lon} entry={analog} interactive={interactive} />
+        <WhiskerScan lat={card.lat} lon={card.lon} interactive={interactive} />
       </div>
     </div>
   );

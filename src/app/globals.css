@@ -71,15 +71,6 @@ body::after {
   text-shadow: var(--glow-shadow);
 }
 
-/* Recharts radar (DimensionRadar): grid and tick colors from the tokens. */
-.purr-radar .recharts-polar-grid line,
-.purr-radar .recharts-polar-grid polygon {
-  stroke: var(--line);
-}
-.purr-radar .recharts-polar-angle-axis-tick text {
-  fill: var(--dim);
-}
-
 .cursor-blink::after {
   content: "▌";
   margin-left: 0.1em;

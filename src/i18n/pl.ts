@@ -135,6 +135,7 @@ export const pl: Dictionary = {
     scoreAndPct: "wynik {score} · {pct}",
     tieNote: "Percentyl wśród wszystkich ocenionych komórek lądu; wiele komórek ma ex aequo wartość minimalną.",
     limiting: "Najsłabszy wymiar: {dim}",
+    radarShort: "0–100 na wymiar · najsłabszy (bursztynowy) obniża wynik",
     unscored: "Nie do ocenienia przez globalną siatkę",
     noCountry: "—",
     regional: "Regionalna · siatka 0,25°",
