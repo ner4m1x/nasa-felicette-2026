@@ -1,0 +1,364 @@
+{
+  "pipeline_version": "1.0.0",
+  "run_timestamp": "2026-11-14T14:17:24+00:00",
+  "years": [
+    2023
+  ],
+  "config": {
+    "path": "scripts/config/targets.json",
+    "commit": "de66a694269a7b6eb9f4855bf7e9ed99daf132c9",
+    "subject": "freeze scoring config v2",
+    "date": "2026-11-14T15:16:03+01:00",
+    "dirty": false
+  },
+  "datasets": {
+    "MOD13C2": {
+      "source_id": "MOD13C2.061",
+      "short_name": "MOD13C2",
+      "version": "061",
+      "title": "MODIS/Terra Vegetation Indices Monthly L3 Global 0.05Deg CMG V061",
+      "doi": "10.5067/MODIS/MOD13C2.061",
+      "concept_id": "C2565788914-LPCLOUD",
+      "provider": "LPCLOUD",
+      "temporal_range": [
+        "2023-01-01T00:00:00.000Z",
+        "2023-12-31T23:59:59.000Z"
+      ],
+      "granule_count": 12,
+      "download_date": "2026-11-14T12:54:13+00:00",
+      "role": "NDVI (vegetation)",
+      "read_metadata": {
+        "sds": "CMG 0.05 Deg Monthly NDVI",
+        "scale_factor": 10000.0,
+        "add_offset": 0.0,
+        "fill": -3000,
+        "valid_range": [
+          -2000,
+          10000
+        ],
+        "units": "NDVI",
+        "convention": "(raw - 0.0) / 10000.0  [MODIS VI convention]"
+      }
+    },
+    "MOD11C3": {
+      "source_id": "MOD11C3.061",
+      "short_name": "MOD11C3",
+      "version": "061",
+      "title": "MODIS/Terra Land Surface Temperature/Emissivity Monthly L3 Global 0.05Deg CMG V061",
+      "doi": "10.5067/MODIS/MOD11C3.061",
+      "concept_id": "C2565788897-LPCLOUD",
+      "provider": "LPCLOUD",
+      "temporal_range": [
+        "2023-01-01T00:00:00.000Z",
+        "2023-12-31T23:59:59.000Z"
+      ],
+      "granule_count": 12,
+      "download_date": "2026-11-14T12:59:09+00:00",
+      "role": "land surface temperature",
+      "read_metadata": {
+        "sds": [
+          "LST_Day_CMG",
+          "LST_Night_CMG"
+        ],
+        "scale_factor": 0.02,
+        "add_offset": 0.0,
+        "fill": 0,
+        "valid_range": [
+          7500,
+          65535
+        ],
+        "units": "K",
+        "convention": "0.02 * (raw - 0.0)  [HDF4 SD convention]"
+      }
+    },
+    "MCD12C1": {
+      "source_id": "MCD12C1.061",
+      "short_name": "MCD12C1",
+      "version": "061",
+      "title": "MODIS/Terra+Aqua Land Cover Type Yearly L3 Global 0.05Deg CMG V061",
+      "doi": "10.5067/MODIS/MCD12C1.061",
+      "concept_id": "C2484078896-LPCLOUD",
+      "provider": "LPCLOUD",
+      "temporal_range": [
+        "2023-01-01T00:00:00.000Z",
+        "2023-12-31T23:59:00.000Z"
+      ],
+      "granule_count": 1,
+      "download_date": "2026-11-14T13:07:55+00:00",
+      "role": "IGBP land-cover fractions + land/water mask",
+      "read_metadata": {
+        "sds": "Land_Cover_Type_1_Percent",
+        "scale_factor": null,
+        "add_offset": 0.0,
+        "fill": 255,
+        "valid_range": [
+          0,
+          100
+        ],
+        "units": "percent in integers",
+        "convention": "no scale_factor attribute: raw values used"
+      }
+    },
+    "M2TMNXFLX": {
+      "source_id": "M2TMNXFLX.5.12.4",
+      "short_name": "M2TMNXFLX",
+      "version": "5.12.4",
+      "title": "MERRA-2 tavgM_2d_flx_Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Surface Flux Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TMNXFLX) ",
+      "doi": "10.5067/0JRLVL8YV2Y4",
+      "concept_id": "C1276812868-GES_DISC",
+      "provider": "GES_DISC",
+      "temporal_range": [
+        "2023-01-01T00:00:00.000Z",
+        "2023-12-31T23:59:59.000Z"
+      ],
+      "granule_count": 12,
+      "download_date": "2026-11-14T13:13:08+00:00",
+      "role": "precipitation (PRECTOTCORR)",
+      "read_metadata": {
+        "var": "PRECTOTCORR",
+        "units_in_file": "kg m-2 s-1",
+        "months": 12
+      }
+    },
+    "M2TMNXAER": {
+      "source_id": "M2TMNXAER.5.12.4",
+      "short_name": "M2TMNXAER",
+      "version": "5.12.4",
+      "title": "MERRA-2 tavgM_2d_aer_Nx: 2d,Monthly mean,Time-averaged,Single-Level,Assimilation,Aerosol Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TMNXAER) ",
+      "doi": "10.5067/FH9A0MLJPC7N",
+      "concept_id": "C1276812866-GES_DISC",
+      "provider": "GES_DISC",
+      "temporal_range": [
+        "2023-01-01T00:00:00.000Z",
+        "2023-12-31T23:59:59.000Z"
+      ],
+      "granule_count": 12,
+      "download_date": "2026-11-14T13:18:32+00:00",
+      "role": "dust AOD (DUEXTTAU)",
+      "read_metadata": {
+        "var": "DUEXTTAU",
+        "units_in_file": "1",
+        "months": 12
+      }
+    },
+    "ETOPO_2022_60s": {
+      "source_id": "ETOPO_2022_60s",
+      "short_name": "ETOPO_2022_60s",
+      "version": "2022 v1, 60 arc-second, surface",
+      "title": "ETOPO_2022_60s",
+      "doi": "10.25921/fd45-gt74",
+      "dataset_doi": null,
+      "concept_id": null,
+      "url": "https://www.ngdc.noaa.gov/thredds/fileServer/global/ETOPO2022/60s/60s_surface_elev_netcdf/ETOPO_2022_v1_60s_N90W180_surface.nc",
+      "landing_url": null,
+      "license": null,
+      "license_note": null,
+      "temporal_range": null,
+      "granule_count": 1,
+      "download_date": "2026-11-14T13:23:26+00:00",
+      "role": "DEM: relief, slope, trafficability",
+      "read_metadata": null
+    },
+    "GLiM": {
+      "source_id": "GLiM",
+      "short_name": "GLiM",
+      "version": "GLiM full-resolution polygons (LiMW_GIS 2015.gdb)",
+      "title": "The new global lithological map database GLiM: A representation of rock properties at the Earth surface",
+      "doi": "10.1029/2012GC004370",
+      "dataset_doi": "10.1594/PANGAEA.788537",
+      "concept_id": null,
+      "url": "https://www.dropbox.com/s/9vuowtebp9f1iud/LiMW_GIS%202015.gdb.zip?dl=1",
+      "landing_url": "https://www.geo.uni-hamburg.de/en/geologie/forschung/aquatische-geochemie/glim.html",
+      "license": "https://creativecommons.org/licenses/by/3.0/",
+      "license_note": "license read from the PANGAEA record of the GLiM 0.5 deg release (same authors and paper); the full-resolution download page states no separate license",
+      "temporal_range": null,
+      "granule_count": 1,
+      "download_date": "2026-11-14T13:29:26+00:00",
+      "role": "lithology (basic volcanics)",
+      "read_metadata": {
+        "mode": "full-resolution polygons (streamed in chunks)",
+        "layer": "GLiM_export",
+        "class_column": "xx",
+        "fields": [
+          "IDENTITY_",
+          "Litho",
+          "xx",
+          "Shape_Length",
+          "Shape_Area"
+        ],
+        "raster_res_deg": 0.025,
+        "features": 1235259,
+        "features_burnt": 1235259,
+        "chunk_features": 20000
+      }
+    },
+    "NE_geography_regions": {
+      "source_id": "NE_geography_regions",
+      "short_name": "NE_geography_regions",
+      "version": "5.0.0",
+      "title": "NE_geography_regions",
+      "doi": null,
+      "dataset_doi": null,
+      "concept_id": null,
+      "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_geography_regions_polys.zip",
+      "landing_url": null,
+      "license": null,
+      "license_note": null,
+      "temporal_range": null,
+      "granule_count": 1,
+      "download_date": "2026-11-14T13:29:29+00:00",
+      "role": "candidate region naming",
+      "read_metadata": null
+    },
+    "NE_admin0": {
+      "source_id": "NE_admin0",
+      "short_name": "NE_admin0",
+      "version": "5.1.1",
+      "title": "NE_admin0",
+      "doi": null,
+      "dataset_doi": null,
+      "concept_id": null,
+      "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip",
+      "landing_url": null,
+      "license": null,
+      "license_note": null,
+      "temporal_range": null,
+      "granule_count": 1,
+      "download_date": "2026-11-14T13:29:30+00:00",
+      "role": "country naming",
+      "read_metadata": null
+    }
+  },
+  "sanity_checks": [
+    {
+      "region": "Central Sahara",
+      "feature": "ndvi_mean",
+      "value": 0.09874583780765533,
+      "condition": "< 0.15",
+      "where": "median of 256 land cells in lat [21, 25] lon [9, 13]",
+      "result": "PASS"
+    },
+    {
+      "region": "Central Sahara",
+      "feature": "barren_frac",
+      "value": 100.0,
+      "condition": "> 80",
+      "where": "median of 256 land cells in lat [21, 25] lon [9, 13]",
+      "result": "PASS"
+    },
+    {
+      "region": "Central Amazon",
+      "feature": "ndvi_mean",
+      "value": 0.8266785740852356,
+      "condition": "> 0.7",
+      "where": "median of 287 land cells in lat [-5, -2] lon [-66, -60]",
+      "result": "PASS"
+    },
+    {
+      "region": "Central Amazon",
+      "feature": "precip_mm_yr",
+      "value": 2166.088134765625,
+      "condition": "> 1500",
+      "where": "median of 287 land cells in lat [-5, -2] lon [-66, -60]",
+      "result": "PASS"
+    },
+    {
+      "region": "Atacama around Yungay",
+      "feature": "precip_mm_yr",
+      "value": 2.4702563285827637,
+      "condition": "< 50",
+      "where": "cell containing (-24.08, -70.0)",
+      "result": "PASS"
+    },
+    {
+      "region": "East Antarctic plateau",
+      "feature": "lst_night_mean_c",
+      "value": -54.97806167602539,
+      "condition": "< -40",
+      "where": "median of 4480 land cells in lat [-82, -75] lon [100, 140]",
+      "result": "PASS"
+    },
+    {
+      "region": "East Antarctic plateau",
+      "feature": "snowice_frac",
+      "value": 100.0,
+      "condition": "> 90",
+      "where": "median of 4480 land cells in lat [-82, -75] lon [100, 140]",
+      "result": "PASS"
+    },
+    {
+      "region": "Iceland interior",
+      "feature": "basalt_frac",
+      "value": 100.0,
+      "condition": "> 50",
+      "where": "median of 36 land cells in lat [64.4, 65.2] lon [-19.5, -16.5]",
+      "result": "PASS"
+    }
+  ],
+  "outputs": {
+    "scan_moon_shackleton.png": {
+      "bytes": 50226,
+      "sha256": "a5de0d19c510fd64e8654f3ca447f03afb462330617317f6c7fcea63cdaf3cd3"
+    },
+    "scan_moon_tranquillitatis_pit.png": {
+      "bytes": 14434,
+      "sha256": "5d53e6f7e8e9bc1eb971b0c50a1f0b069046db61927a8fcffbf14e1be56f8bd2"
+    },
+    "scan_mars_jezero.png": {
+      "bytes": 50898,
+      "sha256": "dd1a32559cf02a717e02f2afe16d20377a4676a56c499076ee0f902b5293f4a1"
+    },
+    "scan_mars_arcadia.png": {
+      "bytes": 81158,
+      "sha256": "700a63dd249a2f0f89568ebcf23956d37a3f48eed6c695f62043b8ca11ba8866"
+    },
+    "scan_grid.bin.gz": {
+      "bytes": 1791500,
+      "sha256": "63d6ea336df1b1d452cf5459d3ab028d064dd58bc42b04c1367f196c5336a941"
+    },
+    "scan_grid_meta.json": {
+      "bytes": 15071,
+      "sha256": "8037087f98589c811394950e8a49cf1c0531511b975d1239d1417bbea4adb451"
+    },
+    "candidates_moon_shackleton.geojson": {
+      "bytes": 76007,
+      "sha256": "d7b5cf5ea391eb5e89382d1da390564fa176537ef45a458a7e8a87901068da85"
+    },
+    "candidates_moon_tranquillitatis_pit.geojson": {
+      "bytes": 36559,
+      "sha256": "16dab358c9501acdc66a9797d96097ffb4a3b0e1f5889c4c808bd13526c3bcaf"
+    },
+    "candidates_mars_jezero.geojson": {
+      "bytes": 66224,
+      "sha256": "7dd96f9924e8d32badc07bbe23838881ac787c1546a00d82e51c300ef04256db"
+    },
+    "candidates_mars_arcadia.geojson": {
+      "bytes": 33100,
+      "sha256": "6384fbaaa7b5318ea88c428d22efc13363f58fc71ed107985d8ecfdf930351db"
+    },
+    "validation_report.json": {
+      "bytes": 37890,
+      "sha256": "3279c1cde30add8e0c00ccb7c2408c4381c56370dfcbf15080de01af5da0a35f"
+    },
+    "sensitivity_report.json": {
+      "bytes": 14782,
+      "sha256": "631b72d8edc99bfc5a09b1f0d202aa93f7c2a6cbc7a9cffe2a8275baac83df13"
+    },
+    "scoring_config.json": {
+      "bytes": 8332,
+      "sha256": "18262528214314e3e656303ea1711879a6baf3929a5b44780470f9438db1e556"
+    },
+    "deck.json": {
+      "bytes": 1180855,
+      "sha256": "04186692a0b56831190f8dbc14b4a89b8c4600224e497a29a2ee5a48b42baec1"
+    },
+    "curated_grid_values.json": {
+      "bytes": 14038,
+      "sha256": "2caccedd9a1d36d61ef23e94652ee80f984b56ddda940b0e63a00c6f2dc7a5c1"
+    }
+  },
+  "missing_fields": [
+    "NE_geography_regions.doi",
+    "NE_admin0.doi"
+  ]
+}

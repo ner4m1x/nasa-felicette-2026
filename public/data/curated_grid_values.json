@@ -1,0 +1,451 @@
+{
+  "generated": "2026-11-14T14:17:25+00:00",
+  "note": "Grid values at 0.25 deg resolution. Curated sites are smaller than a grid cell; these numbers describe the surrounding region, not the site itself.",
+  "radius_km": 25,
+  "cards": {
+    "curated-lake-salda": {
+      "lat": 37.5476,
+      "lon": 29.6816,
+      "containing_cell_is_land": true,
+      "analog": {
+        "moon_shackleton": {
+          "total": 0.032667376101017,
+          "dims": {
+            "lst_night_min_c": 0.0,
+            "polar_day_frac": 0.0,
+            "relief_std_m": 0.5261219143867493,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "snowice_frac": 0.5
+          },
+          "limiting": "lst_night_min_c",
+          "percentile": 29.70993892216973,
+          "cell": {
+            "lat": 37.375,
+            "lon": 29.625,
+            "dist_km": 19.831790353252934
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "moon_tranquillitatis_pit": {
+          "total": 0.01875843107700348,
+          "dims": {
+            "basalt_frac": 0.0,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "relief_std_m": 0.6626895666122437
+          },
+          "limiting": "basalt_frac",
+          "percentile": 5.58412188125143,
+          "cell": {
+            "lat": 37.625,
+            "lon": 29.875,
+            "dist_km": 19.091407910141097
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "mars_jezero": {
+          "total": 0.032142866402864456,
+          "dims": {
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "barren_frac": 0.0,
+            "lst_diurnal_range_k": 0.15920615196228027,
+            "relief_std_m": 1.0,
+            "dust_aod": 0.21570149064064026
+          },
+          "limiting": "precip_mm_yr",
+          "percentile": 49.573715431237616,
+          "cell": {
+            "lat": 37.625,
+            "lon": 29.875,
+            "dist_km": 19.091407910141097
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "mars_arcadia": {
+          "total": 0.015848932787775993,
+          "dims": {
+            "lst_allmonth_mean_c": 0.0,
+            "relief_std_m": 0.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "unvegetated_frac": 0.0,
+            "snowice_frac": 1.0
+          },
+          "limiting": "lst_allmonth_mean_c",
+          "percentile": 3.036453265495129,
+          "cell": {
+            "lat": 37.625,
+            "lon": 29.625,
+            "dist_km": 9.947111599016555
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        }
+      },
+      "features_containing_cell": {
+        "precip_mm_yr": 678.728271484375,
+        "ndvi_mean": 0.46027031540870667,
+        "ndvi_max": 0.548520028591156,
+        "lst_day_mean_c": 19.470006942749023,
+        "lst_night_mean_c": 8.3944091796875,
+        "lst_diurnal_range_k": 11.075596809387207,
+        "lst_night_min_c": -3.7099609375,
+        "lst_allmonth_mean_c": 13.932208061218262,
+        "barren_frac": 0.36000001430511475,
+        "snowice_frac": 0.0,
+        "water_frac": 6.320000171661377,
+        "unvegetated_frac": 0.36000001430511475,
+        "dust_aod": 0.048267755657434464,
+        "relief_std_m": 205.85214233398438,
+        "slope_mean_deg": 3.8509273529052734,
+        "slope_p90_deg": 7.126879692077637,
+        "trafficable_frac": 0.7536231875419617,
+        "elev_mean_m": 1250.7586669921875,
+        "basalt_frac": 0.0,
+        "pb_frac": 47.31182861328125,
+        "polar_day_frac": 0.0,
+        "ice_proxy": 0.0
+      },
+      "ndvi_imputed": false
+    },
+    "curated-ostrzyca": {
+      "lat": 51.056,
+      "lon": 15.7633,
+      "containing_cell_is_land": true,
+      "analog": {
+        "moon_shackleton": {
+          "total": 0.03249172866344452,
+          "dims": {
+            "lst_night_min_c": 0.0,
+            "polar_day_frac": 0.0,
+            "relief_std_m": 0.5121287703514099,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "snowice_frac": 0.5
+          },
+          "limiting": "lst_night_min_c",
+          "percentile": 29.53965955850459,
+          "cell": {
+            "lat": 50.875,
+            "lon": 15.625,
+            "dist_km": 22.33535873307621
+          },
+          "n_cells_considered": 5,
+          "ndvi_imputed": false
+        },
+        "moon_tranquillitatis_pit": {
+          "total": 0.019904725253582,
+          "dims": {
+            "basalt_frac": 0.0,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "relief_std_m": 0.9841048121452332
+          },
+          "limiting": "basalt_frac",
+          "percentile": 12.899284880412528,
+          "cell": {
+            "lat": 51.125,
+            "lon": 15.625,
+            "dist_km": 12.335411303238898
+          },
+          "n_cells_considered": 5,
+          "ndvi_imputed": false
+        },
+        "mars_jezero": {
+          "total": 0.015848932787775993,
+          "dims": {
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "barren_frac": 0.0,
+            "lst_diurnal_range_k": 0.0,
+            "relief_std_m": 1.0,
+            "dust_aod": 0.0
+          },
+          "limiting": "precip_mm_yr",
+          "percentile": 21.397609641153092,
+          "cell": {
+            "lat": 51.125,
+            "lon": 15.625,
+            "dist_km": 12.335411303238898
+          },
+          "n_cells_considered": 5,
+          "ndvi_imputed": false
+        },
+        "mars_arcadia": {
+          "total": 0.03734560310840607,
+          "dims": {
+            "lst_allmonth_mean_c": 0.0,
+            "relief_std_m": 0.7264359593391418,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "unvegetated_frac": 0.0,
+            "snowice_frac": 1.0
+          },
+          "limiting": "lst_allmonth_mean_c",
+          "percentile": 13.83849544553991,
+          "cell": {
+            "lat": 51.125,
+            "lon": 15.625,
+            "dist_km": 12.335411303238898
+          },
+          "n_cells_considered": 5,
+          "ndvi_imputed": false
+        }
+      },
+      "features_containing_cell": {
+        "precip_mm_yr": 868.231201171875,
+        "ndvi_mean": 0.6412479877471924,
+        "ndvi_max": 0.7683920860290527,
+        "lst_day_mean_c": 13.037205696105957,
+        "lst_night_mean_c": 4.6472039222717285,
+        "lst_diurnal_range_k": 8.390002250671387,
+        "lst_night_min_c": -4.184417724609375,
+        "lst_allmonth_mean_c": 8.842205047607422,
+        "barren_frac": 0.0,
+        "snowice_frac": 0.0,
+        "water_frac": 0.0,
+        "unvegetated_frac": 0.0,
+        "dust_aod": 0.01822882704436779,
+        "relief_std_m": 60.89910125732422,
+        "slope_mean_deg": 0.769545316696167,
+        "slope_p90_deg": 1.479612946510315,
+        "trafficable_frac": 1.0,
+        "elev_mean_m": 256.714111328125,
+        "basalt_frac": 4.0,
+        "pb_frac": 0.0,
+        "polar_day_frac": 0.0,
+        "ice_proxy": 0.0
+      },
+      "ndvi_imputed": false
+    },
+    "curated-central-amazon": {
+      "lat": -2.9489,
+      "lon": -59.9299,
+      "containing_cell_is_land": true,
+      "analog": {
+        "moon_shackleton": {
+          "total": 0.014787576161324978,
+          "dims": {
+            "lst_night_min_c": 0.0,
+            "polar_day_frac": 0.0,
+            "relief_std_m": 0.0,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "snowice_frac": 0.5
+          },
+          "limiting": "lst_night_min_c",
+          "percentile": 6.88034137935077,
+          "cell": {
+            "lat": -2.875,
+            "lon": -60.125,
+            "dist_km": 23.17209969955551
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "moon_tranquillitatis_pit": {
+          "total": 0.019952623173594475,
+          "dims": {
+            "basalt_frac": 0.0,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "relief_std_m": 1.0
+          },
+          "limiting": "basalt_frac",
+          "percentile": 22.782483969940337,
+          "cell": {
+            "lat": -2.875,
+            "lon": -60.125,
+            "dist_km": 23.17209969955551
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "mars_jezero": {
+          "total": 0.015848932787775993,
+          "dims": {
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "barren_frac": 0.0,
+            "lst_diurnal_range_k": 0.0,
+            "relief_std_m": 1.0,
+            "dust_aod": 0.0
+          },
+          "limiting": "precip_mm_yr",
+          "percentile": 21.397609641153092,
+          "cell": {
+            "lat": -3.125,
+            "lon": -59.875,
+            "dist_km": 20.508411860140406
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "mars_arcadia": {
+          "total": 0.03981071710586548,
+          "dims": {
+            "lst_allmonth_mean_c": 0.0,
+            "relief_std_m": 1.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "unvegetated_frac": 0.0,
+            "snowice_frac": 1.0
+          },
+          "limiting": "lst_allmonth_mean_c",
+          "percentile": 28.15705560309961,
+          "cell": {
+            "lat": -2.875,
+            "lon": -60.125,
+            "dist_km": 23.17209969955551
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        }
+      },
+      "features_containing_cell": {
+        "precip_mm_yr": 1605.5301513671875,
+        "ndvi_mean": 0.8122074007987976,
+        "ndvi_max": 0.8344759941101074,
+        "lst_day_mean_c": 28.20878791809082,
+        "lst_night_mean_c": 23.654521942138672,
+        "lst_diurnal_range_k": 4.758520126342773,
+        "lst_night_min_c": 21.20001220703125,
+        "lst_allmonth_mean_c": 26.027799606323242,
+        "barren_frac": 0.0,
+        "snowice_frac": 0.0,
+        "water_frac": 0.03999999910593033,
+        "unvegetated_frac": 0.0,
+        "dust_aod": 0.017120376229286194,
+        "relief_std_m": 17.50098991394043,
+        "slope_mean_deg": 0.31140631437301636,
+        "slope_p90_deg": 0.5065608620643616,
+        "trafficable_frac": 1.0,
+        "elev_mean_m": 74.88809204101562,
+        "basalt_frac": 0.0,
+        "pb_frac": 0.0,
+        "polar_day_frac": 0.0,
+        "ice_proxy": 0.0
+      },
+      "ndvi_imputed": false
+    },
+    "curated-lunares": {
+      "lat": 53.1511,
+      "lon": 16.738,
+      "containing_cell_is_land": true,
+      "analog": {
+        "moon_shackleton": {
+          "total": 0.014787576161324978,
+          "dims": {
+            "lst_night_min_c": 0.0,
+            "polar_day_frac": 0.0,
+            "relief_std_m": 0.0,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "snowice_frac": 0.5
+          },
+          "limiting": "lst_night_min_c",
+          "percentile": 6.88034137935077,
+          "cell": {
+            "lat": 53.125,
+            "lon": 16.375,
+            "dist_km": 24.38708563800887
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "moon_tranquillitatis_pit": {
+          "total": 0.019952623173594475,
+          "dims": {
+            "basalt_frac": 0.0,
+            "unvegetated_frac": 0.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "relief_std_m": 1.0
+          },
+          "limiting": "basalt_frac",
+          "percentile": 22.782483969940337,
+          "cell": {
+            "lat": 53.125,
+            "lon": 16.375,
+            "dist_km": 24.38708563800887
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "mars_jezero": {
+          "total": 0.015848932787775993,
+          "dims": {
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "barren_frac": 0.0,
+            "lst_diurnal_range_k": 0.0,
+            "relief_std_m": 1.0,
+            "dust_aod": 0.0
+          },
+          "limiting": "precip_mm_yr",
+          "percentile": 21.397609641153092,
+          "cell": {
+            "lat": 53.125,
+            "lon": 16.375,
+            "dist_km": 24.38708563800887
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        },
+        "mars_arcadia": {
+          "total": 0.03981071710586548,
+          "dims": {
+            "lst_allmonth_mean_c": 0.0,
+            "relief_std_m": 1.0,
+            "precip_mm_yr": 0.0,
+            "ndvi_max": 0.0,
+            "unvegetated_frac": 0.0,
+            "snowice_frac": 1.0
+          },
+          "limiting": "lst_allmonth_mean_c",
+          "percentile": 28.15705560309961,
+          "cell": {
+            "lat": 53.125,
+            "lon": 16.875,
+            "dist_km": 9.588309887737498
+          },
+          "n_cells_considered": 4,
+          "ndvi_imputed": false
+        }
+      },
+      "features_containing_cell": {
+        "precip_mm_yr": 799.5855102539062,
+        "ndvi_mean": 0.5912076234817505,
+        "ndvi_max": 0.6863880157470703,
+        "lst_day_mean_c": 12.565531730651855,
+        "lst_night_mean_c": 4.336145877838135,
+        "lst_diurnal_range_k": 8.229385375976562,
+        "lst_night_min_c": -6.524383544921875,
+        "lst_allmonth_mean_c": 8.450839042663574,
+        "barren_frac": 0.0,
+        "snowice_frac": 0.0,
+        "water_frac": 0.07999999821186066,
+        "unvegetated_frac": 0.0,
+        "dust_aod": 0.018309511244297028,
+        "relief_std_m": 32.24225997924805,
+        "slope_mean_deg": 0.41157597303390503,
+        "slope_p90_deg": 0.7778162360191345,
+        "trafficable_frac": 1.0,
+        "elev_mean_m": 92.59276580810547,
+        "basalt_frac": 0.0,
+        "pb_frac": 0.0,
+        "polar_day_frac": 0.0,
+        "ice_proxy": 0.0
+      },
+      "ndvi_imputed": false
+    }
+  }
+}

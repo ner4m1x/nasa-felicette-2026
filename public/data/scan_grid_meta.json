@@ -1,0 +1,652 @@
+{
+  "generated": "2026-11-14T14:17:24+00:00",
+  "config_version": 2,
+  "file": "scan_grid.bin.gz",
+  "encoding": "gzip",
+  "decompress": "gzip (e.g. new DecompressionStream('gzip') in the browser) before reading bytes",
+  "layout": "band-sequential uint8; index = band * nlat * nlon + row * nlon + col",
+  "nlat": 360,
+  "nlon": 720,
+  "step_deg": 0.5,
+  "origin": {
+    "lat_north": 90.0,
+    "lon_west": -180.0
+  },
+  "row_col": "row = floor((90 - lat) / step), col = floor((lon + 180) / step); row 0 = north",
+  "nodata": 255,
+  "decode": "value = offset + scale * q (q != 255); limiting: categories[q]",
+  "aggregation": "mean of the 0.25 deg land cells inside each 0.5 deg cell (ocean excluded); limiting = argmin of the aggregated dimension scores (floored)",
+  "bands": [
+    {
+      "index": 0,
+      "name": "precip_mm_yr",
+      "kind": "feature",
+      "units": "mm yr-1",
+      "scale": 31.698783251317586,
+      "offset": 0.15993307158350945
+    },
+    {
+      "index": 1,
+      "name": "ndvi_mean",
+      "kind": "feature",
+      "units": "1",
+      "scale": 0.0037864205376135084,
+      "offset": -0.08269776031374931
+    },
+    {
+      "index": 2,
+      "name": "ndvi_max",
+      "kind": "feature",
+      "units": "1",
+      "scale": 0.003831267657535752,
+      "offset": -0.057641999796032906
+    },
+    {
+      "index": 3,
+      "name": "lst_day_mean_c",
+      "kind": "feature",
+      "units": "degC",
+      "scale": 0.4375937153973917,
+      "offset": -63.2351598739624
+    },
+    {
+      "index": 4,
+      "name": "lst_night_mean_c",
+      "kind": "feature",
+      "units": "degC",
+      "scale": 0.3757402314914493,
+      "offset": -63.8130464553833
+    },
+    {
+      "index": 5,
+      "name": "lst_diurnal_range_k",
+      "kind": "feature",
+      "units": "K",
+      "scale": 0.1400115383187617,
+      "offset": -1.212094932794571
+    },
+    {
+      "index": 6,
+      "name": "lst_night_min_c",
+      "kind": "feature",
+      "units": "degC",
+      "scale": 0.4133936964620755,
+      "offset": -76.32819366455078
+    },
+    {
+      "index": 7,
+      "name": "lst_allmonth_mean_c",
+      "kind": "feature",
+      "units": "degC",
+      "scale": 0.4051985290106826,
+      "offset": -63.52410316467285
+    },
+    {
+      "index": 8,
+      "name": "barren_frac",
+      "kind": "feature",
+      "units": "%",
+      "scale": 0.3937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 9,
+      "name": "snowice_frac",
+      "kind": "feature",
+      "units": "%",
+      "scale": 0.3937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 10,
+      "name": "water_frac",
+      "kind": "feature",
+      "units": "%",
+      "scale": 0.1966929097813884,
+      "offset": 0.0
+    },
+    {
+      "index": 11,
+      "name": "unvegetated_frac",
+      "kind": "feature",
+      "units": "%",
+      "scale": 0.3937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 12,
+      "name": "dust_aod",
+      "kind": "feature",
+      "units": "1",
+      "scale": 0.0022467138950610314,
+      "offset": 0.0005577061092481017
+    },
+    {
+      "index": 13,
+      "name": "relief_std_m",
+      "kind": "feature",
+      "units": "m",
+      "scale": 3.926333858917548,
+      "offset": 0.2166167050600052
+    },
+    {
+      "index": 14,
+      "name": "slope_mean_deg",
+      "kind": "feature",
+      "units": "degree",
+      "scale": 0.06764900499765072,
+      "offset": 0.004727355611976236
+    },
+    {
+      "index": 15,
+      "name": "slope_p90_deg",
+      "kind": "feature",
+      "units": "degree",
+      "scale": 0.12285193614845025,
+      "offset": 0.00872963247820735
+    },
+    {
+      "index": 16,
+      "name": "trafficable_frac",
+      "kind": "feature",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 17,
+      "name": "elev_mean_m",
+      "kind": "feature",
+      "units": "m",
+      "scale": 25.560898427888166,
+      "offset": -764.2158813476562
+    },
+    {
+      "index": 18,
+      "name": "basalt_frac",
+      "kind": "feature",
+      "units": "%",
+      "scale": 0.3937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 19,
+      "name": "pb_frac",
+      "kind": "feature",
+      "units": "%",
+      "scale": 0.3937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 20,
+      "name": "polar_day_frac",
+      "kind": "feature",
+      "units": "1",
+      "scale": 0.0019163700148189474,
+      "offset": 0.0
+    },
+    {
+      "index": 21,
+      "name": "ice_proxy",
+      "kind": "feature",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 22,
+      "name": "moon_shackleton.total",
+      "kind": "score",
+      "target": "moon_shackleton",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 23,
+      "name": "moon_shackleton.dim.lst_night_min_c",
+      "kind": "dim",
+      "target": "moon_shackleton",
+      "dim": "lst_night_min_c",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 24,
+      "name": "moon_shackleton.dim.polar_day_frac",
+      "kind": "dim",
+      "target": "moon_shackleton",
+      "dim": "polar_day_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 25,
+      "name": "moon_shackleton.dim.relief_std_m",
+      "kind": "dim",
+      "target": "moon_shackleton",
+      "dim": "relief_std_m",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 26,
+      "name": "moon_shackleton.dim.unvegetated_frac",
+      "kind": "dim",
+      "target": "moon_shackleton",
+      "dim": "unvegetated_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 27,
+      "name": "moon_shackleton.dim.precip_mm_yr",
+      "kind": "dim",
+      "target": "moon_shackleton",
+      "dim": "precip_mm_yr",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 28,
+      "name": "moon_shackleton.dim.snowice_frac",
+      "kind": "dim",
+      "target": "moon_shackleton",
+      "dim": "snowice_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 29,
+      "name": "moon_shackleton.limiting",
+      "kind": "limiting",
+      "target": "moon_shackleton",
+      "categories": [
+        "lst_night_min_c",
+        "polar_day_frac",
+        "relief_std_m",
+        "unvegetated_frac",
+        "precip_mm_yr",
+        "snowice_frac"
+      ],
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "index": 30,
+      "name": "moon_tranquillitatis_pit.total",
+      "kind": "score",
+      "target": "moon_tranquillitatis_pit",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 31,
+      "name": "moon_tranquillitatis_pit.dim.basalt_frac",
+      "kind": "dim",
+      "target": "moon_tranquillitatis_pit",
+      "dim": "basalt_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 32,
+      "name": "moon_tranquillitatis_pit.dim.unvegetated_frac",
+      "kind": "dim",
+      "target": "moon_tranquillitatis_pit",
+      "dim": "unvegetated_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 33,
+      "name": "moon_tranquillitatis_pit.dim.precip_mm_yr",
+      "kind": "dim",
+      "target": "moon_tranquillitatis_pit",
+      "dim": "precip_mm_yr",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 34,
+      "name": "moon_tranquillitatis_pit.dim.ndvi_max",
+      "kind": "dim",
+      "target": "moon_tranquillitatis_pit",
+      "dim": "ndvi_max",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 35,
+      "name": "moon_tranquillitatis_pit.dim.relief_std_m",
+      "kind": "dim",
+      "target": "moon_tranquillitatis_pit",
+      "dim": "relief_std_m",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 36,
+      "name": "moon_tranquillitatis_pit.limiting",
+      "kind": "limiting",
+      "target": "moon_tranquillitatis_pit",
+      "categories": [
+        "basalt_frac",
+        "unvegetated_frac",
+        "precip_mm_yr",
+        "ndvi_max",
+        "relief_std_m"
+      ],
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "index": 37,
+      "name": "mars_jezero.total",
+      "kind": "score",
+      "target": "mars_jezero",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 38,
+      "name": "mars_jezero.dim.precip_mm_yr",
+      "kind": "dim",
+      "target": "mars_jezero",
+      "dim": "precip_mm_yr",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 39,
+      "name": "mars_jezero.dim.ndvi_max",
+      "kind": "dim",
+      "target": "mars_jezero",
+      "dim": "ndvi_max",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 40,
+      "name": "mars_jezero.dim.barren_frac",
+      "kind": "dim",
+      "target": "mars_jezero",
+      "dim": "barren_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 41,
+      "name": "mars_jezero.dim.lst_diurnal_range_k",
+      "kind": "dim",
+      "target": "mars_jezero",
+      "dim": "lst_diurnal_range_k",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 42,
+      "name": "mars_jezero.dim.relief_std_m",
+      "kind": "dim",
+      "target": "mars_jezero",
+      "dim": "relief_std_m",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 43,
+      "name": "mars_jezero.dim.dust_aod",
+      "kind": "dim",
+      "target": "mars_jezero",
+      "dim": "dust_aod",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 44,
+      "name": "mars_jezero.limiting",
+      "kind": "limiting",
+      "target": "mars_jezero",
+      "categories": [
+        "precip_mm_yr",
+        "ndvi_max",
+        "barren_frac",
+        "lst_diurnal_range_k",
+        "relief_std_m",
+        "dust_aod"
+      ],
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "index": 45,
+      "name": "mars_arcadia.total",
+      "kind": "score",
+      "target": "mars_arcadia",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 46,
+      "name": "mars_arcadia.dim.lst_allmonth_mean_c",
+      "kind": "dim",
+      "target": "mars_arcadia",
+      "dim": "lst_allmonth_mean_c",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 47,
+      "name": "mars_arcadia.dim.relief_std_m",
+      "kind": "dim",
+      "target": "mars_arcadia",
+      "dim": "relief_std_m",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 48,
+      "name": "mars_arcadia.dim.precip_mm_yr",
+      "kind": "dim",
+      "target": "mars_arcadia",
+      "dim": "precip_mm_yr",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 49,
+      "name": "mars_arcadia.dim.ndvi_max",
+      "kind": "dim",
+      "target": "mars_arcadia",
+      "dim": "ndvi_max",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 50,
+      "name": "mars_arcadia.dim.unvegetated_frac",
+      "kind": "dim",
+      "target": "mars_arcadia",
+      "dim": "unvegetated_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 51,
+      "name": "mars_arcadia.dim.snowice_frac",
+      "kind": "dim",
+      "target": "mars_arcadia",
+      "dim": "snowice_frac",
+      "units": "1",
+      "scale": 0.003937007874015748,
+      "offset": 0.0
+    },
+    {
+      "index": 52,
+      "name": "mars_arcadia.limiting",
+      "kind": "limiting",
+      "target": "mars_arcadia",
+      "categories": [
+        "lst_allmonth_mean_c",
+        "relief_std_m",
+        "precip_mm_yr",
+        "ndvi_max",
+        "unvegetated_frac",
+        "snowice_frac"
+      ],
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "index": 53,
+      "name": "ndvi_imputed",
+      "kind": "flag",
+      "description": "NDVI imputed (no MODIS coverage)",
+      "scale": 1.0,
+      "offset": 0.0
+    },
+    {
+      "index": 54,
+      "name": "land",
+      "kind": "mask",
+      "scale": 1.0,
+      "offset": 0.0
+    }
+  ],
+  "bytes_uncompressed": 14256000,
+  "overlays": {
+    "moon_shackleton": {
+      "file": "scan_moon_shackleton.png",
+      "width": 2048,
+      "height": 2048,
+      "bounds_lonlat": [
+        [
+          -85.0511,
+          -180.0
+        ],
+        [
+          85.0511,
+          180.0
+        ]
+      ],
+      "bounds_3857": [
+        -20037508.342789244,
+        -20037471.205137063,
+        20037508.342789244,
+        20037471.205137063
+      ],
+      "crs": "EPSG:3857",
+      "colormap": "viridis",
+      "vmin": 0.0,
+      "vmax": 1.0,
+      "transparent_below": 0.2,
+      "resampling": "nearest"
+    },
+    "moon_tranquillitatis_pit": {
+      "file": "scan_moon_tranquillitatis_pit.png",
+      "width": 2048,
+      "height": 2048,
+      "bounds_lonlat": [
+        [
+          -85.0511,
+          -180.0
+        ],
+        [
+          85.0511,
+          180.0
+        ]
+      ],
+      "bounds_3857": [
+        -20037508.342789244,
+        -20037471.205137063,
+        20037508.342789244,
+        20037471.205137063
+      ],
+      "crs": "EPSG:3857",
+      "colormap": "viridis",
+      "vmin": 0.0,
+      "vmax": 1.0,
+      "transparent_below": 0.2,
+      "resampling": "nearest"
+    },
+    "mars_jezero": {
+      "file": "scan_mars_jezero.png",
+      "width": 2048,
+      "height": 2048,
+      "bounds_lonlat": [
+        [
+          -85.0511,
+          -180.0
+        ],
+        [
+          85.0511,
+          180.0
+        ]
+      ],
+      "bounds_3857": [
+        -20037508.342789244,
+        -20037471.205137063,
+        20037508.342789244,
+        20037471.205137063
+      ],
+      "crs": "EPSG:3857",
+      "colormap": "viridis",
+      "vmin": 0.0,
+      "vmax": 1.0,
+      "transparent_below": 0.2,
+      "resampling": "nearest"
+    },
+    "mars_arcadia": {
+      "file": "scan_mars_arcadia.png",
+      "width": 2048,
+      "height": 2048,
+      "bounds_lonlat": [
+        [
+          -85.0511,
+          -180.0
+        ],
+        [
+          85.0511,
+          180.0
+        ]
+      ],
+      "bounds_3857": [
+        -20037508.342789244,
+        -20037471.205137063,
+        20037508.342789244,
+        20037471.205137063
+      ],
+      "crs": "EPSG:3857",
+      "colormap": "viridis",
+      "vmin": 0.0,
+      "vmax": 1.0,
+      "transparent_below": 0.2,
+      "resampling": "nearest"
+    }
+  }
+}

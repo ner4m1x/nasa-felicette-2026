@@ -107,3 +107,9 @@ Chronological log of methodological decisions (pre-registration, frozen configs,
   - **At the time of this change, no validation, percentile, sensitivity or candidate result had been
     computed under v1 or v2.** `validate` had never run. Only the feature sanity checks and the
     land-cell counts per target had been seen.
+- 2026-11-14 — **First validation run** on config v2 (de66a69, clean), followed by sensitivity (200 runs,
+  seed 20261114), candidates and `export --publish`. No config change was made after seeing the results.
+  For every target, the benchmark median percentile is above the trap median (see docs/VALIDATION_REPORT.md).
+  Lanzarote cannot be scored on the 0.25° grid: only two cell centres lie within 25 km, and both count as
+  ocean (MCD12C1 water 50.2 % and 74.1 %, land mask < 50 %). It is reported as "not scorable", and the
+  radius and land mask were not changed.
