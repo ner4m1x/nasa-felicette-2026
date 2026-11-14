@@ -1,0 +1,1 @@
+# Stub — pinned dependencies are added when the pipeline is implemented.
