@@ -20,3 +20,15 @@ Chronological log of methodological decisions (pre-registration, frozen configs,
   - Also filled the eight empty `rationale` fields and added the `scoring`, `method` (radii, top fraction,
     Monte Carlo settings incl. seed) and `not_captured` sections, so they are pre-registered too.
   - Not changed: `ice_proxy` (mission-only, `mission_features.json`) still uses `lst_day_mean_c`.
+- 2026-11-14 — `freeze scoring config v1` committed (4cfc24a) before any real-data feature run.
+- 2026-11-14 — **Post-freeze code fixes (no scoring rule changed):**
+  - `pipeline/download.py`: `earthaccess.download()` stalled indefinitely (8 parallel connections to
+    LP DAAC, no bytes received for >10 min). Replaced by a sequential streaming download over
+    earthaccess's authenticated session, with read timeouts, `.part` files and up to 4 retries.
+    One transient HTTP 502 (MOD13C2 July granule) was recovered by a retry.
+  - `pipeline/features.py`: MERRA-2 files opened with xarray engine `netcdf4` instead of `h5netcdf`
+    (`h5netcdf` needs `h5py`, which is not installed). Reader change only; values and units unchanged.
+  - `pipeline/regrid.py`: GLiM class-column detection accepted only `object` dtype; pandas 3.1 stores
+    text as the `str` dtype, so the full-resolution loader fell back to the 0.5 deg grid on the first
+    features run. That run was stopped before scoring; detection now accepts string dtypes and finds
+    column `xx`. features was re-run from scratch with full-resolution GLiM.

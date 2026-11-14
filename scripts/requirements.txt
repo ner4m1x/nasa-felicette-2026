@@ -1,1 +1,20 @@
-# Stub — pinned dependencies are added when the pipeline is implemented.
+# Global scan pipeline (scripts/global_scan.py). Python 3.11+.
+earthaccess
+xarray
+netCDF4
+h5netcdf
+numpy
+scipy
+rasterio
+rioxarray
+pyproj
+geopandas
+shapely
+pillow
+matplotlib
+tqdm
+pyhdf
+pytest
+python-dotenv
+requests
+jsonschema
