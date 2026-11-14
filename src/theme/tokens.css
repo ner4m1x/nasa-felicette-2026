@@ -22,6 +22,11 @@
   --sky: #7cc8ff;
   --violet: #c7a2ff;
 
+  /* Map laser cursor and mission-patch bodies (decorative, not data) */
+  --laser: #ff3b3b;
+  --body-moon: #b8c2bc;
+  --body-mars: #d9622b;
+
   /* Swipe verdicts */
   --purr: var(--phosphor);
   --hiss: var(--danger);

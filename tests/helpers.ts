@@ -26,7 +26,7 @@ export function makeCard(overrides: CardOverrides = {}): DeckCard {
     analog: Object.fromEntries(TARGET_IDS.map((t) => [t, entry])),
     stability: null,
     known: false,
-    breakdown: { matches: { en: [], pl: [] }, breaksDown: { en: [], pl: [] }, utility: { en: [], pl: [] } },
+    breakdown: {},
     sourceIds: [],
     ...rest,
     mission: {

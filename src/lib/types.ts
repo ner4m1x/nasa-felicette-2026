@@ -48,6 +48,14 @@ export interface MissionFeatures {
   basaltFrac: number | null;
 }
 
+/** Generated (pipeline) or hand-written (curated) text for one target, per language. */
+export interface TargetBreakdown {
+  matches: Record<Lang, string[]>;
+  breaksDown: Record<Lang, string[]>;
+  /** what to test here: instruments, rovers, ISRU, ops */
+  utility: Record<Lang, string[]>;
+}
+
 export interface DeckCard {
   id: string;
   kind: CardKind;
@@ -66,13 +74,12 @@ export interface DeckCard {
   stability: number | null;
   /** near an established analog site */
   known: boolean;
-  /** i18n keys or generated text per language */
-  breakdown: {
-    matches: Record<Lang, string[]>;
-    breaksDown: Record<Lang, string[]>;
-    /** what to test here: instruments, rovers, ISRU, ops */
-    utility: Record<Lang, string[]>;
-  };
+  /**
+   * Breakdown text per target (the pipeline generates it per target from the frozen config, in EN
+   * and PL). A target without an entry has no breakdown: the UI says so instead of guessing.
+   * Mirrors `breakdown` in scripts/config/deck.schema.json.
+   */
+  breakdown: Partial<Record<TargetId, TargetBreakdown>>;
   sourceIds: string[];
 }
 

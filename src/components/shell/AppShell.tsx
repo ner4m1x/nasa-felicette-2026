@@ -3,18 +3,18 @@
 /**
  * App shell: TopBar, three tab panels (Swipe | Map | Report) and the phone bottom nav.
  * - Full-height (100dvh) layout; only the active panel's content scrolls, so nothing jumps.
- * - Panels stay mounted and are hidden, so the map (Phase 6) is never remounted.
+ * - Panels stay mounted and are hidden, so the map is never remounted (it is created on the first
+ *   visit to the Map tab and re-measured whenever the tab becomes visible again).
  * - On desktop (≥ lg) the bottom nav becomes a tab bar inside the TopBar.
  * - The red FixtureBanner shows whenever the loaded deck is dev fixture data (ground rule 2).
  */
 
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
-import { FileText, Map as MapIcon, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { MissionConfigurator } from "@/components/configurator/MissionConfigurator";
+import { MapClient } from "@/components/map/MapClient";
+import { MissionReport } from "@/components/report/MissionReport";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
-import { useI18n } from "@/i18n/I18nProvider";
-import type { I18nKey } from "@/i18n/types";
 import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
 import { BottomNav, TAB_IDS, type TabId } from "./BottomNav";
@@ -35,10 +35,15 @@ export function AppShell() {
 
         <main className="relative min-h-0 flex-1 pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
           {TAB_IDS.map((id) => (
-            <section key={id} id={`panel-${id}`} hidden={tab !== id} className="h-full overflow-y-auto">
+            <section
+              key={id}
+              id={`panel-${id}`}
+              hidden={tab !== id}
+              className={`h-full ${id === "map" ? "overflow-hidden" : "overflow-y-auto"}`}
+            >
               {id === "swipe" && <SwipeTab active={tab === "swipe"} />}
-              {id === "map" && <TabPlaceholder Icon={MapIcon} textKey="tabs.mapOffline" />}
-              {id === "report" && <TabPlaceholder Icon={FileText} textKey="tabs.reportOffline" />}
+              {id === "map" && <MapClient active={tab === "map"} />}
+              {id === "report" && <MissionReport onGoToSwipe={() => setTab("swipe")} />}
             </section>
           ))}
         </main>
@@ -79,15 +84,5 @@ function SwipeTab({ active }: { active: boolean }) {
         </motion.div>
       )}
     </AnimatePresence>
-  );
-}
-
-function TabPlaceholder({ Icon, textKey }: { Icon: LucideIcon; textKey: I18nKey }) {
-  const { t } = useI18n();
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center text-dim">
-      <Icon aria-hidden size={40} className="text-line" />
-      <p className="cursor-blink max-w-xs text-sm">{t(textKey)}</p>
-    </div>
   );
 }

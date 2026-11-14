@@ -108,3 +108,125 @@ dialog.purr-sheet::backdrop {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Global Scan Map (Leaflet) ---------- */
+.leaflet-container.leaflet-container {
+  background: var(--bg);
+  font-family: var(--font-mono);
+}
+/* Leaflet's own stylesheet loads after this file (with the map chunk): scope under
+   .leaflet-container so these overrides win on specificity. */
+.leaflet-container .leaflet-bar a,
+.leaflet-container .leaflet-bar a:hover {
+  background: var(--panel);
+  color: var(--phosphor);
+  border-color: var(--line);
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+}
+.leaflet-container .leaflet-control-attribution.leaflet-control {
+  background: rgb(5 10 7 / 0.8);
+  color: var(--dim);
+  font-size: 10px;
+  max-width: calc(100vw - 24px);
+  white-space: normal;
+}
+.leaflet-container .leaflet-control-attribution a {
+  color: var(--fg);
+}
+/* the phone inspector sheet covers the bottom of the map: lift Leaflet's bottom controls above it */
+@media (max-width: 63.99rem) {
+  .leaflet-container .leaflet-bottom {
+    bottom: 132px;
+  }
+}
+.purr-scan-overlay {
+  image-rendering: pixelated;
+}
+
+/* Candidate pins (CandidateMarkers): colour from --pin (a --kind-* token). */
+.purr-pin-wrap {
+  background: none;
+  border: 0;
+}
+.purr-pin {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: 6px;
+  border-radius: 9999px;
+  background: var(--pin);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1.5px var(--pin), 0 0 10px var(--pin);
+}
+.purr-pin--purred {
+  width: 22px;
+  height: 22px;
+  margin: 3px;
+  border-color: var(--purr);
+  box-shadow: 0 0 0 2px var(--purr), 0 0 16px var(--purr);
+}
+.purr-pin--rejected {
+  opacity: 0.45;
+  box-shadow: 0 0 0 1.5px var(--pin);
+}
+.leaflet-marker-icon:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* Selected point: a pulse (the touch feedback). */
+.purr-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid var(--amber);
+  animation: purr-pulse 1.6s var(--ease-out) infinite;
+}
+.purr-pulse::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 9999px;
+  background: var(--amber);
+}
+@keyframes purr-pulse {
+  0% {
+    transform: scale(0.35);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Laser-dot cursor (fine pointers only; see LaserCursor). */
+.purr-laser .leaflet-container.leaflet-container,
+.purr-laser .leaflet-interactive {
+  cursor: crosshair;
+}
+.purr-laser-dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  z-index: 1200;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: var(--laser);
+  box-shadow: 0 0 6px 2px var(--laser), 0 0 18px 6px rgb(255 59 59 / 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+
+/* Mission patch (MissionReport). */
+.purr-patch text {
+  font-family: var(--font-mono);
+}

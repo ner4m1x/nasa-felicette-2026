@@ -3,9 +3,16 @@
  *
  * Numeric fields stay `null` + TODO_VERIFY until sourced. Coordinates are representative points
  * taken from OpenStreetMap Nominatim (source "osm-nominatim", accessed 2026-11-14), not survey data.
- * Breakdown texts are qualitative and contain no numbers.
+ * Breakdown texts are qualitative and contain no numbers. They are keyed by target: Lake Salda is
+ * written for Jezero only; the trap and operational narratives apply to every target (the traps'
+ * relevant_targets in scripts/config/known_sites.json list all four).
  */
-import type { DeckCard } from "@/lib/types";
+import { TARGET_IDS, type DeckCard, type TargetBreakdown, type TargetId } from "@/lib/types";
+
+/** The same hand-written breakdown for every target (for cards whose text is target-agnostic). */
+function allTargets(b: TargetBreakdown): Partial<Record<TargetId, TargetBreakdown>> {
+  return Object.fromEntries(TARGET_IDS.map((t) => [t, b]));
+}
 
 export const LUNARES_CARD_ID = "curated-lunares";
 
@@ -34,17 +41,19 @@ export const CURATED_CARDS: readonly DeckCard[] = [
     stability: null,
     known: true, // TODO_VERIFY: cite source "lake-salda-jezero-analog"
     breakdown: {
-      matches: {
-        en: ["Carbonate shoreline deposits, compared with the marginal carbonates of Jezero crater"], // TODO_VERIFY
-        pl: ["Węglanowe osady brzegowe, porównywane z węglanami na obrzeżu krateru Jezero"], // TODO_VERIFY
-      },
-      breaksDown: {
-        en: ["Liquid water, a living lake ecosystem and Earth's thick atmosphere"],
-        pl: ["Woda w stanie ciekłym, żywy ekosystem jeziora i gęsta atmosfera Ziemi"],
-      },
-      utility: {
-        en: ["Test carbonate detection and biosignature sampling workflows"],
-        pl: ["Testy wykrywania węglanów i procedur pobierania próbek pod kątem biosygnatur"],
+      mars_jezero: {
+        matches: {
+          en: ["Carbonate shoreline deposits, compared with the marginal carbonates of Jezero crater"], // TODO_VERIFY
+          pl: ["Węglanowe osady brzegowe, porównywane z węglanami na obrzeżu krateru Jezero"], // TODO_VERIFY
+        },
+        breaksDown: {
+          en: ["Liquid water, a living lake ecosystem and Earth's thick atmosphere"],
+          pl: ["Woda w stanie ciekłym, żywy ekosystem jeziora i gęsta atmosfera Ziemi"],
+        },
+        utility: {
+          en: ["Test carbonate detection and biosignature sampling workflows"],
+          pl: ["Testy wykrywania węglanów i procedur pobierania próbek pod kątem biosygnatur"],
+        },
       },
     },
     sourceIds: ["lake-salda-jezero-analog", "osm-nominatim"],
@@ -63,7 +72,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
     mission: NO_MISSION_FEATURES,
     stability: null,
     known: false,
-    breakdown: {
+    breakdown: allTargets({
       matches: {
         en: ["Volcanic basalt: the right rock family for lunar mare comparisons"], // TODO_VERIFY
         pl: ["Wulkaniczny bazalt: właściwa rodzina skał do porównań z księżycowymi morzami"], // TODO_VERIFY
@@ -76,7 +85,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
         en: ["Teaching case: why rock type alone does not make a planetary analog"],
         pl: ["Przykład dydaktyczny: sam typ skały nie czyni miejsca analogiem planetarnym"],
       },
-    },
+    }),
     sourceIds: ["osm-nominatim"],
   },
   {
@@ -93,7 +102,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
     mission: NO_MISSION_FEATURES,
     stability: null,
     known: false,
-    breakdown: {
+    breakdown: allTargets({
       matches: {
         en: ["Radar roughness looks rocky, like a boulder field"], // TODO_VERIFY with pipeline radar layer
         pl: ["Szorstkość radarowa wygląda na skalistą, jak pole głazów"], // TODO_VERIFY with pipeline radar layer
@@ -106,7 +115,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
         en: ["Sanity check: a single remote-sensing dimension can fool an analog search"],
         pl: ["Test zdrowego rozsądku: pojedynczy wymiar teledetekcyjny może oszukać wyszukiwanie analogów"],
       },
-    },
+    }),
     sourceIds: ["osm-nominatim"],
   },
   {
@@ -124,7 +133,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
     mission: NO_MISSION_FEATURES,
     stability: null,
     known: true,
-    breakdown: {
+    breakdown: allTargets({
       matches: {
         en: ["Isolated habitat for simulated crewed missions"],
         pl: ["Izolowany habitat do symulowanych misji załogowych"],
@@ -137,7 +146,7 @@ export const CURATED_CARDS: readonly DeckCard[] = [
         en: ["Crew procedures, isolation, communication delay and habitat operations"],
         pl: ["Procedury załogi, izolacja, opóźnienie łączności i obsługa habitatu"],
       },
-    },
+    }),
     sourceIds: ["lunares-station", "osm-nominatim"],
   },
 ];

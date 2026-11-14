@@ -3,6 +3,11 @@
 /**
  * Shown after every swipe: Félicette's verdict vs the user's (with the running agreement score),
  * where the analogy matches / breaks down, what to test here, the mission-fit verdict and sources.
+ * Also opened from a map pin: then `record` is the user's earlier swipe (or null if the card has
+ * not been judged yet) and only Félicette's recommendation is shown when there is nothing to compare.
+ *
+ * The breakdown text is per target: the sheet shows the entry for the configured target, or a
+ * clear "no breakdown for this target" line.
  *
  * Confetti (sparingly): only when the user PURRed a card Félicette also recommends. The canvas is
  * fixed-positioned inside the modal dialog so it renders above the backdrop (top layer).
@@ -10,16 +15,20 @@
 
 import { useEffect, useRef } from "react";
 import { Sheet } from "@/components/ui/Sheet";
+import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
+import { breakdownFor } from "@/lib/deck";
 import { HONESTY_NOTE_KEY } from "@/lib/missionFit";
 import type { RankedCard } from "@/lib/types";
 import { agrees, shouldCelebrate, type Agreement, type FelicetteVerdict, type SwipeRecord } from "@/lib/verdict";
+import { useMission } from "@/state/MissionContext";
 import { CONFETTI_COLOR_VARS } from "@/theme/tokens";
 import { KindBadge, reasonText, SourceList, to100 } from "./parts";
 
 export interface Decision {
   ranked: RankedCard;
-  record: SwipeRecord;
+  /** null = opened from the map for a card the user has not judged yet */
+  record: SwipeRecord | null;
   verdict: FelicetteVerdict;
 }
 
@@ -27,6 +36,10 @@ interface BreakdownSheetProps {
   decision: Decision | null;
   agreement: Agreement;
   onClose: () => void;
+  /** label of the footer button (default: "Next card") */
+  closeActionLabel?: string;
+  /** false when re-opening an earlier decision (e.g. from a map pin): no repeat celebration */
+  allowConfetti?: boolean;
 }
 
 function readColors(): string[] {
@@ -34,10 +47,18 @@ function readColors(): string[] {
   return CONFETTI_COLOR_VARS.map((v) => css.getPropertyValue(v).trim()).filter(Boolean);
 }
 
-export function BreakdownSheet({ decision, agreement, onClose }: BreakdownSheetProps) {
+export function BreakdownSheet({
+  decision,
+  agreement,
+  onClose,
+  closeActionLabel,
+  allowConfetti = true,
+}: BreakdownSheetProps) {
   const { t, lang, dim } = useI18n();
+  const { config } = useMission();
   const canvas = useRef<HTMLCanvasElement>(null);
-  const celebrate = decision !== null && shouldCelebrate(decision.record);
+  const celebrate =
+    allowConfetti && decision !== null && decision.record !== null && shouldCelebrate(decision.record);
 
   // Fire confetti once per celebrated decision (external system: canvas).
   useEffect(() => {
@@ -57,19 +78,26 @@ export function BreakdownSheet({ decision, agreement, onClose }: BreakdownSheetP
 
   const { ranked, record, verdict } = decision;
   const { card, analog, missionFit } = ranked;
-  const agreed = agrees(record);
-  const headline =
-    agreed === null
+  const agreed = record ? agrees(record) : null;
+  const rec = verdict.recommendation;
+  const headline = !record
+    ? t(rec === "purr" ? "verdict.recommendPurr" : rec === "hiss" ? "verdict.recommendHiss" : "verdict.abstain")
+    : agreed === null
       ? t("verdict.abstain")
       : agreed
         ? t(record.verdict === "purr" ? "verdict.agreePurr" : "verdict.agreeHiss")
         : t(record.verdict === "purr" ? "verdict.purrVsHiss" : "verdict.hissVsPurr");
+  const tone = record ? record.verdict : rec === "abstain" ? null : rec;
+  const toneColor = tone === "purr" ? "var(--purr)" : tone === "hiss" ? "var(--hiss)" : "var(--line)";
 
-  const sections = [
-    { id: "matches", icon: "✅", title: t("breakdown.matches"), items: card.breakdown.matches[lang] ?? [] },
-    { id: "breaksDown", icon: "⚠️", title: t("breakdown.breaksDown"), items: card.breakdown.breaksDown[lang] ?? [] },
-    { id: "utility", icon: "🚀", title: t("breakdown.utility"), items: card.breakdown.utility[lang] ?? [] },
-  ];
+  const breakdown = breakdownFor(card, config.target);
+  const sections = breakdown
+    ? [
+        { id: "matches", icon: "✅", title: t("breakdown.matches"), items: breakdown.matches[lang] ?? [] },
+        { id: "breaksDown", icon: "⚠️", title: t("breakdown.breaksDown"), items: breakdown.breaksDown[lang] ?? [] },
+        { id: "utility", icon: "🚀", title: t("breakdown.utility"), items: breakdown.utility[lang] ?? [] },
+      ]
+    : [];
 
   return (
     <Sheet
@@ -99,21 +127,20 @@ export function BreakdownSheet({ decision, agreement, onClose }: BreakdownSheetP
           autoFocus
           className="flex min-h-12 w-full items-center justify-center rounded-control border-2 border-phosphor text-sm font-bold uppercase tracking-widest text-phosphor hover:bg-phosphor/10"
         >
-          {t("breakdown.next")}
+          {closeActionLabel ?? t("breakdown.next")}
         </button>
       }
     >
       <div className="space-y-5">
-        <section
-          className="rounded-control border p-3"
-          style={{ borderColor: record.verdict === "purr" ? "var(--purr)" : "var(--hiss)" }}
-        >
+        <section className="rounded-control border p-3" style={{ borderColor: toneColor }}>
           <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("breakdown.verdictTitle")}</h3>
           <p
             className="mt-1 text-xs font-black uppercase tracking-widest"
-            style={{ color: record.verdict === "purr" ? "var(--purr)" : "var(--hiss)" }}
+            style={{ color: record ? toneColor : "var(--dim)" }}
           >
-            {t(record.verdict === "purr" ? "breakdown.youPurred" : "breakdown.youHissed")}
+            {record
+              ? t(record.verdict === "purr" ? "breakdown.youPurred" : "breakdown.youHissed")
+              : t("breakdown.notJudged")}
           </p>
           <p className="mt-2 flex gap-2 text-sm leading-relaxed">
             <span aria-hidden className="text-amber">
@@ -133,6 +160,12 @@ export function BreakdownSheet({ decision, agreement, onClose }: BreakdownSheetP
                 })}
           </p>
         </section>
+
+        {!breakdown && (
+          <p className="rounded-control border border-dashed border-line px-3 py-2 text-sm text-dim">
+            {t("breakdown.noTarget", { target: t(TARGETS[config.target].labelKey) })}
+          </p>
+        )}
 
         {sections.map((s) => (
           <section key={s.id}>
@@ -187,7 +220,12 @@ export function BreakdownSheet({ decision, agreement, onClose }: BreakdownSheetP
             <span aria-hidden>📚</span> {t("breakdown.sources")}
           </h3>
           <div className="mt-1">
-            <SourceList ids={card.sourceIds} unverifiedLabel={t("breakdown.unverified")} />
+            <SourceList
+              ids={card.sourceIds}
+              unverifiedLabel={t("breakdown.unverified")}
+              datasetLabel={t("sources.dataset")}
+              versionLabel={t("sources.version")}
+            />
           </div>
         </section>
       </div>

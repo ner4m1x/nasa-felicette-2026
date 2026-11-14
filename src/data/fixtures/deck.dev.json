@@ -61,29 +61,109 @@
       "stability": 0.5,
       "known": false,
       "breakdown": {
-        "matches": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_shackleton": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "breaksDown": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_tranquillitatis_pit": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "utility": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "mars_jezero": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
+        },
+        "mars_arcadia": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         }
       },
       "sourceIds": []
@@ -145,29 +225,109 @@
       "stability": 0.5,
       "known": false,
       "breakdown": {
-        "matches": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_shackleton": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "breaksDown": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_tranquillitatis_pit": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "utility": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "mars_jezero": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
+        },
+        "mars_arcadia": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         }
       },
       "sourceIds": []
@@ -229,29 +389,109 @@
       "stability": 0.5,
       "known": false,
       "breakdown": {
-        "matches": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_shackleton": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "breaksDown": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_tranquillitatis_pit": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "utility": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "mars_jezero": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
+        },
+        "mars_arcadia": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         }
       },
       "sourceIds": []
@@ -313,29 +553,109 @@
       "stability": 0.5,
       "known": false,
       "breakdown": {
-        "matches": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_shackleton": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "breaksDown": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_tranquillitatis_pit": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "utility": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "mars_jezero": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
+        },
+        "mars_arcadia": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         }
       },
       "sourceIds": []
@@ -397,29 +717,109 @@
       "stability": 0.5,
       "known": false,
       "breakdown": {
-        "matches": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_shackleton": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "breaksDown": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_tranquillitatis_pit": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "utility": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "mars_jezero": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
+        },
+        "mars_arcadia": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         }
       },
       "sourceIds": []
@@ -481,29 +881,109 @@
       "stability": 0.5,
       "known": false,
       "breakdown": {
-        "matches": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_shackleton": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "breaksDown": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "moon_tranquillitatis_pit": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         },
-        "utility": {
-          "en": [
-            "FIXTURE — not real data"
-          ],
-          "pl": [
-            "FIXTURE — to nie są prawdziwe dane"
-          ]
+        "mars_jezero": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
+        },
+        "mars_arcadia": {
+          "matches": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "breaksDown": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          },
+          "utility": {
+            "en": [
+              "FIXTURE — not real data"
+            ],
+            "pl": [
+              "FIXTURE — to nie są prawdziwe dane"
+            ]
+          }
         }
       },
       "sourceIds": []

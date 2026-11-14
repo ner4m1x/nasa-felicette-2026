@@ -81,13 +81,54 @@ const ITEMS: LimitItem[] = [
   },
 ];
 
+/** The four limits with their sources; shared by the sheet and the Mission Report. */
+export function EarthLimitsList({ compact = false }: { compact?: boolean }) {
+  const { t, lang } = useI18n();
+  return (
+    <ul className={compact ? "grid gap-3 sm:grid-cols-2" : "space-y-4"}>
+      {ITEMS.map((item) => (
+        <li key={item.id} className="rounded-control border border-line bg-panel-2 p-3">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-phosphor">{t(item.titleKey)}</h3>
+          <p className="mt-1 text-sm leading-relaxed">{t(item.bodyKey, item.params?.(lang))}</p>
+          <p className="mt-2 text-[11px] text-dim">
+            {t("limits.sources")}:{" "}
+            {item.sourceIds.map((id, i) => {
+              const src = getSource(id);
+              if (!src) return null;
+              return (
+                <span key={id}>
+                  {i > 0 && " · "}
+                  {src.url ? (
+                    <a
+                      href={src.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-0.5 underline decoration-dotted underline-offset-2 hover:text-fg"
+                    >
+                      {src.title}
+                      <ExternalLink aria-hidden size={10} />
+                    </a>
+                  ) : (
+                    src.title
+                  )}
+                  {!src.verified && <sup title={t("limits.unverified")}>*</sup>}
+                </span>
+              );
+            })}
+          </p>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 interface EarthLimitsSheetProps {
   open: boolean;
   onClose: () => void;
 }
 
 export function EarthLimitsSheet({ open, onClose }: EarthLimitsSheetProps) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
 
   return (
     <Sheet
@@ -98,44 +139,11 @@ export function EarthLimitsSheet({ open, onClose }: EarthLimitsSheetProps) {
       subtitle={t("limits.intro")}
       closeLabel={t("limits.close")}
     >
-      <ul className="space-y-4">
-        {ITEMS.map((item) => (
-          <li key={item.id} className="rounded-control border border-line bg-panel-2 p-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-phosphor">{t(item.titleKey)}</h3>
-            <p className="mt-1 text-sm leading-relaxed">{t(item.bodyKey, item.params?.(lang))}</p>
-            <p className="mt-2 text-[11px] text-dim">
-              {t("limits.sources")}:{" "}
-              {item.sourceIds.map((id, i) => {
-                const src = getSource(id);
-                if (!src) return null;
-                return (
-                  <span key={id}>
-                    {i > 0 && " · "}
-                    {src.url ? (
-                      <a
-                        href={src.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-0.5 underline decoration-dotted underline-offset-2 hover:text-fg"
-                      >
-                        {src.title}
-                        <ExternalLink aria-hidden size={10} />
-                      </a>
-                    ) : (
-                      src.title
-                    )}
-                    {!src.verified && <sup title={t("limits.unverified")}>*</sup>}
-                  </span>
-                );
-              })}
-            </p>
-          </li>
-        ))}
-        <li className="text-[11px] text-dim">* {t("limits.unverified")}</li>
-        <li className="text-center text-xs italic text-dim">
-          =^.^= {t("felicette.name")}: {t("limits.cat")}
-        </li>
-      </ul>
+      <EarthLimitsList />
+      <p className="mt-4 text-[11px] text-dim">* {t("limits.unverified")}</p>
+      <p className="mt-4 text-center text-xs italic text-dim">
+        =^.^= {t("felicette.name")}: {t("limits.cat")}
+      </p>
     </Sheet>
   );
 }

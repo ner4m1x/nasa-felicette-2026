@@ -12,7 +12,16 @@
  */
 import { CURATED_CARDS } from "@/data/curatedCards";
 import type { I18nKey } from "@/i18n/types";
-import { CARD_KINDS, type DeckCard, type DeckFile, type DeckSource } from "./types";
+import { LANGS } from "@/i18n/types";
+import {
+  CARD_KINDS,
+  TARGET_IDS,
+  type DeckCard,
+  type DeckFile,
+  type DeckSource,
+  type TargetBreakdown,
+  type TargetId,
+} from "./types";
 
 export const DECK_URL = "/data/deck.json";
 
@@ -66,6 +75,17 @@ const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFin
 const isNumOrNull = (v: unknown) => v === null || isNum(v);
 const isUnit = (v: unknown) => isNum(v) && v >= 0 && v <= 1;
 
+const isStringList = (v: unknown) => Array.isArray(v) && v.every((x) => typeof x === "string");
+
+/** { matches, breaksDown, utility }, each with a string list per language (deck.schema.json). */
+function isTargetBreakdown(b: unknown): boolean {
+  if (!isObj(b)) return false;
+  return (["matches", "breaksDown", "utility"] as const).every((section) => {
+    const perLang = b[section];
+    return isObj(perLang) && LANGS.every((lang) => isStringList(perLang[lang]));
+  });
+}
+
 function cardProblem(c: unknown): string | null {
   if (!isObj(c)) return "card is not an object";
   if (typeof c.id !== "string" || !c.id) return "missing id";
@@ -87,6 +107,10 @@ function cardProblem(c: unknown): string | null {
     if (!isNumOrNull(c.mission[k])) return `${c.id}: bad mission.${k}`;
   }
   if (!isObj(c.breakdown)) return `${c.id}: missing breakdown`;
+  for (const [target, b] of Object.entries(c.breakdown)) {
+    if (!(TARGET_IDS as readonly string[]).includes(target)) return `${c.id}: breakdown for unknown target ${target}`;
+    if (!isTargetBreakdown(b)) return `${c.id}: bad breakdown for ${target}`;
+  }
   if (!Array.isArray(c.sourceIds)) return `${c.id}: missing sourceIds`;
   return null;
 }
@@ -98,6 +122,11 @@ export function parseDeckFile(json: unknown): DeckFile {
     if (problem) throw new DeckFormatError(problem);
   }
   return json as unknown as DeckFile;
+}
+
+/** The breakdown of `card` for `target`, or null when the card has none for that target. */
+export function breakdownFor(card: Pick<DeckCard, "breakdown">, target: TargetId): TargetBreakdown | null {
+  return card.breakdown[target] ?? null;
 }
 
 /** Pipeline/fixture cards first; curated cards appended unless a card with the same id exists. */

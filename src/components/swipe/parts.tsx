@@ -3,11 +3,12 @@
 /** Small presentational pieces shared by the swipe components. Colors come from src/theme/tokens.css. */
 
 import { ExternalLink } from "lucide-react";
-import { getSource } from "@/data/sources";
 import type { DimLabel } from "@/i18n/I18nProvider";
 import type { I18nKey, I18nParams, Lang } from "@/i18n/types";
+import { resolveSource } from "@/lib/manifest";
 import type { CardKind } from "@/lib/types";
 import type { VerdictReason } from "@/lib/verdict";
+import { useManifest } from "@/state/usePipeline";
 
 type T = (key: I18nKey, params?: I18nParams) => string;
 
@@ -80,36 +81,70 @@ export function ScoreBar({ label, hint, value, outOf, color, detail }: ScoreBarP
   );
 }
 
-export function SourceList({ ids, unverifiedLabel }: { ids: readonly string[]; unverifiedLabel: string }) {
+interface SourceListProps {
+  ids: readonly string[];
+  unverifiedLabel: string;
+  /** label for dataset entries resolved from /data/manifest.json */
+  datasetLabel: string;
+  versionLabel: string;
+}
+
+const linkClass =
+  "inline-flex items-center gap-1 underline decoration-dotted underline-offset-2 hover:text-phosphor";
+
+/**
+ * Sources of a card: literature from src/data/sources.ts, pipeline datasets from
+ * /data/manifest.json (name, version, DOI link), and unknown ids as plain text (never a crash).
+ */
+export function SourceList({ ids, unverifiedLabel, datasetLabel, versionLabel }: SourceListProps) {
+  const manifest = useManifest() ?? null;
   if (ids.length === 0) return <p className="text-xs text-dim">—</p>;
   return (
     <ul className="space-y-1 text-xs">
       {ids.map((id) => {
-        const src = getSource(id);
-        if (!src) {
+        const src = resolveSource(id, manifest);
+        if (src.kind === "unknown") {
           return (
-            <li key={id} className="text-dim">
+            <li key={id} className="break-words text-dim">
               {id}
             </li>
           );
         }
+        if (src.kind === "dataset") {
+          const d = src.entry;
+          const name = d.title ?? d.shortName;
+          return (
+            <li key={id} className="break-words">
+              {d.url ? (
+                <a href={d.url} target="_blank" rel="noreferrer" className={linkClass}>
+                  {name}
+                  <ExternalLink aria-hidden size={10} />
+                </a>
+              ) : (
+                <span>{name}</span>
+              )}
+              <span className="text-dim">
+                {" "}
+                · {d.shortName}
+                {d.version && ` ${versionLabel} ${d.version}`}
+                {d.doi && <> · DOI {d.doi}</>} · {datasetLabel}
+              </span>
+            </li>
+          );
+        }
+        const lit = src.entry;
         return (
-          <li key={id}>
-            {src.url ? (
-              <a
-                href={src.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 underline decoration-dotted underline-offset-2 hover:text-phosphor"
-              >
-                {src.title}
+          <li key={id} className="break-words">
+            {lit.url ? (
+              <a href={lit.url} target="_blank" rel="noreferrer" className={linkClass}>
+                {lit.title}
                 <ExternalLink aria-hidden size={10} />
               </a>
             ) : (
-              <span>{src.title}</span>
+              <span>{lit.title}</span>
             )}
-            <span className="text-dim"> · {src.publisher}</span>
-            {!src.verified && (
+            <span className="text-dim"> · {lit.publisher}</span>
+            {!lit.verified && (
               <sup className="text-dim" title={unverifiedLabel}>
                 *
               </sup>
