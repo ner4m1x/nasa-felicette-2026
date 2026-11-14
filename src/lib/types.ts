@@ -1,0 +1,151 @@
+/**
+ * Core domain types. `DeckCard` must match what the Python pipeline exports to /public/data/deck.json.
+ *
+ * Two scores, never mixed:
+ *  - Analog Score (`DeckCard.analog`): planetary similarity from the frozen pipeline config.
+ *    Read-only in the browser; configurator settings never change it.
+ *  - Mission Fit (`MissionFitResult.fit`): engineering suitability, computed in the browser
+ *    from the configurator settings (src/lib/missionFit.ts).
+ */
+import type { I18nKey, Lang } from "@/i18n/types";
+
+export type { Lang } from "@/i18n/types";
+
+// ---------- Targets ----------
+
+export const TARGET_IDS = [
+  "moon_shackleton",
+  "moon_tranquillitatis_pit",
+  "mars_jezero",
+  "mars_arcadia",
+] as const;
+export type TargetId = (typeof TARGET_IDS)[number];
+
+// ---------- Deck cards ----------
+
+export const CARD_KINDS = ["benchmark", "discovery", "trap", "curated", "operational"] as const;
+export type CardKind = (typeof CARD_KINDS)[number];
+
+export interface AnalogEntry {
+  /** 0..1, from the frozen pipeline config */
+  total: number;
+  /** per-dimension 0..1 */
+  dims: Record<string, number>;
+  /** dimension id that limits the total */
+  limiting: string;
+  /** percentile among land cells, 0..100 */
+  percentile: number;
+}
+
+export interface MissionFeatures {
+  slopeMeanDeg: number | null;
+  /** fraction of DEM pixels with slope < 5° */
+  trafficableFrac: number | null;
+  reliefStdM: number | null;
+  /** 0..1 */
+  iceProxy: number | null;
+  /** 0..1 */
+  basaltFrac: number | null;
+}
+
+export interface DeckCard {
+  id: string;
+  kind: CardKind;
+  name: string;
+  country: string | null;
+  lat: number;
+  lon: number;
+  /** regional = from the 0.25° grid; site = curated, below grid resolution */
+  scale: "regional" | "site";
+  regionAreaKm2: number | null;
+  /** null = not scorable by the global grid (e.g. mineralogy-only analog) */
+  analog: Partial<Record<TargetId, AnalogEntry>> | null;
+  /** raw mission-relevant features, with units in the pipeline meta */
+  mission: MissionFeatures;
+  /** from the pipeline's sensitivity analysis */
+  stability: number | null;
+  /** near an established analog site */
+  known: boolean;
+  /** i18n keys or generated text per language */
+  breakdown: {
+    matches: Record<Lang, string[]>;
+    breaksDown: Record<Lang, string[]>;
+    /** what to test here: instruments, rovers, ISRU, ops */
+    utility: Record<Lang, string[]>;
+  };
+  sourceIds: string[];
+}
+
+/** Shape of /public/data/deck.json and of src/data/fixtures/deck.dev.json. */
+export interface DeckFile {
+  /** true only for dev fixtures; a production build refuses to load such a file */
+  __fixture?: boolean;
+  generatedAt?: string | null;
+  configId?: string | null;
+  cards: DeckCard[];
+}
+
+// ---------- Mission configurator ----------
+
+export const FOOTPRINT_IDS = ["compact", "medium", "mega"] as const;
+export type FootprintId = (typeof FOOTPRINT_IDS)[number];
+
+export const MOBILITY_IDS = ["climber", "heavy"] as const;
+export type MobilityId = (typeof MOBILITY_IDS)[number];
+
+export const CREW_IDS = ["robotic", "short", "permanent"] as const;
+export type CrewId = (typeof CREW_IDS)[number];
+
+export interface MissionConfig {
+  target: TargetId;
+  footprint: FootprintId;
+  mobility: MobilityId;
+  crew: CrewId;
+}
+
+// ---------- Mission fit ----------
+
+export type ConstraintId = "trafficability" | "footprint" | "resource";
+
+export interface Constraint {
+  id: ConstraintId;
+  /** hard = the card is moved to the "Rejected by your mission specs" pile */
+  hard: boolean;
+  /** i18n key of the human-readable reason ("HISS: 34% trafficable terrain, …") */
+  reasonKey: I18nKey;
+  params: Record<string, number | string>;
+}
+
+export interface Note {
+  key: I18nKey;
+  params?: Record<string, number | string>;
+}
+
+export interface MissionFitResult {
+  /** 0..1; 0 whenever a hard constraint failed */
+  fit: number;
+  /** every constraint that did not fully pass (hard fails and soft penalties) */
+  failed: Constraint[];
+  notes: Note[];
+}
+
+// ---------- Ranking ----------
+
+export interface RankedCard {
+  card: DeckCard;
+  /** Analog entry for the configured target, passed through unchanged (null = unscored). */
+  analog: AnalogEntry | null;
+  missionFit: MissionFitResult;
+  /** analog.total × fit; null for unscored (curated / trap / operational) cards */
+  rankScore: number | null;
+}
+
+export interface RankedDeck {
+  deck: RankedCard[];
+  /** cards with at least one hard-failed constraint */
+  rejected: RankedCard[];
+}
+
+// ---------- Loader ----------
+
+export type DeckSource = "pipeline" | "fixture" | "curated-only";
