@@ -8,6 +8,7 @@
 
 import { MapPin, Star } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
+import { HAMMAGUIR_CARD_ID } from "@/data/curatedCards";
 import { formatPercentile } from "@/lib/format";
 import type { RankedCard } from "@/lib/types";
 import { NdviImputedNote } from "./NdviImputedNote";
@@ -89,11 +90,39 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
           <span aria-hidden className="not-italic text-amber">
             =^.^=
           </span>
-          <span>{t(`card.teaser.${card.kind}`)}</span>
+          <span>{t(card.id === HAMMAGUIR_CARD_ID ? "card.hammaguir.teaser" : `card.teaser.${card.kind}`)}</span>
         </p>
+
+        {card.id === HAMMAGUIR_CARD_ID && <HammaguirStory ranked={ranked} />}
 
         <WhiskerScan lat={card.lat} lon={card.lon} entry={analog} interactive={interactive} />
       </div>
+    </div>
+  );
+}
+
+/** Strong-analog wording only at or above this percentile (display only). */
+const STRONG_PERCENTILE = 90;
+
+/** Félicette's launch-site story; the Jezero score and percentile are read from the card (scan grid). */
+function HammaguirStory({ ranked }: { ranked: RankedCard }) {
+  const { t, lang } = useI18n();
+  const jezero = ranked.card.analog?.mars_jezero ?? null;
+  const pct = jezero ? formatPercentile(jezero.percentile, lang) : null;
+  const pctText =
+    pct?.kind === "top" ? t("card.percentileTop") : pct?.kind === "value" ? t("card.percentile", { p: pct.text }) : null;
+  return (
+    <div className="space-y-1.5 rounded-control border border-amber/50 bg-panel-2 p-3 text-xs leading-relaxed">
+      <p>{t("card.hammaguir.story1")}</p>
+      <p>{t("card.hammaguir.story2")}</p>
+      {jezero && pctText && (
+        <p className="font-bold">
+          {t(jezero.percentile >= STRONG_PERCENTILE ? "card.hammaguir.story3Strong" : "card.hammaguir.story3", {
+            score: to100(jezero.total),
+            pct: pctText,
+          })}
+        </p>
+      )}
     </div>
   );
 }

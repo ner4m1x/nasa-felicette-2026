@@ -10,7 +10,9 @@
  * Production guard (ground rule 2): a production build never uses fixture data. Loading the
  * fixture, or a deck.json marked `__fixture: true`, throws FixtureInProductionError.
  */
-import { CURATED_CARDS } from "@/data/curatedCards";
+import { CURATED_CARDS, HAMMAGUIR_BASE } from "@/data/curatedCards";
+import { cardFromGridCell } from "./gridCard";
+import type { ScanGrid } from "./scanGrid";
 import type { I18nKey } from "@/i18n/types";
 import { LANGS } from "@/i18n/types";
 import {
@@ -200,6 +202,16 @@ async function fetchPipelineDeck(fetchImpl: typeof fetch): Promise<unknown | nul
   }
   if (!res.ok) return null;
   return res.json();
+}
+
+/** Add the curated cards that are built from the scan grid (no hand-typed scores), unless present. */
+export function withGridCards(cards: readonly DeckCard[], grid: ScanGrid): DeckCard[] {
+  const ids = new Set(cards.map((c) => c.id));
+  const extra = [HAMMAGUIR_BASE]
+    .filter((b) => !ids.has(b.id))
+    .map((b) => cardFromGridCell(grid, b))
+    .filter((c): c is DeckCard => c !== null);
+  return [...cards, ...extra];
 }
 
 export async function loadDeck(options: LoadDeckOptions = {}): Promise<DeckLoadResult> {

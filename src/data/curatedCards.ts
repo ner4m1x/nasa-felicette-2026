@@ -11,6 +11,7 @@
  * (`site-<id>` from scripts/config/known_sites.json). When both are loaded, mergeCurated keeps one
  * card: curated text first, then the pipeline's numbers and generated lines.
  */
+import type { GridCardBase } from "@/lib/gridCard";
 import { TARGET_IDS, type DeckCard, type TargetBreakdown, type TargetId } from "@/lib/types";
 
 /** The same hand-written breakdown for every target (for cards whose text is target-agnostic). */
@@ -156,3 +157,45 @@ export const CURATED_CARDS: readonly DeckCard[] = [
     sourceIds: ["lunares-station", "osm-nominatim"],
   },
 ];
+
+// ---- Hammaguir easter egg: Félicette's launch site ----
+
+export const HAMMAGUIR_CARD_ID = "curated-hammaguir";
+
+/**
+ * Hammaguir (Algerian Sahara), the Diamant launch pad coordinates. Unlike the other curated cards,
+ * its numbers are NOT written here: the card is built from the scan-grid cell at these coordinates
+ * (src/lib/gridCard.ts), so it only exists once the scan grid is published. The story lines are in
+ * i18n (`card.hammaguir.*`), sourced from "wiki-felicette" and "wiki-hammaguir".
+ */
+export const HAMMAGUIR_BASE: GridCardBase = {
+  id: HAMMAGUIR_CARD_ID,
+  kind: "curated",
+  name: "Hammaguir – Félicette's launch pad (1963)",
+  country: "Algeria",
+  lat: 30.778,
+  lon: -3.054,
+  scale: "site",
+  known: false,
+  breakdown: allTargets({
+    matches: {
+      en: ["Bare, dry desert surface in the surrounding grid cell"],
+      pl: ["Goła, sucha pustynna powierzchnia w otaczającej komórce siatki"],
+    },
+    breaksDown: {
+      en: [
+        "The grid cell (0.5°) describes the surrounding Sahara region, not the launch pad itself",
+        "Earth's air, gravity and magnetic shield – see Earth Limits",
+      ],
+      pl: [
+        "Komórka siatki (0,5°) opisuje otaczający region Sahary, a nie samą wyrzutnię",
+        "Ziemskie powietrze, grawitacja i osłona magnetyczna – zob. Granice Ziemi",
+      ],
+    },
+    utility: {
+      en: ["History stop: where the first cat to reach space began her flight"],
+      pl: ["Przystanek historyczny: stąd wystartował pierwszy kot, który dotarł w kosmos"],
+    },
+  }),
+  sourceIds: ["wiki-felicette", "wiki-hammaguir"],
+};

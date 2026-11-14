@@ -149,6 +149,14 @@ export const pl: Dictionary = {
       curated: "Wybrane ręcznie: to, co tu wyjątkowe, jest niewidoczne dla mojej siatki.",
       operational: "Nie chodzi o skały: tu załogi uczą się żyć jak astronauci.",
     },
+    hammaguir: {
+      teaser: "Moja wyrzutnia! Stąd w 1963 roku opuściłam planetę.",
+      story1:
+        "18 października 1963 r. o 8:09 czasu lokalnego Félicette, czarno-biała kotka z Paryża, wystartowała z Hammaguir (algierska Sahara) na pokładzie rakiety sondażowej Véronique AGI 47.",
+      story2: "Dotarła na wysokość około 152 km i wróciła żywa na spadochronie.",
+      story3Strong: "Nasz globalny skan niezależnie ocenia to miejsce jako silny analog Jezero: wynik analogii {score}/100, {pct}.",
+      story3: "Nasz globalny skan ocenia to miejsce dla Jezero na {score}/100 (wynik analogii), {pct}.",
+    },
     scan: "Skanuj wąsami",
     scanning: "Węszę w NASA POWER…",
     retry: "Ponów skan",
@@ -443,6 +451,7 @@ export const pl: Dictionary = {
     colScore: "Jak blisko dochodzi Ziemia",
     invisible: "niewidoczne dla globalnych danych o Ziemi",
     pending: "brak wartości siatki",
+    loading: "Wczytuję dane skanu…",
     scoreNA: "nie jest ocenianym wymiarem dla tego celu",
     footer:
       "Wartości planetarne z recenzowanych analiz danych NASA PDS (LRO, Mars 2020, MRO). Ziemia nie odtworzy próżni, grawitacji ani promieniowania – zob. Granice Ziemi.",

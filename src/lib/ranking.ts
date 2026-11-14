@@ -9,9 +9,28 @@
  * - Operational cards are boosted to the top for crewed missions (short / permanent).
  * - Any card with a hard-failed constraint goes to the "Rejected by your mission specs" pile.
  */
+import { HAMMAGUIR_CARD_ID } from "@/data/curatedCards";
 import { CREW_OPTIONS } from "@/data/missionOptions";
 import { hasHardFail, missionFit } from "./missionFit";
-import type { DeckCard, MissionConfig, RankedCard, RankedDeck } from "./types";
+import type { DeckCard, MissionConfig, RankedCard, RankedDeck, TargetId } from "./types";
+
+/** Cards shown at a fixed 1-based position of a target's deck (if they pass the mission specs). */
+export const PINNED_CARDS: Partial<Record<TargetId, readonly { id: string; position: number }[]>> = {
+  mars_jezero: [{ id: HAMMAGUIR_CARD_ID, position: 2 }],
+};
+
+/** Move pinned cards to their positions (clamped to the deck length); everything else keeps its order. */
+export function applyPinned(deck: RankedCard[], pins: readonly { id: string; position: number }[] = []): RankedCard[] {
+  let out = deck;
+  for (const pin of [...pins].sort((a, b) => a.position - b.position)) {
+    const i = out.findIndex((r) => r.card.id === pin.id);
+    if (i < 0) continue;
+    const rest = out.filter((_, k) => k !== i);
+    const at = Math.min(Math.max(pin.position - 1, 0), rest.length);
+    out = [...rest.slice(0, at), out[i], ...rest.slice(at)];
+  }
+  return out;
+}
 
 /** Unscored cards appear at 1-based positions 3, 6, 9, … so they always show up early. */
 export const INTERLEAVE_EVERY = 3;
@@ -63,5 +82,6 @@ export function rankDeck(cards: readonly DeckCard[], config: MissionConfig): Ran
   const top = boost ? unscored.filter((r) => r.card.kind === "operational") : [];
   const rest = boost ? unscored.filter((r) => r.card.kind !== "operational") : unscored;
 
-  return { deck: [...top, ...interleave(scored, rest, top.length + 1)], rejected };
+  const deck = [...top, ...interleave(scored, rest, top.length + 1)];
+  return { deck: applyPinned(deck, PINNED_CARDS[config.target]), rejected };
 }

@@ -19,6 +19,8 @@ interface PlanetaryComparisonProps {
   target: TargetId;
   /** grid sample at the place; null = no grid data (yet) */
   sample: ScanGridSample | null;
+  /** true while the scan grid is still being fetched */
+  gridLoading?: boolean;
 }
 
 export function usePlanetaryFormat() {
@@ -38,16 +40,16 @@ export function usePlanetaryFormat() {
     return v;
   };
 
-  const earthValue = (e: EarthCell): string => {
+  const earthValue = (e: EarthCell, gridLoading = false): string => {
     if (e.kind === "invisible") return t("planetary.invisible");
-    if (e.kind === "pending") return t("planetary.pending");
+    if (e.kind === "pending") return t(gridLoading ? "planetary.loading" : "planetary.pending");
     return withUnit(new Intl.NumberFormat(lang, { maximumFractionDigits: 1 }).format(e.value), e.unit);
   };
 
   return { planetValue, earthValue };
 }
 
-export function PlanetaryComparison({ target, sample }: PlanetaryComparisonProps) {
+export function PlanetaryComparison({ target, sample, gridLoading = false }: PlanetaryComparisonProps) {
   const { t } = useI18n();
   const { planetValue, earthValue } = usePlanetaryFormat();
   const rows = comparisonRows(target, sample);
@@ -84,7 +86,7 @@ export function PlanetaryComparison({ target, sample }: PlanetaryComparisonProps
                     {ref.noteKey && <div className="mt-0.5 text-[10px] leading-snug text-dim">{t(ref.noteKey)}</div>}
                   </td>
                   <td className={`py-1.5 pr-2 tabular-nums ${earth.kind === "value" ? "text-fg" : "text-[10px] italic text-dim"}`}>
-                    {earthValue(earth)}
+                    {earthValue(earth, gridLoading)}
                   </td>
                   <td className="py-1.5">
                     {scored && score !== null ? (
@@ -115,5 +117,11 @@ export function PlanetaryComparison({ target, sample }: PlanetaryComparisonProps
 export function PlanetaryComparisonAt({ target, lat, lon }: { target: TargetId; lat: number; lon: number }) {
   const grid = useScanGrid(true);
   const sample = grid?.status === "ready" ? grid.grid.sample(lat, lon) : null;
-  return <PlanetaryComparison target={target} sample={sample && sample.land !== false ? sample : null} />;
+  return (
+    <PlanetaryComparison
+      target={target}
+      sample={sample && sample.land !== false ? sample : null}
+      gridLoading={grid === undefined}
+    />
+  );
 }

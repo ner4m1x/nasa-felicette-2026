@@ -14,7 +14,7 @@
 
 import { createContext, use, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { browser } from "react-dom";
-import { loadDeck, type DeckLoadResult } from "@/lib/deck";
+import { loadDeck, withGridCards, type DeckLoadResult } from "@/lib/deck";
 import { rankDeck } from "@/lib/ranking";
 import type { MissionConfig, RankedCard, RankedDeck } from "@/lib/types";
 import {
@@ -26,6 +26,7 @@ import {
   type Verdict,
 } from "@/lib/verdict";
 import { useMission } from "./MissionContext";
+import { useScanGrid } from "./usePipeline";
 
 export const SWIPES_STORAGE_KEY = "purr.swipes";
 
@@ -120,10 +121,14 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
   const records = useMemo(() => byMission[key] ?? [], [byMission, key]);
   const skipped = useMemo(() => skippedByMission[key] ?? [], [skippedByMission, key]);
 
-  const ranked = useMemo(
-    () => (deck.status === "ready" ? rankDeck(deck.result.cards, config) : null),
-    [deck, config],
-  );
+  // Grid-built curated cards (Hammaguir) join the deck once the scan grid is loaded.
+  const grid = useScanGrid(true);
+  const cards = useMemo(() => {
+    if (deck.status !== "ready") return null;
+    return grid?.status === "ready" ? withGridCards(deck.result.cards, grid.grid) : deck.result.cards;
+  }, [deck, grid]);
+
+  const ranked = useMemo(() => (cards ? rankDeck(cards, config) : null), [cards, config]);
 
   const queue = useMemo(() => {
     if (!ranked) return [];

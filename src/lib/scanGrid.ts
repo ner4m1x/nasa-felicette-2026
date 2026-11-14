@@ -16,7 +16,7 @@ import { DATA_BASE, fetchOptionalJson, isObj, num, once, str } from "./pipelineF
 
 export const SCAN_GRID_META_URL = `${DATA_BASE}scan_grid_meta.json`;
 
-export type BandKind = "feature" | "score" | "dim" | "limiting" | "mask";
+export type BandKind = "feature" | "score" | "dim" | "limiting" | "mask" | "flag";
 
 export interface ScanBand {
   index: number;
@@ -51,7 +51,7 @@ export class ScanGridFormatError extends Error {
   }
 }
 
-const BAND_KINDS: readonly BandKind[] = ["feature", "score", "dim", "limiting", "mask"];
+const BAND_KINDS: readonly BandKind[] = ["feature", "score", "dim", "limiting", "mask", "flag"];
 
 export function parseScanGridMeta(json: unknown): ScanGridMeta | null {
   if (!isObj(json) || !Array.isArray(json.bands)) return null;
@@ -122,11 +122,19 @@ export interface ScanGridSample {
   land: boolean | null;
   features: Record<string, FeatureSample>;
   targets: Partial<Record<TargetId, TargetSample>>;
+  /** "ndvi_imputed" flag band (null/absent when the grid has no such band or no data) */
+  ndviImputed?: boolean | null;
 }
 
 export interface ScanGrid {
   meta: ScanGridMeta;
   sample: (lat: number, lon: number) => ScanGridSample;
+  /**
+   * Percentile of the cell's Analog Score among all scored land cells of THIS grid (0.5°,
+   * uint8-quantised): 100 × (n_below + 0.5 × n_equal) / n — the pipeline's formula, applied to the
+   * published grid. null when the cell has no score.
+   */
+  percentile: (target: TargetId, lat: number, lon: number) => number | null;
 }
 
 /** Row/col of the cell containing (lat, lon); longitudes are wrapped, latitudes clamped. */
@@ -161,6 +169,7 @@ export function decodeScanGrid(meta: ScanGridMeta, bytes: Uint8Array): ScanGrid 
     const targets: Partial<Record<TargetId, TargetSample>> = {};
     const tgt = (t: TargetId) => (targets[t] ??= { total: null, dims: {}, limiting: null });
     let land: boolean | null = null;
+    let ndviImputed: boolean | null = null;
 
     for (const band of meta.bands) {
       switch (band.kind) {
@@ -179,6 +188,12 @@ export function decodeScanGrid(meta: ScanGridMeta, bytes: Uint8Array): ScanGrid 
         case "mask":
           if (band.name === "land") land = read(band, cell) === 1;
           break;
+        case "flag":
+          if (band.name === "ndvi_imputed") {
+            const v = read(band, cell);
+            ndviImputed = v === null ? null : v === 1;
+          }
+          break;
       }
     }
     return {
@@ -187,10 +202,46 @@ export function decodeScanGrid(meta: ScanGridMeta, bytes: Uint8Array): ScanGrid 
       land,
       features,
       targets,
+      ndviImputed,
     };
   };
 
-  return { meta, sample };
+  // Per-target histogram of quantised scores over land cells (built lazily, once).
+  const landBand = meta.bands.find((b) => b.kind === "mask" && b.name === "land");
+  const histograms = new Map<TargetId, { counts: Uint32Array; n: number }>();
+  const histogram = (band: ScanBand) => {
+    const target = band.target as TargetId;
+    let h = histograms.get(target);
+    if (!h) {
+      const counts = new Uint32Array(256);
+      let n = 0;
+      for (let cell = 0; cell < plane; cell++) {
+        if (landBand && bytes[landBand.index * plane + cell] !== 1) continue;
+        const q = bytes[band.index * plane + cell];
+        if (q === meta.nodata) continue;
+        counts[q]++;
+        n++;
+      }
+      h = { counts, n };
+      histograms.set(target, h);
+    }
+    return h;
+  };
+
+  const percentile = (target: TargetId, lat: number, lon: number): number | null => {
+    const band = meta.bands.find((b) => b.kind === "score" && b.target === target);
+    if (!band) return null;
+    const { row, col } = cellIndex(meta, lat, lon);
+    const q = bytes[band.index * plane + row * meta.nlon + col];
+    if (q === meta.nodata) return null;
+    const { counts, n } = histogram(band);
+    if (n === 0) return null;
+    let below = 0;
+    for (let i = 0; i < q; i++) if (i !== meta.nodata) below += counts[i];
+    return (100 * (below + 0.5 * counts[q])) / n;
+  };
+
+  return { meta, sample, percentile };
 }
 
 // ---------- Loading ----------

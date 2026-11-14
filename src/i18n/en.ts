@@ -152,6 +152,14 @@ export const en = {
       curated: "Hand-picked: what makes it special is invisible to my grid.",
       operational: "Not about rocks: this is where crews learn to live like astronauts.",
     },
+    hammaguir: {
+      teaser: "My launch pad! This is where I left the planet in 1963.",
+      story1:
+        "On 18 October 1963 at 08:09 local time, Félicette, a black-and-white cat from Paris, was launched from Hammaguir (Algerian Sahara) aboard the Véronique AGI 47 sounding rocket.",
+      story2: "She reached about 152 km and returned alive by parachute.",
+      story3Strong: "Our global scan independently rates this spot as a strong Jezero analog: Analog Score {score}/100, {pct}.",
+      story3: "Our global scan rates this spot for Jezero at Analog Score {score}/100, {pct}.",
+    },
     scan: "Scan with whiskers",
     scanning: "Sniffing NASA POWER…",
     retry: "Retry scan",
@@ -447,6 +455,7 @@ export const en = {
     colScore: "How far Earth gets",
     invisible: "not visible to Earth global data",
     pending: "no grid value here",
+    loading: "Loading scan data…",
     scoreNA: "not a scored dimension for this target",
     footer:
       "Planetary values from peer-reviewed analyses of NASA PDS data (LRO, Mars 2020, MRO). Earth cannot reproduce vacuum, gravity or radiation – see Earth Limits.",

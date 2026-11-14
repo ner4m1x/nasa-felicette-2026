@@ -120,7 +120,11 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
         </h3>
         <GridSection grid={grid} sample={sample} point={point} config={config} />
         <div className="mt-3">
-          <PlanetaryComparison target={config.target} sample={sample && sample.land !== false ? sample : null} />
+          <PlanetaryComparison
+            target={config.target}
+            sample={sample && sample.land !== false ? sample : null}
+            gridLoading={grid === undefined}
+          />
         </div>
       </section>
 

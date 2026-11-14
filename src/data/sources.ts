@@ -151,6 +151,31 @@ export const SOURCES = {
     accessed: null,
     verified: false,
   },
+  // ---- Félicette / Hammaguir (curated card "curated-hammaguir") ----
+  // Checked with curl (action=raw) on 2026-11-14:
+  // - "Félicette": 18 October 1963 at 8:09 am, launched from the CIEES site in Algeria (= Hammaguir),
+  //   Véronique AGI 47 sounding rocket, nose cone "before reaching a height of 152 km", parachutes,
+  //   "recovered safely"; infobox: Parisian, tuxedo (black and white) cat. The page does not
+  //   name Hammaguir and says 152 km, not 157 km; it says CERMA bought the cats from a pet dealer.
+  // - "Hammaguir": launch table lists 18 October 1963, Félicette (cat), Véronique.
+  "wiki-felicette": {
+    id: "wiki-felicette",
+    title: "Félicette",
+    publisher: "Wikipedia",
+    url: "https://en.wikipedia.org/wiki/F%C3%A9licette",
+    doi: null,
+    accessed: "2026-11-14",
+    verified: false,
+  },
+  "wiki-hammaguir": {
+    id: "wiki-hammaguir",
+    title: "Hammaguir",
+    publisher: "Wikipedia",
+    url: "https://en.wikipedia.org/wiki/Hammaguir",
+    doi: null,
+    accessed: "2026-11-14",
+    verified: false,
+  },
   // ---- Planetary reference values (src/data/planetaryReference.ts) ----
   // DOIs confirmed via the Crossref API (title, journal, volume, pages) and doi.org on 2026-11-14.
   "paige-2010-diviner-coldtraps": {
