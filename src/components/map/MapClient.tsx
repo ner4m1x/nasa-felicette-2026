@@ -18,7 +18,6 @@ import { ChevronUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
-import { FelicetteEyes } from "@/components/felicette/FelicetteEyes";
 import { PointInspector } from "@/components/inspector/PointInspector";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { formatCoords, to100 } from "@/components/swipe/parts";
@@ -166,7 +165,7 @@ export function MapClient({ active }: { active: boolean }) {
       {desktop ? (
         <aside className="min-h-0 overflow-y-auto border-l border-line bg-panel" aria-label={t("map.inspector.title")}>
           <div className="flex justify-center border-b border-line py-3">
-            <FelicetteEyes label={t("map.eyesAria")} className="h-14 w-28" />
+            <FelicetteAvatar followPointer label={t("map.eyesAria")} className="h-24 w-24" />
           </div>
           {inspector}
         </aside>

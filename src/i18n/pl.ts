@@ -148,7 +148,7 @@ export const pl: Dictionary = {
       cell: "~0,25° komórka siatki",
       unavailable: "Zobrazowanie niedostępne",
       loading: "Ładowanie zobrazowania…",
-      trapHint: "Wygląda na skały? Sprawdź NDVI →",
+      trapHint: "Pod spodem bazalt? Sprawdź NDVI →",
     },
     ndviImputed:
       "NDVI imputowane – brak pokrycia MODIS w tym miejscu, pokrycie terenu wskazuje na powierzchnię bez roślinności",

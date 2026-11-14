@@ -76,16 +76,19 @@
      low end so the scores stay above the fold, desktop (≥ 64rem, Tailwind lg) a bit more */
   --imagery-card-height: 38%;
 
-  /* ---- Félicette (FelicetteAvatar / FelicetteEyes): tuxedo cat in a helmet ---- */
-  --cat-fur: #0b100d;
-  --cat-white: var(--fg);
-  --cat-outline: var(--dim);
+  /* ---- Félicette (FelicetteAvatar): chibi tuxedo cat in a glass helmet ---- */
+  --cat-fur: #101512;
+  /* lighter rim so the solid black head and ears separate from the dark background */
+  --cat-rim: rgb(133 184 150 / 0.55);
+  --cat-white: #eef7f0;
+  --cat-mouth: #2a332d;
   --cat-eye: var(--phosphor);
-  --cat-nose: var(--amber);
-  --cat-ear-inner: rgb(255 178 46 / 0.6);
-  --cat-whisker: rgb(214 245 222 / 0.55);
-  --felicette-glass: rgb(77 255 154 / 0.07);
-  --felicette-glare: rgb(214 245 222 / 0.45);
+  --cat-nose: #f2a2bd;
+  --cat-ear-inner: rgb(242 162 189 / 0.45);
+  --cat-whisker: rgb(214 245 222 / 0.5);
+  --felicette-glass: rgb(77 255 154 / 0.1);
+  --felicette-glare: rgb(214 245 222 / 0.5);
+  --felicette-collar: #12321f;
   --felicette-ring: var(--phosphor);
   --felicette-ring-happy: var(--purr);
   --felicette-ring-hiss: var(--hiss);

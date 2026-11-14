@@ -152,7 +152,7 @@ export const en = {
       cell: "~0.25° grid cell",
       unavailable: "Imagery unavailable",
       loading: "Loading imagery…",
-      trapHint: "Looks rocky? Check NDVI →",
+      trapHint: "Basalt underneath? Check NDVI →",
     },
     ndviImputed: "NDVI imputed – no MODIS coverage here, land cover shows a non-vegetated surface",
     teaser: {

@@ -21,7 +21,7 @@ describe("FelicetteAvatar", () => {
   });
 
   it("gives every expression a distinct drawing", () => {
-    const strip = (s: string) => s.replace(/data-mood="[^"]*"/, "").replace(/felicette-clip-[\w-]+/g, "clip");
+    const strip = (s: string) => s.replace(/data-mood="[^"]*"/, "").replace(/felicette-(helmet|head)-[\w-]+/g, "clip");
     const all = FELICETTE_MOODS.map((m) => strip(render(m)));
     expect(new Set(all).size).toBe(FELICETTE_MOODS.length);
   });
@@ -44,6 +44,34 @@ describe("FelicetteAvatar", () => {
 
   it("shows a thought bubble only while thinking", () => {
     for (const m of FELICETTE_MOODS) expect(render(m).includes('data-part="thought"')).toBe(m === "thinking");
+  });
+
+  it("draws a solid black head, a white muzzle, a collar and a glass bubble", () => {
+    const svg = render("neutral");
+    expect(svg).toMatch(/<ellipse[^>]*fill="var\(--cat-fur\)"[^>]*stroke="var\(--cat-rim\)"/);
+    expect(svg).toContain('data-part="collar"');
+    expect(svg).toContain('fill="var(--felicette-glass)"');
+  });
+
+  it("has movable pupils only where the eyes are open with pupils", () => {
+    const count = (m: FelicetteMood) => (render(m).match(/data-part="pupil"/g) ?? []).length;
+    expect(count("neutral")).toBe(2);
+    expect(count("thinking")).toBe(2);
+    expect(count("surprised")).toBe(2);
+    expect(count("happy")).toBe(0);
+    expect(count("hiss")).toBe(0);
+  });
+
+  it("drops whiskers in compact mode", () => {
+    expect(render("neutral")).toContain("var(--cat-whisker)");
+    const compact = renderToStaticMarkup(createElement(FelicetteAvatar, { mood: "neutral", compact: true }));
+    expect(compact).not.toContain("var(--cat-whisker)");
+  });
+
+  it("renders the same drawing with followPointer (tracking only runs in the browser)", () => {
+    const strip = (s: string) => s.replace(/felicette-(helmet|head)-[\w-]+/g, "clip");
+    const follow = renderToStaticMarkup(createElement(FelicetteAvatar, { mood: "neutral", followPointer: true }));
+    expect(strip(follow)).toBe(strip(render("neutral")));
   });
 
   it("is decorative by default and an image when labelled", () => {
