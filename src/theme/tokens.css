@@ -21,6 +21,8 @@
   --danger: #ff6b6b;
   --sky: #7cc8ff;
   --violet: #c7a2ff;
+  /* user scans (P1); 10.3:1 on --bg */
+  --user-scan: #ff9bd2;
 
   /* Map laser cursor and mission-patch bodies (decorative, not data) */
   --laser: #ff3b3b;
@@ -38,6 +40,7 @@
   --kind-trap: var(--danger);
   --kind-curated: var(--violet);
   --kind-operational: var(--amber);
+  --kind-user: var(--user-scan);
 
   /* Score bars */
   --score-analog: var(--sky);

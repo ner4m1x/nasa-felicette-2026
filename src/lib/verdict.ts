@@ -44,6 +44,9 @@ const pct = (x: number) => Math.round(x * 100);
 export function felicetteVerdict(ranked: RankedCard, config: MissionConfig): FelicetteVerdict {
   const { card, analog, missionFit } = ranked;
 
+  // User scans: Félicette abstains, so they never count toward the agreement score.
+  if (card.kind === "user") return { recommendation: "abstain", reason: { key: "verdict.reason.userScan" } };
+
   const hard = missionFit.failed.find((c) => c.hard);
   if (hard) return { recommendation: "hiss", reason: { key: hard.reasonKey, params: hard.params } };
 

@@ -148,6 +148,7 @@ export const pl: Dictionary = {
       trap: "Z orbity pachnie dobrze… ale wąsy mi drgają.",
       curated: "Wybrane ręcznie: to, co tu wyjątkowe, jest niewidoczne dla mojej siatki.",
       operational: "Nie chodzi o skały: tu załogi uczą się żyć jak astronauci.",
+      user: "Twoje własne znalezisko z mapy. Oceniłam komórkę siatki; decyzja należy do ciebie.",
     },
     hammaguir: {
       teaser: "Moja wyrzutnia! Stąd w 1963 roku opuściłam planetę.",
@@ -219,6 +220,7 @@ export const pl: Dictionary = {
       operationalCrew: "twoja załoga potrzebuje miejsca do ćwiczenia procedur.",
       operationalRobotic: "to trening dla ludzi, a twoja misja jest robotyczna.",
       unscored: "globalna siatka nie oceni tego miejsca, więc decyzja należy do ciebie.",
+      userScan: "to miejsce znalazłeś/aś sam(a), więc się wstrzymuję: nie liczy się do naszej zgodności.",
     },
   },
   kinds: {
@@ -227,6 +229,7 @@ export const pl: Dictionary = {
     trap: "Pułapka",
     curated: "Wybrane",
     operational: "Operacyjny",
+    user: "Twój skan",
   },
   targets: {
     moon_shackleton: {
@@ -321,6 +324,7 @@ export const pl: Dictionary = {
         "Powierzchnia bazy jest poniżej rozdzielczości siatki (~25 km). Ostateczny wybór miejsca wymaga DEM/zdjęć wysokiej rozdzielczości.",
       trafficabilityUnknown:
         "Przejezdność nie została zmierzona dla tego miejsca; ograniczenia nachylenia są niezweryfikowane.",
+      footprintUserSite: "Powierzchnia bazy: niezweryfikowana (skala punktu) – kliknięty punkt nie ma zmierzonej powierzchni.",
       areaUnknown:
         "Użyteczna powierzchnia nie została zmierzona; ograniczenie powierzchni jest niezweryfikowane.",
       reliefBonus: "Urozmaicona rzeźba terenu: dobry poligon dla twojego łazika wspinaczkowego.",
@@ -401,6 +405,15 @@ export const pl: Dictionary = {
       summaryNoLimit: "Najbliżej do {target}.",
       noneScored: "Żaden z czterech celów nie jest oceniony dla tej komórki.",
       fitNote: "Dopasowanie misji poniżej dotyczy tylko twojego celu: {target}.",
+      add: {
+        button: "Dodaj do talii Félicette",
+        inDeck: "W twojej talii jako TWÓJ SKAN – to następna karta do przesunięcia.",
+        addedRejected: "Dodano, ale specyfikacja misji ją odrzuca: jest w stosie odrzuconych.",
+        remove: "Usuń z talii",
+        ocean: "Tu nie ma lądu – globalny skan ocenia tylko ląd, więc nie ma czego dodać.",
+        unscored: "Twój cel nie jest oceniany dla tej komórki, więc nie może trafić do tej talii.",
+        noGrid: "Wymaga siatki globalnego skanu (wczytuje się lub nie została opublikowana).",
+      },
       targetNote: "Wyniki dotyczą skonfigurowanego celu: {target}.",
       chartAria: "Parametr wykresu miesięcznego",
       monthly: "klimatologia miesięczna",

@@ -126,6 +126,9 @@ export function mobilityFactor(card: DeckCard, config: MissionConfig): FactorRes
 export function footprintFactor(card: DeckCard, config: MissionConfig): FactorResult {
   const option = FOOTPRINT_OPTIONS[config.footprint];
 
+  // User scans: a clicked point has no measured area → footprint unverified (site-scale).
+  if (card.kind === "user") return { factor: 1, failed: [], notes: [{ key: "fit.note.footprintUserSite" }] };
+
   // Site-scale cards are already below grid resolution: a compact base gets no penalty.
   if (card.scale === "site" && option.belowGridResolution) return PASS;
 

@@ -151,6 +151,7 @@ export const en = {
       trap: "Smells right from orbit… but my whiskers are twitching.",
       curated: "Hand-picked: what makes it special is invisible to my grid.",
       operational: "Not about rocks: this is where crews learn to live like astronauts.",
+      user: "Your own find from the map. I scored the grid cell; the call is yours.",
     },
     hammaguir: {
       teaser: "My launch pad! This is where I left the planet in 1963.",
@@ -222,6 +223,7 @@ export const en = {
       operationalCrew: "your crew needs somewhere to rehearse operations.",
       operationalRobotic: "it trains humans, and your mission is robotic.",
       unscored: "the global grid can't score this site, so it's your call.",
+      userScan: "you found this spot yourself, so I abstain: it doesn't count toward our agreement.",
     },
   },
   kinds: {
@@ -230,6 +232,7 @@ export const en = {
     trap: "Trap",
     curated: "Curated",
     operational: "Operational",
+    user: "User scan",
   },
   targets: {
     moon_shackleton: {
@@ -325,6 +328,7 @@ export const en = {
         "Footprint is below grid resolution (~25 km). Final site selection needs high-resolution DEM/imagery.",
       trafficabilityUnknown:
         "Trafficability not measured for this site; slope constraints are unverified.",
+      footprintUserSite: "Footprint: unverified (site-scale) – a clicked point has no measured area.",
       areaUnknown:
         "Usable area not measured for this site; footprint constraint is unverified.",
       reliefBonus: "Rugged relief: good test terrain for your climbing rover.",
@@ -406,6 +410,15 @@ export const en = {
       summaryNoLimit: "Closest to {target}.",
       noneScored: "None of the four targets is scored for this cell.",
       fitNote: "Mission Fit below is for your configured target only: {target}.",
+      add: {
+        button: "Add to Félicette's deck",
+        inDeck: "In your deck as a USER SCAN – it's the next card to swipe.",
+        addedRejected: "Added, but your mission specs reject it: it's in the rejected pile.",
+        remove: "Remove from deck",
+        ocean: "No land here – the global scan only scores land, so there's nothing to add.",
+        unscored: "Your configured target is not scored for this cell, so it can't join this deck.",
+        noGrid: "Needs the global scan grid (loading or not published).",
+      },
       chartAria: "Monthly chart parameter",
       monthly: "monthly climatology",
       chart: {

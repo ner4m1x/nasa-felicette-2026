@@ -6,11 +6,12 @@
  * Félicette and the "Scan with whiskers" cross-check.
  */
 
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, Trash2 } from "lucide-react";
 import { useI18n } from "@/i18n/I18nProvider";
 import { HAMMAGUIR_CARD_ID } from "@/data/curatedCards";
 import { formatPercentile } from "@/lib/format";
 import type { RankedCard } from "@/lib/types";
+import { useSwipe } from "@/state/SwipeContext";
 import { NdviImputedNote } from "./NdviImputedNote";
 import { formatCoords, KindBadge, ScoreBar, to100 } from "./parts";
 import { WhiskerScan } from "./WhiskerScan";
@@ -24,6 +25,7 @@ interface CardFaceProps {
 export function CardFace({ ranked, interactive }: CardFaceProps) {
   const { t, lang, dim } = useI18n();
   const { card, analog, missionFit } = ranked;
+  const { removeUserCard } = useSwipe();
 
   const pct = analog ? formatPercentile(analog.percentile, lang) : null;
   const pctText =
@@ -51,6 +53,19 @@ export function CardFace({ ranked, interactive }: CardFaceProps) {
           <span className="ml-auto text-[10px] uppercase tracking-wider text-dim">
             {t(card.scale === "regional" ? "card.regional" : "card.site")}
           </span>
+          {card.kind === "user" && (
+            <button
+              type="button"
+              onClick={() => removeUserCard(card.id)}
+              onPointerDown={(e) => e.stopPropagation()}
+              tabIndex={interactive ? 0 : -1}
+              aria-label={t("map.inspector.add.remove")}
+              title={t("map.inspector.add.remove")}
+              className="-my-2 flex min-h-11 min-w-11 items-center justify-center text-dim hover:text-hiss"
+            >
+              <Trash2 aria-hidden size={14} />
+            </button>
+          )}
         </div>
         <h2 className="mt-2 text-lg font-bold leading-tight text-fg">{card.name}</h2>
         <p className="mt-0.5 flex items-center gap-1 text-xs text-dim">

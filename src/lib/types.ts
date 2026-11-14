@@ -23,7 +23,8 @@ export type TargetId = (typeof TARGET_IDS)[number];
 
 // ---------- Deck cards ----------
 
-export const CARD_KINDS = ["benchmark", "discovery", "trap", "curated", "operational"] as const;
+/** "user" = added by the user from the map (src/lib/userCards.ts); never in deck.json. */
+export const CARD_KINDS = ["benchmark", "discovery", "trap", "curated", "operational", "user"] as const;
 export type CardKind = (typeof CARD_KINDS)[number];
 
 export interface AnalogEntry {

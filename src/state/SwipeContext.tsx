@@ -17,7 +17,8 @@ import { browser } from "react-dom";
 import { loadDeck, withGridCards, type DeckLoadResult } from "@/lib/deck";
 import { applyIceFilter } from "@/lib/mapPins";
 import { rankDeck } from "@/lib/ranking";
-import type { MissionConfig, RankedCard, RankedDeck } from "@/lib/types";
+import type { DeckCard, MissionConfig, RankedCard, RankedDeck } from "@/lib/types";
+import { addUserCard, readUserCards, removeUserCard, writeUserCards, type UserCardsByMission } from "@/lib/userCards";
 import {
   agreementScore,
   felicetteVerdict,
@@ -63,6 +64,12 @@ interface SwipeValue {
   /** Record a swipe and return it (with Félicette's recommendation). */
   decide: (card: RankedCard, verdict: Verdict) => SwipeRecord;
   skip: (cardId: string) => void;
+  /** user scans (kind "user") of the current mission, in the order they were added */
+  userCards: DeckCard[];
+  /** Add a user scan; it becomes the next card of the current deck. */
+  addUserCard: (card: DeckCard) => void;
+  /** Remove a user scan (and any swipe on it) from the current mission. */
+  removeUserCard: (cardId: string) => void;
   /** Clear the current mission's records and skips. */
   reset: () => void;
 }
@@ -101,6 +108,7 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
   const [deck, setDeck] = useState<DeckState>({ status: "loading" });
   const [byMission, setByMission] = useState<RecordsByMission>(readStoredRecords);
   const [skippedByMission, setSkippedByMission] = useState<Record<string, string[]>>({});
+  const [userByMission, setUserByMission] = useState<UserCardsByMission>(() => readUserCards(window.localStorage));
 
   // Load the deck once (external system: network / bundled fixture).
   useEffect(() => {
@@ -123,7 +131,11 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
     }
   }, [byMission]);
 
+  // Persist user scans (external system: localStorage; try/catch inside).
+  useEffect(() => writeUserCards(window.localStorage, userByMission), [userByMission]);
+
   const key = missionKey(config);
+  const userCards = useMemo(() => userByMission[key] ?? [], [userByMission, key]);
   const records = useMemo(() => byMission[key] ?? [], [byMission, key]);
   const skipped = useMemo(() => skippedByMission[key] ?? [], [skippedByMission, key]);
 
@@ -131,8 +143,9 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
   const grid = useScanGrid(true);
   const cards = useMemo(() => {
     if (deck.status !== "ready") return null;
-    return grid?.status === "ready" ? withGridCards(deck.result.cards, grid.grid) : deck.result.cards;
-  }, [deck, grid]);
+    const base = grid?.status === "ready" ? withGridCards(deck.result.cards, grid.grid) : deck.result.cards;
+    return [...base, ...userCards];
+  }, [deck, grid, userCards]);
 
   const ranked = useMemo(() => (cards ? rankDeck(cards, config) : null), [cards, config]);
   const [hideIce, setHideIce] = useState(false);
@@ -143,12 +156,19 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
     const decided = new Set(records.map((r) => r.cardId));
     const open = visible.deck.filter((r) => !decided.has(r.card.id));
     const skipOrder = new Map(skipped.map((id, i) => [id, i]));
-    const fresh = open.filter((r) => !skipOrder.has(r.card.id));
+    // User scans jump the queue, newest first ("insert as the next card").
+    const userOrder = new Map(userCards.map((c, i) => [c.id, i]));
+    const fresh = [
+      ...open
+        .filter((r) => userOrder.has(r.card.id) && !skipOrder.has(r.card.id))
+        .sort((a, b) => userOrder.get(b.card.id)! - userOrder.get(a.card.id)!),
+      ...open.filter((r) => !userOrder.has(r.card.id) && !skipOrder.has(r.card.id)),
+    ];
     const later = open
       .filter((r) => skipOrder.has(r.card.id))
       .sort((a, b) => skipOrder.get(a.card.id)! - skipOrder.get(b.card.id)!);
     return [...fresh, ...later];
-  }, [visible, records, skipped]);
+  }, [visible, records, skipped, userCards]);
 
   const verdictFor = useCallback((card: RankedCard) => felicetteVerdict(card, config), [config]);
 
@@ -175,6 +195,23 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
     [key],
   );
 
+  const addUser = useCallback(
+    (card: DeckCard) => {
+      setUserByMission((prev) => addUserCard(prev, key, card));
+      setSkippedByMission((prev) => ({ ...prev, [key]: (prev[key] ?? []).filter((id) => id !== card.id) }));
+    },
+    [key],
+  );
+
+  const removeUser = useCallback(
+    (cardId: string) => {
+      setUserByMission((prev) => removeUserCard(prev, key, cardId));
+      setByMission((prev) => ({ ...prev, [key]: (prev[key] ?? []).filter((r) => r.cardId !== cardId) }));
+      setSkippedByMission((prev) => ({ ...prev, [key]: (prev[key] ?? []).filter((id) => id !== cardId) }));
+    },
+    [key],
+  );
+
   const reset = useCallback(() => {
     setByMission((prev) => ({ ...prev, [key]: [] }));
     setSkippedByMission((prev) => ({ ...prev, [key]: [] }));
@@ -196,9 +233,12 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
       verdictFor,
       decide,
       skip,
+      userCards,
+      addUserCard: addUser,
+      removeUserCard: removeUser,
       reset,
     }),
-    [deck, ranked, visible, hideIce, queue, records, verdictFor, decide, skip, reset],
+    [deck, ranked, visible, hideIce, queue, records, verdictFor, decide, skip, userCards, addUser, removeUser, reset],
   );
 
   return <SwipeContext.Provider value={value}>{children}</SwipeContext.Provider>;

@@ -17,6 +17,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
 import { PlanetaryComparison } from "@/components/planetary/PlanetaryComparison";
 import { formatCoords, reasonText, ScoreBar } from "@/components/swipe/parts";
+import { AddToDeck } from "./AddToDeck";
 import { TargetComparison } from "./TargetComparison";
 import { PowerValueList } from "@/components/swipe/PowerValueList";
 import { TARGETS } from "@/data/targets";
@@ -132,6 +133,11 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
         {targets && (
           <div className="mt-2">
             <TargetComparison rows={targets.rows} best={targets.best} configured={config.target} />
+          </div>
+        )}
+        {grid?.status !== "pending" && (
+          <div className="mt-3">
+            <AddToDeck point={point} grid={grid?.status === "ready" ? grid.grid : null} sample={sample} config={config} />
           </div>
         )}
         <GridSection grid={grid} sample={sample} point={point} config={config} />

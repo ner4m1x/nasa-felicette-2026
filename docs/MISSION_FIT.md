@@ -96,6 +96,19 @@ Decision order (the first rule that applies wins):
 Agreement score = agreed swipes / swipes where Félicette had an opinion (PURR or HISS). Confetti
 fires only when the user PURRs a card Félicette also recommends.
 
+## User scans (`src/lib/userCards.ts`)
+
+Cards the user adds from the map ("Add to Félicette's deck") have kind `user` and scale `site`. They are
+built from one scan-grid cell through the same path as the Hammaguir card (`src/lib/gridCard.ts`), so every
+score comes from the grid. The breakdown text uses the pipeline's templates (`scripts/config/deck_text.json`).
+
+- Félicette always **abstains** on user cards, so they never count toward the agreement score.
+- Footprint: a clicked point has no measured area, so the footprint constraint is never applied. It is
+  reported as "unverified (site-scale)" (factor 1, no penalty, no hard fail).
+- Mobility and permanent-crew constraints apply as for any other card.
+- User cards are stored per mission configuration in `localStorage` (`purr.userCards`). They are inserted as the
+  next card of the current deck, are always pinned on the map, and can be removed.
+
 ## Honesty note (shown in the UI)
 
 Bearing capacity and local slopes are not measured by global data; regional slopes underestimate
