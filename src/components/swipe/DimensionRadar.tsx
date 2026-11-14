@@ -3,8 +3,8 @@
 /**
  * Compact per-dimension analog radar for the card front (0..1 from the frozen pipeline, shown 0–100).
  * Hand-drawn SVG (no chart library) so it renders at a fixed, tiny size inside a swiping card.
- * Axes are numbered; `DimensionLegend` names every axis with its value and marks the limiting
- * (weakest) dimension in amber — never one unexplained number. Radars need ≥ 3 axes: with fewer,
+ * Axes are numbered; `DimensionLegend` names every axis with its value (limiting dimension in full,
+ * in amber; the rest as short labels) — never one unexplained number. Radars need ≥ 3 axes: with fewer,
  * only the legend is shown. Cards without dims get `DimensionNone` instead of an empty chart.
  */
 
@@ -76,36 +76,43 @@ export function DimensionRadar({ entry, className = "" }: { entry: AnalogEntry; 
   );
 }
 
-/** Numbered legend: scientific label (Félicette's label in the tooltip), value, limiting tag. */
+/**
+ * Compact numbered legend: the limiting dimension in full (amber, with its tag), every other axis as
+ * a numbered short label + value. Full scientific and Félicette labels are in each row's tooltip.
+ */
 export function DimensionLegend({ entry, className = "" }: { entry: AnalogEntry; className?: string }) {
   const { t, dim } = useI18n();
-  const ids = Object.keys(entry.dims);
+  const rows = Object.keys(entry.dims).map((id, i) => ({ id, n: i + 1, label: dim(id), value: to100(entry.dims[id]) }));
+  const lim = rows.find((r) => r.id === entry.limiting) ?? null;
+  const rest = rows.filter((r) => r !== lim);
+  const tip = (r: (typeof rows)[number]) => (r.label.cat ? `${r.label.sci} — ${r.label.cat}` : r.label.sci);
+
   return (
     <div className={`min-w-0 ${className}`}>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-score-analog">{t("scan.radarTitle")}</p>
-      <p className="text-[10px] leading-snug text-dim">{t("card.radarShort")}</p>
-      {ids.length < MIN_RADAR_AXES && <p className="mt-0.5 text-[10px] text-dim">{t("scan.radarFew")}</p>}
-      <ol className="mt-1 grid gap-y-0.5">
-        {ids.map((id, i) => {
-          const label = dim(id);
-          const limiting = id === entry.limiting;
-          return (
-            <li
-              key={id}
-              title={label.cat ? `${label.sci} — ${label.cat}` : label.sci}
-              className={`flex min-w-0 items-baseline gap-1.5 text-[10px] leading-tight ${limiting ? "text-amber" : "text-fg/90"}`}
-            >
-              <span className={`w-2.5 shrink-0 text-right tabular-nums ${limiting ? "font-bold" : "text-score-analog"}`}>
-                {i + 1}
-              </span>
-              <span className="min-w-0 flex-1 truncate">
-                {label.sci}
-                {limiting && <span className="sr-only"> ({t("scan.limitingTag")})</span>}
-              </span>
-              <span className="shrink-0 font-bold tabular-nums">{to100(entry.dims[id])}</span>
-            </li>
-          );
-        })}
+      <p className="text-[10px] font-bold uppercase tracking-wider text-score-analog">
+        {t("scan.radarTitle")} <span className="font-normal text-dim">· 0–100</span>
+      </p>
+      {rows.length < MIN_RADAR_AXES && <p className="mt-0.5 text-[10px] text-dim">{t("scan.radarFew")}</p>}
+      {lim && (
+        <p title={tip(lim)} className="mt-1 flex items-baseline gap-1.5 text-[10px] font-bold leading-tight text-amber">
+          <span className="w-2.5 shrink-0 text-right tabular-nums">{lim.n}</span>
+          <span className="min-w-0 flex-1">
+            {lim.label.sci}{" "}
+            <span className="whitespace-nowrap rounded-pill border border-amber/60 px-1 text-[8px] uppercase tracking-wider">
+              {t("scan.limitingTag")}
+            </span>
+          </span>
+          <span className="shrink-0 tabular-nums">{lim.value}</span>
+        </p>
+      )}
+      <ol className="mt-1 grid gap-x-3 gap-y-0.5 lg:grid-cols-2">
+        {rest.map((r) => (
+          <li key={r.id} title={tip(r)} className="flex min-w-0 items-baseline gap-1.5 text-[10px] leading-tight text-fg/90">
+            <span className="w-2.5 shrink-0 text-right tabular-nums text-score-analog">{r.n}</span>
+            <span className="min-w-0 flex-1 truncate">{r.label.short}</span>
+            <span className="shrink-0 font-bold tabular-nums">{r.value}</span>
+          </li>
+        ))}
       </ol>
     </div>
   );

@@ -109,6 +109,28 @@ body::after {
   }
 }
 
+/* Félicette's idle blink (FelicetteAvatar): a quick squash of both eyes every --duration-blink. */
+.felicette-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: felicette-blink var(--duration-blink) infinite;
+}
+@keyframes felicette-blink {
+  0%,
+  95%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .felicette-blink {
+    animation: none;
+  }
+}
+
 /* Native <dialog> used by EarthLimitsSheet: bottom sheet on phones, centered modal on desktop. */
 dialog.purr-sheet::backdrop {
   background: rgb(0 0 0 / 0.7);

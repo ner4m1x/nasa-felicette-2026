@@ -11,6 +11,7 @@
 import { Ban, RotateCcw, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MissionBrief } from "@/components/configurator/MissionBrief";
+import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { TARGETS } from "@/data/targets";
@@ -109,7 +110,7 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
   );
 
   return (
-    <div className="mx-auto flex h-full min-h-[600px] max-w-6xl flex-col gap-3 px-3 pb-3 pt-3 lg:grid lg:min-h-0 lg:grid-cols-[440px_360px] lg:justify-center lg:gap-8 lg:p-6">
+    <div className="mx-auto flex h-full min-h-[600px] max-w-6xl flex-col gap-3 px-3 pb-3 pt-3 lg:grid lg:min-h-0 lg:grid-cols-[var(--deck-desktop-width)_360px] lg:justify-center lg:gap-8 lg:p-6">
       {/* ---- Deck column ---- */}
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:max-h-[800px]">
         <div className="flex items-center gap-2">
@@ -144,7 +145,11 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
           aria-label={t("deck.stackAria")}
           className="relative mb-7 min-h-[380px] flex-1"
         >
-          {swipe.status === "loading" && <Panel title={t("deck.loading")} />}
+          {swipe.status === "loading" && (
+            <Panel title={t("deck.loading")}>
+              <FelicetteAvatar mood="thinking" className="order-first h-20 w-20" />
+            </Panel>
+          )}
           {swipe.status === "error" && <Panel title={t("deck.loadError", { error: swipe.error ?? "" })} tone="danger" />}
           {swipe.status === "ready" && total === 0 && (
             <Panel title={t("deck.emptyTitle")} body={t("deck.emptyBody")}>

@@ -46,6 +46,11 @@
   --score-analog: var(--sky);
   --score-fit: var(--amber);
   --score-track: var(--line);
+  /* segmented terminal meter (ScoreBar); segment count is METER.segments in tokens.ts */
+  --meter-height: 0.6rem;
+  --meter-gap: 2px;
+  --meter-radius: 1px;
+  --meter-glow: 0 0 4px;
 
   /* ---- Map ---- */
   /* Terminal-style dim on the BASE tile layer only (thematic layers, scan overlay and pins are not
@@ -67,14 +72,37 @@
   --imagery-skeleton-shine: rgb(77 255 154 / 0.07);
   --imagery-scrim: rgb(5 10 7 / 0.72);
   --duration-shimmer: 1.4s;
-  --imagery-aspect: 16 / 9;
+  /* thumbnail height as a share of the card's height (card layout: image ≈ 38–45 %); phones use the
+     low end so the scores stay above the fold, desktop (≥ 64rem, Tailwind lg) a bit more */
+  --imagery-card-height: 38%;
+
+  /* ---- Félicette (FelicetteAvatar / FelicetteEyes): tuxedo cat in a helmet ---- */
+  --cat-fur: #0b100d;
+  --cat-white: var(--fg);
+  --cat-outline: var(--dim);
+  --cat-eye: var(--phosphor);
+  --cat-nose: var(--amber);
+  --cat-ear-inner: rgb(255 178 46 / 0.6);
+  --cat-whisker: rgb(214 245 222 / 0.55);
+  --felicette-glass: rgb(77 255 154 / 0.07);
+  --felicette-glare: rgb(214 245 222 / 0.45);
+  --felicette-ring: var(--phosphor);
+  --felicette-ring-happy: var(--purr);
+  --felicette-ring-hiss: var(--hiss);
+  --felicette-ring-thinking: var(--amber);
+  --felicette-ring-surprised: var(--amber);
+  --duration-blink: 5.5s;
 
   /* ---- Compact dimension radar (card front) ---- */
-  --radar-size: 7rem;
+  --radar-size: 6.75rem;
   --radar-line: var(--score-analog);
   --radar-limiting: var(--amber);
   --radar-grid: var(--line);
   --radar-fill-opacity: 0.22;
+
+  /* ---- Swipe deck ---- */
+  /* desktop: the card stays phone-width, centred, with the info panel beside it */
+  --deck-desktop-width: 400px;
 
   /* ---- Radii ---- */
   --card-radius: 1rem;
@@ -94,4 +122,10 @@
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   color-scheme: dark;
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --imagery-card-height: 42%;
+  }
 }

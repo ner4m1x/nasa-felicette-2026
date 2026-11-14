@@ -2,7 +2,8 @@
 
 /**
  * One draggable card of the Orbital Swipe deck.
- * - Framer Motion drag="x": rotation follows the offset; PURR/HISS stamps fade in with distance.
+ * - Framer Motion drag="x": rotation follows the offset; PURR/HISS stamps fade in with distance,
+ *   drawn over the satellite image.
  * - Release: commits on offset OR velocity (src/lib/swipe.ts), otherwise springs back.
  * - Touch: `touch-action: pan-y` on the card AND on the card body's scroll container (CardFace), plus
  *   dragDirectionLock: one-finger horizontal drag anywhere = swipe; vertical drag = scroll the body.
@@ -138,8 +139,16 @@ function Stamp({
   return (
     <motion.span
       aria-hidden
-      style={{ opacity, color, borderColor: color, rotate: side === "left" ? -14 : 14 }}
-      className={`pointer-events-none absolute top-16 ${
+      // Centred vertically on the satellite image (top --imagery-card-height of the card).
+      style={{
+        opacity,
+        color,
+        borderColor: color,
+        rotate: side === "left" ? -14 : 14,
+        y: "-50%",
+        top: "calc(var(--imagery-card-height) / 2)",
+      }}
+      className={`pointer-events-none absolute ${
         side === "left" ? "left-4" : "right-4"
       } rounded-control border-4 bg-bg/70 px-3 py-1 text-3xl font-black tracking-widest`}
     >

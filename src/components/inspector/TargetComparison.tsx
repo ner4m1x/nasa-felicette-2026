@@ -40,7 +40,7 @@ export function TargetComparison({ rows, best, bestLow = null, configured }: Tar
   return (
     <div className="space-y-2">
       <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.inspector.allTitle")}</h4>
-      <FelicetteSays key={summary} text={summary} />
+      <FelicetteSays key={summary} text={summary} mood={bestLow ? "surprised" : "neutral"} />
       {bestLow && <LowScoreNote reason={bestLow} />}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-[11px]">

@@ -55,3 +55,6 @@ export const IMAGERY = {
   /** Footprint outline drawn on regional cards: the pipeline's grid step (degrees). */
   cellSizeDeg: 0.25,
 } as const;
+
+/** Terminal-style segmented score meter (ScoreBar): number of segments across the bar. */
+export const METER = { segments: 20 } as const;

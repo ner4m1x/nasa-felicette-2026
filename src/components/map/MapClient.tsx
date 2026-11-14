@@ -17,6 +17,7 @@ import { motion, useDragControls } from "framer-motion";
 import { ChevronUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { FelicetteEyes } from "@/components/felicette/FelicetteEyes";
 import { PointInspector } from "@/components/inspector/PointInspector";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
@@ -255,7 +256,7 @@ function MobileSheet({
       >
         <span aria-hidden className="block h-1.5 w-12 rounded-pill bg-line" />
         <span aria-live="polite" className="flex w-full items-center gap-2 text-left text-xs font-bold text-fg">
-          <span aria-hidden className="text-amber">=^.^=</span>
+          <FelicetteAvatar compact className="h-6 w-6 shrink-0" />
           <span className="min-w-0 flex-1 truncate">{summary}</span>
           <ChevronUp aria-hidden size={16} className={`shrink-0 text-dim transition-transform ${expanded ? "rotate-180" : ""}`} />
         </span>

@@ -6,9 +6,11 @@ import { ExternalLink } from "lucide-react";
 import type { DimLabel } from "@/i18n/I18nProvider";
 import type { I18nKey, I18nParams, Lang } from "@/i18n/types";
 import { resolveSource } from "@/lib/manifest";
+import { meterSegments } from "@/lib/meter";
 import type { CardKind } from "@/lib/types";
 import type { VerdictReason } from "@/lib/verdict";
 import { useManifest } from "@/state/usePipeline";
+import { METER } from "@/theme/tokens";
 
 type T = (key: I18nKey, params?: I18nParams) => string;
 
@@ -51,15 +53,17 @@ interface ScoreBarProps {
   detailTitle?: string;
 }
 
+/** Segmented terminal meter: METER.segments cells, lit up to the score; the exact value is printed beside it. */
 export function ScoreBar({ label, hint, value, outOf, color, detail, detailTitle }: ScoreBarProps) {
   const v = value === null ? null : to100(value);
+  const lit = meterSegments(value, METER.segments);
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
         <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color }}>
           {label}
         </span>
-        <span className="text-sm font-bold tabular-nums text-fg">
+        <span className="text-base font-bold leading-none tabular-nums text-fg">
           {v === null ? "—" : v}
           {v !== null && <span className="text-[10px] font-normal text-dim">{outOf}</span>}
         </span>
@@ -71,9 +75,19 @@ export function ScoreBar({ label, hint, value, outOf, color, detail, detailTitle
         aria-valuemax={100}
         aria-valuenow={v ?? undefined}
         aria-valuetext={v === null ? "—" : `${v}${outOf}`}
-        className="mt-1 h-2 overflow-hidden rounded-pill bg-score-track"
+        className="mt-1 flex h-(--meter-height) gap-(--meter-gap)"
       >
-        {v !== null && <div className="h-full rounded-pill" style={{ width: `${v}%`, background: color }} />}
+        {Array.from({ length: METER.segments }, (_, i) => (
+          <span
+            key={i}
+            className="flex-1 rounded-(--meter-radius)"
+            style={
+              i < lit
+                ? { background: color, boxShadow: "var(--meter-glow) " + color }
+                : { background: "var(--score-track)" }
+            }
+          />
+        ))}
       </div>
       <p className="mt-1 text-[10px] leading-snug text-dim">
         {hint}

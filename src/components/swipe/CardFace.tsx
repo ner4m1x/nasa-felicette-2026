@@ -1,16 +1,21 @@
 "use client";
 
 /**
- * Card front: satellite thumbnail (CardImagery), name, country, kind badge, both scores as separate
- * labelled bars (Analog Score from the frozen pipeline; Mission Fit from the configurator — never
- * mixed) with the compact per-dimension radar for the active target (always shown when the card has
- * dims; a short text block otherwise), a one-line teaser from Félicette and the "Scan with whiskers"
- * live NASA POWER cross-check.
+ * Card front, top to bottom (fills the card's height):
+ *   1. satellite thumbnail (CardImagery), --imagery-card-height of the card;
+ *   2. kind badge, name, country + coordinates;
+ *   3. both scores as separate segmented meters (Analog Score from the frozen pipeline; Mission Fit
+ *      from the configurator — never mixed), then the compact per-dimension radar + legend for the
+ *      active target (a short text block when the card has no dims);
+ *   4. Félicette's line, then the "Scan with whiskers" live NASA POWER cross-check.
+ * Items 3–4 scroll inside the card body; the actions (HISS / Skip / PURR) sit below the card.
  */
 
 import { MapPin, Star, Trash2 } from "lucide-react";
+import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { useI18n } from "@/i18n/I18nProvider";
 import { HAMMAGUIR_CARD_ID } from "@/data/curatedCards";
+import { moodForTeaser } from "@/lib/felicetteMood";
 import { formatPercentile } from "@/lib/format";
 import type { RankedCard } from "@/lib/types";
 import { useMission } from "@/state/MissionContext";
@@ -39,17 +44,17 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
   const pct = analog ? formatPercentile(analog.percentile, lang) : null;
   const pctText =
     pct?.kind === "top" ? t("card.percentileTop") : pct?.kind === "value" ? t("card.percentile", { p: pct.text }) : null;
+  const withRadar = hasDims(analog) && Object.keys(analog.dims).length >= MIN_RADAR_AXES;
+  // The number sits beside the meter and the limiting dimension is amber in the radar legend, so the
+  // detail line only adds the percentile (or the weakest dimension when there is no legend).
   const analogDetail = analog
-    ? [
-        pctText ? t("card.scoreAndPct", { score: to100(analog.total), pct: pctText }) : null,
-        t("card.limiting", { dim: dim(analog.limiting).sci }),
-      ]
+    ? [pctText, Object.keys(analog.dims).length > 0 ? null : t("card.limiting", { dim: dim(analog.limiting).sci })]
         .filter(Boolean)
-        .join(" · ")
+        .join(" · ") || null
     : t("card.unscored");
 
   const bars = (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       <ScoreBar
         label={t("card.analog")}
         hint={t("card.analogHint")}
@@ -59,7 +64,6 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
         detail={analogDetail}
         detailTitle={pctText ? t("card.tieNote") : undefined}
       />
-      {pctText && <p className="-mt-2 text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
       <ScoreBar
         label={t("card.fit")}
         hint={t("card.fitHint")}
@@ -73,7 +77,7 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
   return (
     <div className="flex h-full flex-col">
       <CardImagery card={card} load={loadImagery} interactive={interactive} />
-      <header className="border-b border-line px-4 pb-3 pt-4">
+      <header className="shrink-0 border-b border-line px-4 pb-2 pt-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <KindBadge kind={card.kind} label={t(`kinds.${card.kind}`)} />
           {card.known && (
@@ -99,7 +103,7 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
             </button>
           )}
         </div>
-        <h2 className="mt-2 text-lg font-bold leading-tight text-fg">{card.name}</h2>
+        <h2 className="mt-1.5 text-lg font-bold leading-tight text-fg">{card.name}</h2>
         <p className="mt-0.5 flex items-center gap-1 text-xs text-dim">
           <MapPin aria-hidden size={12} />
           <span>{card.country ?? t("card.noCountry")}</span>
@@ -112,16 +116,17 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
           that starts here: pan-y = the browser scrolls vertically, horizontal drags reach the card's
           Framer drag (one finger). Without it ("auto") the browser claims horizontal pans → pointercancel. */}
       <div
-        className={`min-h-0 flex-1 space-y-4 px-4 py-3 ${interactive ? "overflow-y-auto overscroll-contain" : "overflow-hidden"}`}
+        className={`min-h-0 flex-1 space-y-3 px-4 py-3 ${interactive ? "overflow-y-auto overscroll-contain" : "overflow-hidden"}`}
         style={{ touchAction: "pan-y" }}
       >
-        {/* Scores + compact radar. Phone: radar and its legend first (right under the image and
-            title), bars below. Desktop (lg): bars with the radar beside them, legend underneath. */}
-        {hasDims(analog) && Object.keys(analog.dims).length >= MIN_RADAR_AXES ? (
-          <div className="grid grid-cols-[var(--radar-size)_minmax(0,1fr)] items-center gap-x-3 gap-y-3 [grid-template-areas:'radar_legend'_'bars_bars'] lg:grid-cols-[minmax(0,1fr)_var(--radar-size)] lg:[grid-template-areas:'bars_radar'_'legend_legend']">
+        {/* Scores first (primary), then the compact radar + legend.
+            Phone: bars full width, radar and legend side by side below.
+            Desktop (lg): bars with the radar beside them, legend underneath. */}
+        {withRadar ? (
+          <div className="grid grid-cols-[var(--radar-size)_minmax(0,1fr)] items-center gap-x-3 gap-y-3 [grid-template-areas:'bars_bars'_'radar_legend'] lg:grid-cols-[minmax(0,1fr)_var(--radar-size)] lg:[grid-template-areas:'bars_radar'_'legend_legend']">
+            <div className="[grid-area:bars]">{bars}</div>
             <DimensionRadar entry={analog} className="[grid-area:radar]" />
             <DimensionLegend entry={analog} className="[grid-area:legend]" />
-            <div className="[grid-area:bars]">{bars}</div>
           </div>
         ) : (
           <>
@@ -134,16 +139,16 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
 
         <NdviImputedNote imputed={card.ndviImputed} label={t("card.ndviImputed")} />
 
-        <p className="flex gap-2 text-xs italic leading-relaxed text-fg/90">
-          <span aria-hidden className="not-italic text-amber">
-            =^.^=
-          </span>
+        <p className="flex items-start gap-2 text-xs italic leading-relaxed text-fg/90">
+          <FelicetteAvatar mood={moodForTeaser(analog?.total)} compact className="h-7 w-7 shrink-0" />
           <span>{t(card.id === HAMMAGUIR_CARD_ID ? "card.hammaguir.teaser" : `card.teaser.${card.kind}`)}</span>
         </p>
 
         {card.id === HAMMAGUIR_CARD_ID && <HammaguirStory ranked={ranked} />}
 
         <WhiskerScan lat={card.lat} lon={card.lon} interactive={interactive} />
+
+        {pctText && <p className="text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
       </div>
     </div>
   );

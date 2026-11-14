@@ -34,6 +34,8 @@ export interface DimLabel {
   sci: string;
   /** Félicette's cat label, shown as a subtitle (null for unknown dimensions) */
   cat: string | null;
+  /** one- or two-word label for tight spaces (the compact radar legend); falls back to `sci` */
+  short: string;
 }
 
 interface I18nValue {
@@ -76,14 +78,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<I18nValue>(() => {
     const dict = DICTIONARIES[lang];
-    const dims = dict.dims as Record<string, { sci: string; cat: string } | undefined>;
+    const dims = dict.dims as Record<string, { sci: string; cat: string; short: string } | undefined>;
     return {
       lang,
       setLang,
       t: (key, params) => translate(dict, key, params),
       dim: (id) => {
         const d = dims[id];
-        return d ? { sci: d.sci, cat: d.cat } : { sci: id, cat: null };
+        return d ? { sci: d.sci, cat: d.cat, short: d.short } : { sci: id, cat: null, short: id };
       },
     };
   }, [lang, setLang]);

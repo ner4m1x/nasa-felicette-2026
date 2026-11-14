@@ -7,6 +7,7 @@
  */
 
 import { ExternalLink } from "lucide-react";
+import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { Sheet } from "@/components/ui/Sheet";
 import { getSource, SOURCES, type SourceId } from "@/data/sources";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -141,8 +142,11 @@ export function EarthLimitsSheet({ open, onClose }: EarthLimitsSheetProps) {
     >
       <EarthLimitsList />
       <p className="mt-4 text-[11px] text-dim">* {t("limits.unverified")}</p>
-      <p className="mt-4 text-center text-xs italic text-dim">
-        =^.^= {t("felicette.name")}: {t("limits.cat")}
+      <p className="mt-4 flex items-center justify-center gap-2 text-center text-xs italic text-dim">
+        <FelicetteAvatar compact className="h-7 w-7 shrink-0" />
+        <span>
+          {t("felicette.name")}: {t("limits.cat")}
+        </span>
       </p>
     </Sheet>
   );

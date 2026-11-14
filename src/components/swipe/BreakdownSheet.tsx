@@ -13,12 +13,15 @@
  * fixed-positioned inside the modal dialog so it renders above the backdrop (top layer).
  */
 
+import { AlertTriangle, CheckCircle2, Rocket } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { PlanetaryComparisonAt } from "@/components/planetary/PlanetaryComparison";
 import { Sheet } from "@/components/ui/Sheet";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import { breakdownFor } from "@/lib/deck";
+import { moodForVerdict } from "@/lib/felicetteMood";
 import { HONESTY_NOTE_KEY } from "@/lib/missionFit";
 import type { RankedCard } from "@/lib/types";
 import { shouldCelebrate, verdictHeadlineKey, type Agreement, type FelicetteVerdict, type SwipeRecord } from "@/lib/verdict";
@@ -88,9 +91,9 @@ export function BreakdownSheet({
   const breakdown = breakdownFor(card, config.target);
   const sections = breakdown
     ? [
-        { id: "matches", icon: "✅", title: t("breakdown.matches"), items: breakdown.matches[lang] ?? [] },
-        { id: "breaksDown", icon: "⚠️", title: t("breakdown.breaksDown"), items: breakdown.breaksDown[lang] ?? [] },
-        { id: "utility", icon: "🚀", title: t("breakdown.utility"), items: breakdown.utility[lang] ?? [] },
+        { id: "matches", Icon: CheckCircle2, title: t("breakdown.matches"), items: breakdown.matches[lang] ?? [] },
+        { id: "breaksDown", Icon: AlertTriangle, title: t("breakdown.breaksDown"), items: breakdown.breaksDown[lang] ?? [] },
+        { id: "utility", Icon: Rocket, title: t("breakdown.utility"), items: breakdown.utility[lang] ?? [] },
       ]
     : [];
 
@@ -137,10 +140,8 @@ export function BreakdownSheet({
               ? t(record.verdict === "purr" ? "breakdown.youPurred" : "breakdown.youHissed")
               : t("breakdown.notJudged")}
           </p>
-          <p className="mt-2 flex gap-2 text-sm leading-relaxed">
-            <span aria-hidden className="text-amber">
-              =^.^=
-            </span>
+          <p className="mt-2 flex items-start gap-2.5 text-sm leading-relaxed">
+            <FelicetteAvatar mood={moodForVerdict(rec, analog?.total)} compact className="h-10 w-10 shrink-0" />
             <span>
               <b>{headline}</b> {reasonText(t, dim, verdict.reason)}
             </span>
@@ -167,7 +168,8 @@ export function BreakdownSheet({
         {sections.map((s) => (
           <section key={s.id}>
             <h3 className="text-xs font-bold uppercase tracking-wider text-phosphor">
-              <span aria-hidden>{s.icon}</span> {s.title}
+              <s.Icon aria-hidden size={13} className="mr-1 inline align-[-2px]" />
+              {s.title}
             </h3>
             {s.items.length === 0 ? (
               <p className="mt-1 text-sm text-dim">{t("breakdown.empty")}</p>

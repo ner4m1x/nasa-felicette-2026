@@ -17,6 +17,7 @@
 
 import { ImageOff } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
+import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { useI18n } from "@/i18n/I18nProvider";
 import {
   buildMosaic,
@@ -87,7 +88,7 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
       role="img"
       aria-label={`${t("card.imagery.alt", { name: card.name })}. ${caption}`}
       className="relative w-full shrink-0 overflow-hidden border-b border-line bg-bg"
-      style={{ aspectRatio: "var(--imagery-aspect)", touchAction: "pan-y" }}
+      style={{ height: "var(--imagery-card-height)", touchAction: "pan-y" }}
     >
       {base && (
         <TileLayer
@@ -164,9 +165,7 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
           className="absolute bottom-7 right-2 min-h-8 rounded-pill border border-amber/70 px-2.5 text-[10px] font-bold tracking-wide text-amber hover:bg-amber/15"
           style={{ background: "var(--imagery-scrim)", touchAction: "manipulation" }}
         >
-          <span aria-hidden className="mr-1">
-            =^.^=
-          </span>
+          <FelicetteAvatar mood="thinking" compact className="mr-1 inline-block h-5 w-5 align-middle" />
           {t("card.imagery.trapHint")}
         </button>
       )}
