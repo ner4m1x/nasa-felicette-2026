@@ -1,0 +1,60 @@
+/*
+ * P.U.R.R. visual tokens — the ONE place to restyle the app.
+ * Colors, radii, shadows and motion durations live here as CSS variables; globals.css maps them to
+ * Tailwind utilities (bg-panel, rounded-card, shadow-card, …). Numbers that Framer Motion needs in
+ * JS (springs, swipe thresholds) live next door in src/theme/tokens.ts.
+ *
+ * Dark only (an orbital console has no light mode).
+ * Contrast on --bg (#050a07): fg 17.1:1, phosphor 15.3:1, amber 11.1:1, dim 8.8:1, danger 7.2:1;
+ * on --panel-2 the lowest is dim at 7.7:1 (all ≥ WCAG AA 4.5:1).
+ */
+:root {
+  /* ---- Colors ---- */
+  --bg: #050a07;
+  --panel: #0a140e;
+  --panel-2: #0f1d14;
+  --line: #1f3a29;
+  --fg: #d6f5de;
+  --dim: #85b896;
+  --phosphor: #4dff9a;
+  --amber: #ffb22e;
+  --danger: #ff6b6b;
+  --sky: #7cc8ff;
+  --violet: #c7a2ff;
+
+  /* Swipe verdicts */
+  --purr: var(--phosphor);
+  --hiss: var(--danger);
+  --skip: var(--dim);
+
+  /* Card kind badges */
+  --kind-benchmark: var(--sky);
+  --kind-discovery: var(--phosphor);
+  --kind-trap: var(--danger);
+  --kind-curated: var(--violet);
+  --kind-operational: var(--amber);
+
+  /* Score bars */
+  --score-analog: var(--sky);
+  --score-fit: var(--amber);
+  --score-track: var(--line);
+
+  /* ---- Radii ---- */
+  --card-radius: 1rem;
+  --sheet-radius: 1rem;
+  --control-radius: 0.5rem;
+  --pill-radius: 9999px;
+
+  /* ---- Shadows ---- */
+  --card-shadow: 0 10px 30px rgb(0 0 0 / 0.55), 0 0 0 1px var(--line);
+  --card-top-shadow: 0 18px 40px rgb(0 0 0 / 0.6), 0 0 24px rgb(77 255 154 / 0.08);
+  --glow-shadow: 0 0 8px rgb(77 255 154 / 0.45);
+
+  /* ---- Motion (CSS transitions; Framer values are in tokens.ts) ---- */
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --duration-slow: 450ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color-scheme: dark;
+}

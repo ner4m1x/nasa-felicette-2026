@@ -1,23 +1,8 @@
 @import "tailwindcss";
+/* All visual tokens (colors, radii, shadows, durations) live in one file. */
+@import "../theme/tokens.css";
 
-/*
- * P.U.R.R. terminal palette. Dark only (an orbital console has no light mode).
- * Contrast on --bg (#050a07): fg 17.1:1, phosphor 15.3:1, amber 11.1:1, dim 8.8:1, danger 7.2:1;
- * on --panel-2 the lowest is dim at 7.7:1 (all ≥ WCAG AA 4.5:1).
- */
-:root {
-  --bg: #050a07;
-  --panel: #0a140e;
-  --panel-2: #0f1d14;
-  --line: #1f3a29;
-  --fg: #d6f5de;
-  --dim: #85b896;
-  --phosphor: #4dff9a;
-  --amber: #ffb22e;
-  --danger: #ff6b6b;
-  color-scheme: dark;
-}
-
+/* Map the tokens to Tailwind utilities (bg-panel, text-purr, rounded-card, shadow-card, …). */
 @theme inline {
   --color-bg: var(--bg);
   --color-panel: var(--panel);
@@ -28,6 +13,21 @@
   --color-phosphor: var(--phosphor);
   --color-amber: var(--amber);
   --color-danger: var(--danger);
+  --color-sky: var(--sky);
+  --color-violet: var(--violet);
+  --color-purr: var(--purr);
+  --color-hiss: var(--hiss);
+  --color-skip: var(--skip);
+  --color-score-analog: var(--score-analog);
+  --color-score-fit: var(--score-fit);
+  --color-score-track: var(--score-track);
+  --radius-card: var(--card-radius);
+  --radius-sheet: var(--sheet-radius);
+  --radius-control: var(--control-radius);
+  --radius-pill: var(--pill-radius);
+  --shadow-card: var(--card-shadow);
+  --shadow-card-top: var(--card-top-shadow);
+  --shadow-glow: var(--glow-shadow);
   --font-mono: var(--font-terminal), ui-monospace, monospace;
   --font-sans: var(--font-terminal), ui-monospace, monospace;
 }
@@ -68,7 +68,16 @@ body::after {
 }
 
 .text-glow {
-  text-shadow: 0 0 8px rgb(77 255 154 / 0.45);
+  text-shadow: var(--glow-shadow);
+}
+
+/* Recharts radar (DimensionRadar): grid and tick colors from the tokens. */
+.purr-radar .recharts-polar-grid line,
+.purr-radar .recharts-polar-grid polygon {
+  stroke: var(--line);
+}
+.purr-radar .recharts-polar-angle-axis-tick text {
+  fill: var(--dim);
 }
 
 .cursor-blink::after {

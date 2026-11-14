@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Python virtualenv of the data pipeline (third-party JS bundled with matplotlib, etc.).
+    "scripts/.venv/**",
   ]),
 ]);
 

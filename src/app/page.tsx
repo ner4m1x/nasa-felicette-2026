@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { MissionProvider } from "@/state/MissionContext";
+import { SwipeProvider } from "@/state/SwipeContext";
 
 /**
  * The providers read localStorage and the URL query on their first render (`use(browser())`),
@@ -20,7 +21,9 @@ export default function Home() {
     <Suspense fallback={<BootScreen />}>
       <I18nProvider>
         <MissionProvider>
-          <AppShell />
+          <SwipeProvider>
+            <AppShell />
+          </SwipeProvider>
         </MissionProvider>
       </I18nProvider>
     </Suspense>
