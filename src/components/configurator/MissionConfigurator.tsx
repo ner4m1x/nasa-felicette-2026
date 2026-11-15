@@ -3,13 +3,14 @@
 /**
  * Mission Configurator (landing screen of the Swipe tab).
  * - Phone: one question per screen, progress dots, Back / Next, "Launch scan" on the last question.
- * - Desktop (≥ lg): all four questions as one compact form, with Félicette and the brief beside it.
+ * - Desktop (≥ lg): all four questions as one compact form, with Félicette (FelicetteHero) and the
+ *   brief beside it. Phones: FelicetteHero above each question.
  * The same DOM serves both: on phones, questions other than the current one are hidden by CSS.
  */
 
 import { ChevronLeft, ChevronRight, Rocket } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { FelicetteSays } from "@/components/felicette/FelicetteSays";
+import { FelicetteHero } from "@/components/felicette/FelicetteHero";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { I18nKey } from "@/i18n/types";
 import type { MissionConfig } from "@/lib/types";
@@ -71,7 +72,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
           </p>
         </header>
 
-        <FelicetteSays key={comment} text={comment} className="mt-3 px-4 lg:hidden" />
+        <FelicetteHero key={comment} text={comment} className="mt-3 px-4 lg:hidden" />
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:mt-4 lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-5 lg:overflow-visible lg:p-0">
           {CONFIG_STEPS.map((s, i) => {
@@ -157,7 +158,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
 
       {/* Desktop side panel */}
       <aside className="hidden space-y-4 lg:sticky lg:top-6 lg:block">
-        <FelicetteSays key={comment} text={comment} />
+        <FelicetteHero key={comment} text={comment} />
         <MissionBrief />
         {launchButton("w-full")}
         <p className="text-[11px] leading-relaxed text-dim">{t("config.shareHint")}</p>

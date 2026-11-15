@@ -12,7 +12,7 @@ import { AlertTriangle, Ban, RotateCcw, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MissionBrief } from "@/components/configurator/MissionBrief";
 import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
-import { FelicetteSays } from "@/components/felicette/FelicetteSays";
+import { FelicetteHero } from "@/components/felicette/FelicetteHero";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -205,7 +205,7 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
 
       {/* ---- Desktop info panel ---- */}
       <aside className="hidden space-y-4 lg:block">
-        <FelicetteSays key="launch" text={t("felicette.launch")} />
+        <FelicetteHero key="launch" text={t("felicette.launch")} />
         <MissionBrief />
         <section className="space-y-1 rounded-control border border-line bg-panel p-3 text-xs">
           <p className="tabular-nums">{t("deck.stats", { purr: purrs, hiss: swipe.records.length - purrs })}</p>

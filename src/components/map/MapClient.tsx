@@ -7,7 +7,8 @@
  *   mounted; ScanMap calls invalidateSize() whenever the tab becomes visible again.
  * - Phone: full-screen map, inspector in a draggable bottom sheet. It starts at a low "peek" with a
  *   one-line summary (best target + score) and expands on tap/drag; collapsed, the map stays visible.
- *   Desktop (≥ lg): map + side inspector panel with Félicette's eyes.
+ *   Desktop (≥ lg): map + side inspector panel; FelicetteHero in its header (pointer-following eyes)
+ *   says the intro, then her summary of the clicked cell.
  * - Pins (src/lib/mapPins.ts): top candidate regions + benchmark/trap/curated cards, sized by rank;
  *   "Show all candidates" lifts the cap. The ice-sheet view filter (SwipeContext) applies here too.
  *   Tapping a pin opens its breakdown.
@@ -21,8 +22,10 @@ import { Check, ChevronUp, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
+import { FelicetteHero } from "@/components/felicette/FelicetteHero";
 import type { DeckAction } from "@/components/inspector/AddToDeck";
 import { PointInspector } from "@/components/inspector/PointInspector";
+import { targetSummary } from "@/components/inspector/TargetComparison";
 import { useDeckAction } from "@/components/inspector/useDeckAction";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { formatCoords, to100 } from "@/components/swipe/parts";
@@ -31,6 +34,7 @@ import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import { bestTarget, targetRows } from "@/lib/bestTarget";
 import { DECK_ACTION_REASON_KEY } from "@/lib/deckAction";
+import { lowScoreFromSample } from "@/lib/lowScore";
 import { selectPins } from "@/lib/mapPins";
 import { DEFAULT_BASE, DEFAULT_OVERLAY_OPACITY, DEFAULT_SHOW_SCAN, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import { useMission } from "@/state/MissionContext";
@@ -50,7 +54,7 @@ const ScanMap = dynamic(() => import("./ScanMap"), {
 const PEEK_PX = 96;
 
 export function MapClient({ active }: { active: boolean }) {
-  const { t, lang } = useI18n();
+  const { t, lang, dim } = useI18n();
   const { config } = useMission();
   const swipe = useSwipe();
   const [visited, setVisited] = useState(active);
@@ -93,10 +97,15 @@ export function MapClient({ active }: { active: boolean }) {
   // One-line summary (phone peek + map popup): best of the four targets at the clicked cell.
   const peek = useMemo(() => {
     if (!point || !sample || grid?.status !== "ready") return null;
-    if (sample.land === false) return { best: null, score: null };
+    if (sample.land === false) return { best: null, score: null, rows: null, low: false };
     const rows = targetRows(sample, (tid) => grid.grid.percentile(tid, point.lat, point.lon));
     const best = bestTarget(rows);
-    return { best, score: rows.find((r) => r.target === best)?.total ?? null };
+    return {
+      best,
+      score: rows.find((r) => r.target === best)?.total ?? null,
+      rows,
+      low: best !== null && lowScoreFromSample(sample, best) !== null,
+    };
   }, [point, sample, grid]);
 
   const markerTitle = useCallback(
@@ -146,7 +155,11 @@ export function MapClient({ active }: { active: boolean }) {
         ? t("map.peek.none")
         : formatCoords(lang, point.lat, point.lon);
 
-  const inspector = <PointInspector point={point} grid={grid} config={config} deckAction={deckAction} />;
+  const inspector = (
+    <PointInspector point={point} grid={grid} config={config} deckAction={deckAction} heroInHeader={desktop} />
+  );
+  // Desktop panel header: Félicette says the intro, then her summary of the clicked cell.
+  const heroText = peek?.rows ? targetSummary(t, dim, peek.rows, peek.best) : t("map.inspector.intro");
   const popup =
     point && popupFor === point ? <MapPointPopup summary={peekText} action={deckAction} onDetails={onDetails} /> : null;
 
@@ -198,8 +211,14 @@ export function MapClient({ active }: { active: boolean }) {
 
       {desktop ? (
         <aside ref={asideRef} className="min-h-0 overflow-y-auto border-l border-line bg-panel" aria-label={t("map.inspector.title")}>
-          <div className="flex justify-center border-b border-line py-3">
-            <FelicetteAvatar followPointer label={t("map.eyesAria")} className="h-24 w-24" />
+          <div className="border-b border-line p-4">
+            <FelicetteHero
+              key={heroText}
+              text={heroText}
+              mood={peek?.low ? "surprised" : "neutral"}
+              followPointer
+              avatarLabel={t("map.eyesAria")}
+            />
           </div>
           {inspector}
         </aside>

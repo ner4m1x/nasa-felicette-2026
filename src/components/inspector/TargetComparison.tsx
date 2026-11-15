@@ -10,6 +10,7 @@ import { LowScoreNote } from "@/components/swipe/LowScoreNote";
 import { to100 } from "@/components/swipe/parts";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
+import type { I18nValue } from "@/i18n/I18nProvider";
 import type { TargetRow } from "@/lib/bestTarget";
 import { formatPercentile } from "@/lib/format";
 import type { LowScoreReason } from "@/lib/lowScore";
@@ -21,16 +22,28 @@ interface TargetComparisonProps {
   /** why the best target's score is very low (null when it isn't) */
   bestLow?: LowScoreReason | null;
   configured: TargetId;
+  /** false = Félicette's summary is said elsewhere (desktop: FelicetteHero in the map panel header) */
+  showSummary?: boolean;
 }
 
-export function TargetComparison({ rows, best, bestLow = null, configured }: TargetComparisonProps) {
-  const { t, lang, dim } = useI18n();
+/** Félicette's one-line summary for the clicked cell: best target and what holds it back. */
+export function targetSummary(
+  t: I18nValue["t"],
+  dim: I18nValue["dim"],
+  rows: readonly TargetRow[],
+  best: TargetId | null,
+): string {
   const bestRow = rows.find((r) => r.target === best) ?? null;
-  const summary = bestRow
+  return bestRow
     ? bestRow.limiting
       ? t("map.inspector.summary", { target: t(TARGETS[bestRow.target].shortKey), dim: dim(bestRow.limiting).sci })
       : t("map.inspector.summaryNoLimit", { target: t(TARGETS[bestRow.target].shortKey) })
     : t("map.inspector.noneScored");
+}
+
+export function TargetComparison({ rows, best, bestLow = null, configured, showSummary = true }: TargetComparisonProps) {
+  const { t, lang, dim } = useI18n();
+  const summary = targetSummary(t, dim, rows, best);
 
   const pctText = (p: number | null) => {
     const d = formatPercentile(p, lang);
@@ -40,7 +53,7 @@ export function TargetComparison({ rows, best, bestLow = null, configured }: Tar
   return (
     <div className="space-y-2">
       <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.inspector.allTitle")}</h4>
-      <FelicetteSays key={summary} text={summary} mood={bestLow ? "surprised" : "neutral"} />
+      {showSummary && <FelicetteSays key={summary} text={summary} mood={bestLow ? "surprised" : "neutral"} />}
       {bestLow && <LowScoreNote reason={bestLow} />}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-[11px]">

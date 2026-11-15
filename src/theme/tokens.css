@@ -100,6 +100,16 @@
   --felicette-ring-surprised: var(--amber);
   --duration-blink: 5.5s;
 
+  /* ---- Félicette hero (FelicetteHero): the cat speaking in a comic bubble ---- */
+  --hero-avatar-size: 72px;
+  --hero-bubble-bg: var(--panel-2);
+  --hero-bubble-border: var(--amber);
+  --hero-bubble-radius: 0.875rem;
+  --hero-text-size: 0.8125rem;
+  /* tail: width × height (px) of the comic pointer under the bubble */
+  --hero-tail-w: 22px;
+  --hero-tail-h: 14px;
+
   /* ---- Compact dimension radar (card front) ---- */
   --radar-size: 6.75rem;
   --radar-line: var(--score-analog);
@@ -134,5 +144,6 @@
 @media (min-width: 64rem) {
   :root {
     --imagery-card-height: 42%;
+    --hero-avatar-size: 104px;
   }
 }

@@ -56,6 +56,8 @@ interface PointInspectorProps {
   config: MissionConfig;
   /** shared Add-to-deck state (useDeckAction in MapClient), shown as a sticky action row */
   deckAction: DeckAction;
+  /** desktop: Félicette speaks from the panel header (FelicetteHero in MapClient), not in the body */
+  heroInHeader?: boolean;
 }
 
 const fmt = (lang: Lang, v: number, digits = 2) => new Intl.NumberFormat(lang, { maximumFractionDigits: digits }).format(v);
@@ -93,7 +95,7 @@ function usePower(point: { lat: number; lon: number } | null) {
   return { power: state.key === key ? state.power : ({ status: "loading" } as PowerState), retry: () => setRetry((n) => n + 1) };
 }
 
-export function PointInspector({ point, grid, config, deckAction }: PointInspectorProps) {
+export function PointInspector({ point, grid, config, deckAction, heroInHeader = false }: PointInspectorProps) {
   const { t, lang } = useI18n();
   const { power, retry } = usePower(point);
   const [chartParam, setChartParam] = useState<PowerParameterId>("TS");
@@ -114,7 +116,7 @@ export function PointInspector({ point, grid, config, deckAction }: PointInspect
   if (!point) {
     return (
       <div className="space-y-3 p-4">
-        <FelicetteSays key="map-intro" text={t("map.inspector.intro")} />
+        {!heroInHeader && <FelicetteSays key="map-intro" text={t("map.inspector.intro")} />}
         <p className="text-xs leading-relaxed text-dim">{t("map.inspector.hint")}</p>
       </div>
     );
@@ -141,7 +143,7 @@ export function PointInspector({ point, grid, config, deckAction }: PointInspect
         </h3>
         {targets && (
           <div className="mt-2">
-            <TargetComparison rows={targets.rows} best={targets.best} bestLow={targets.bestLow} configured={config.target} />
+            <TargetComparison rows={targets.rows} best={targets.best} bestLow={targets.bestLow} configured={config.target} showSummary={!heroInHeader} />
           </div>
         )}
         <GridSection

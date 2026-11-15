@@ -1,20 +1,17 @@
 "use client";
 
 /**
- * Félicette's speech bubble (with her SVG avatar) and a typewriter effect.
+ * Félicette's compact speech bubble (small avatar beside it) and a typewriter effect. For the big
+ * "character speaking" presentation use FelicetteHero.
  * - Give it `key={text}` from the parent so a new line restarts the effect.
  * - Screen readers get the full sentence once (aria-live), not one announcement per character.
  * - prefers-reduced-motion: the full text is shown immediately.
  */
 
-import { useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { FelicetteMood } from "@/lib/felicetteMood";
 import { FelicetteAvatar } from "./FelicetteAvatar";
-
-/** Typing speed of the effect (UI timing, not data). */
-const MS_PER_CHAR = 18;
+import { useTypewriter } from "./useTypewriter";
 
 interface FelicetteSaysProps {
   text: string;
@@ -25,25 +22,7 @@ interface FelicetteSaysProps {
 
 export function FelicetteSays({ text, mood = "neutral", className = "" }: FelicetteSaysProps) {
   const { t } = useI18n();
-  const reduceMotion = useReducedMotion();
-  const [typed, setTyped] = useState(0);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(() => {
-      setTyped((n) => {
-        if (n >= text.length) {
-          window.clearInterval(id);
-          return n;
-        }
-        return n + 1;
-      });
-    }, MS_PER_CHAR);
-    return () => window.clearInterval(id);
-  }, [text, reduceMotion]);
-
-  const shown = reduceMotion ? text.length : typed;
-  const done = shown >= text.length;
+  const { shown, done } = useTypewriter(text);
 
   return (
     <figure className={`flex items-start gap-3 ${className}`}>

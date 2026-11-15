@@ -38,7 +38,7 @@ export interface DimLabel {
   short: string;
 }
 
-interface I18nValue {
+export interface I18nValue {
   lang: Lang;
   setLang: (lang: Lang) => void;
   t: (key: I18nKey, params?: I18nParams) => string;
@@ -46,7 +46,8 @@ interface I18nValue {
   dim: (id: string) => DimLabel;
 }
 
-const I18nContext = createContext<I18nValue | null>(null);
+/** exported for server-render tests (a fixed-language value without the provider) */
+export const I18nContext = createContext<I18nValue | null>(null);
 
 function readStoredLang(): Lang {
   try {
