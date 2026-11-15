@@ -404,6 +404,7 @@ export const en = {
     viewFilter: {
       note: "Display filter – scores unchanged. See METHOD_LOG: known limitation.",
       clear: "Show them again",
+      defaultOn: "On by default for this target – known limitation, see METHOD_LOG.",
     },
     peek: {
       hint: "Tap the map to inspect a point",

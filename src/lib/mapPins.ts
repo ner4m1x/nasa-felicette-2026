@@ -1,6 +1,8 @@
 /**
- * Map pin selection and the "Hide ice-sheet candidates" view filter. Display only: both functions
- * select/reorder existing RankedCard objects and never touch their scores.
+ * Map pin selection and the "Hide ice-sheet candidates" view filter. Display only: scores are never
+ * touched. The filter drops ice-sheet cards BEFORE ranking (rankIceFiltered), so the deck's fixed
+ * positions still hold afterwards — position 1 = best Analog × Fit, pins (LunAres 3rd, Hammaguir 2nd)
+ * land in the filtered deck instead of sliding up into freed slots.
  *
  * - Candidate regions = the pipeline's discovery cards. By default only the top DEFAULT_TOP_N of
  *   them (by Analog Score for the current target) get pins; every other kind (benchmark, trap,
@@ -10,23 +12,50 @@
  * - Ice-sheet candidate = a discovery card in Antarctica (centroid south of ANTARCTICA_LAT, the
  *   pipeline's `in_antarctica` rule in scripts/pipeline/candidates.py) or with NDVI imputed.
  *   Benchmarks/traps are never hidden (they are the validation yardsticks).
+ * - The filter starts ON for the targets in ICE_FILTER_DEFAULT_ON (the user can still toggle it):
+ *   for the lava-tube target, imputed-NDVI ice-sheet cells otherwise dominate the top of the deck
+ *   (known limitation, docs/METHOD_LOG.md). Display only — scores are never changed.
  */
 import { PIN_SIZE } from "@/theme/tokens";
-import type { DeckCard, RankedCard, RankedDeck } from "./types";
+import { rankDeck } from "./ranking";
+import type { DeckCard, MissionConfig, RankedCard, RankedDeck, TargetId } from "./types";
 
 export const DEFAULT_TOP_N = 10;
 /** Mirrors `in_antarctica = clat < -60.0` in scripts/pipeline/candidates.py. */
 export const ANTARCTICA_LAT = -60;
 
+/** Targets whose deck and map hide ice-sheet candidates by default. */
+export const ICE_FILTER_DEFAULT_ON: readonly TargetId[] = ["moon_tranquillitatis_pit"];
+
+export const iceFilterDefault = (target: TargetId): boolean => ICE_FILTER_DEFAULT_ON.includes(target);
+
+/** Effective filter state: the user's choice for this target if they made one, else the target default. */
+export function iceFilterState(target: TargetId, choices: Partial<Record<TargetId, boolean>>): { hide: boolean; byDefault: boolean } {
+  const choice = choices[target];
+  const hide = choice ?? iceFilterDefault(target);
+  return { hide, byDefault: choice === undefined && hide };
+}
+
 export function isIceSheetCandidate(card: DeckCard): boolean {
   return card.kind === "discovery" && (card.lat < ANTARCTICA_LAT || card.ndviImputed === true);
 }
 
-/** Remove ice-sheet candidates from both piles when `hide` is on; otherwise return the deck as is. */
-export function applyIceFilter(deck: RankedDeck, hide: boolean): RankedDeck {
-  if (!hide) return deck;
-  const keep = (r: RankedCard) => !isIceSheetCandidate(r.card);
-  return { deck: deck.deck.filter(keep), rejected: deck.rejected.filter(keep) };
+/**
+ * The deck as shown: `ranked` itself when the filter is off; otherwise the same cards minus the
+ * ice-sheet candidates, ranked again (same scores — ranking only reads them) so pins and position 1
+ * are computed on what is actually shown.
+ */
+export function rankIceFiltered(
+  cards: readonly DeckCard[],
+  config: MissionConfig,
+  ranked: RankedDeck,
+  hide: boolean,
+): RankedDeck {
+  if (!hide) return ranked;
+  return rankDeck(
+    cards.filter((c) => !isIceSheetCandidate(c)),
+    config,
+  );
 }
 
 export interface PinCandidate {

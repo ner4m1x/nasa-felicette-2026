@@ -146,7 +146,7 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
           </button>
         )}
 
-        {swipe.hideIce && <ViewFilterNote onClear={() => swipe.setHideIce(false)} />}
+        {swipe.hideIce && <ViewFilterNote byDefault={swipe.hideIceByDefault} onClear={() => swipe.setHideIce(false)} />}
 
         {swipe.notice && (
           <p role="status" className="rounded-control border border-amber/50 px-3 py-2 text-xs text-amber">

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { applyIceFilter, isIceSheetCandidate, pinSize, selectPins } from "@/lib/mapPins";
+import { ICE_FILTER_DEFAULT_ON, rankIceFiltered, iceFilterDefault, iceFilterState, isIceSheetCandidate, pinSize, selectPins } from "@/lib/mapPins";
+import { TARGET_IDS } from "@/lib/types";
+import { CURATED_CARDS, LUNARES_CARD_ID } from "@/data/curatedCards";
 import { rankDeck } from "@/lib/ranking";
 import type { RankedCard } from "@/lib/types";
 import { PIN_SIZE } from "@/theme/tokens";
@@ -61,20 +63,79 @@ describe("ice-sheet view filter", () => {
   });
 
   it("hides ice-sheet candidates but never changes scores or the order of the rest", () => {
-    const deck = deepFreeze(rankDeck(cards, config({ target: "mars_jezero" })));
-    const off = applyIceFilter(deck, false);
+    const cfg = config({ target: "mars_jezero" });
+    const frozen = deepFreeze(structuredClone(cards));
+    const deck = deepFreeze(rankDeck(frozen, cfg));
+    const off = rankIceFiltered(frozen, cfg, deck, false);
     expect(off).toBe(deck);
-    const on = applyIceFilter(deck, true);
+    const on = rankIceFiltered(frozen, cfg, deck, true);
     const ids = on.deck.map((r) => r.card.id);
     expect(ids).not.toContain("ant");
     expect(ids).not.toContain("imp");
-    // same objects, same scores, same relative order
+    // same scores (the pipeline's analog entries by reference), same relative order
     const kept = deck.deck.filter((r) => ids.includes(r.card.id));
-    expect(on.deck).toEqual(kept);
+    expect(on.deck.map((r) => r.card.id)).toEqual(kept.map((r) => r.card.id));
     on.deck.forEach((r, i) => {
-      expect(r).toBe(kept[i]);
       expect(r.rankScore).toBe(kept[i].rankScore);
       expect(r.analog).toBe(kept[i].analog);
     });
+  });
+});
+
+describe("ice-sheet filter default", () => {
+  it("is ON by default only for the lava-tube target", () => {
+    expect(ICE_FILTER_DEFAULT_ON).toEqual(["moon_tranquillitatis_pit"]);
+    for (const t of TARGET_IDS) expect(iceFilterDefault(t), t).toBe(t === "moon_tranquillitatis_pit");
+  });
+
+  it("the user's choice wins; byDefault only when the default is what turned it on", () => {
+    expect(iceFilterState("moon_tranquillitatis_pit", {})).toEqual({ hide: true, byDefault: true });
+    expect(iceFilterState("moon_tranquillitatis_pit", { moon_tranquillitatis_pit: false })).toEqual({ hide: false, byDefault: false });
+    expect(iceFilterState("moon_tranquillitatis_pit", { moon_tranquillitatis_pit: true })).toEqual({ hide: true, byDefault: false });
+    expect(iceFilterState("mars_jezero", {})).toEqual({ hide: false, byDefault: false });
+    expect(iceFilterState("mars_jezero", { mars_jezero: true })).toEqual({ hide: true, byDefault: false });
+    // a choice for one target does not leak into another
+    expect(iceFilterState("moon_shackleton", { moon_tranquillitatis_pit: false }).hide).toBe(false);
+  });
+
+  it("default-on for the lava tube changes nothing about the scores", () => {
+    const pit = (id: string, total: number, extra: CardOverrides) =>
+      makeCard({ id, analog: { moon_tranquillitatis_pit: { total, dims: { a: total }, limiting: "a", percentile: 50 } }, ...extra });
+    const cards = [
+      pit("ant", 0.95, { kind: "discovery", lat: -75 }),
+      pit("imp", 0.9, { kind: "discovery", lat: -62, ndviImputed: true }),
+      pit("ok", 0.8, { kind: "discovery", lat: 20 }),
+    ];
+    const cfg = config({ target: "moon_tranquillitatis_pit" });
+    const ranked = deepFreeze(rankDeck(cards, cfg));
+    const snapshot = structuredClone(ranked);
+    const shown = rankIceFiltered(cards, cfg, ranked, iceFilterState("moon_tranquillitatis_pit", {}).hide);
+    expect(shown.deck.map((r) => r.card.id)).toEqual(["ok"]);
+    const ok = ranked.deck.find((r) => r.card.id === "ok")!;
+    expect(shown.deck[0].analog).toBe(ok.analog);
+    expect(shown.deck[0].rankScore).toBe(ok.rankScore);
+    expect(shown.deck[0].analog!.total).toBe(0.8);
+    expect(ranked.deck.map((r) => r.analog!.total)).toEqual([0.95, 0.9, 0.8]);
+    expect(ranked).toEqual(snapshot); // unfiltered deck (and every score in it) untouched
+  });
+});
+
+describe("ice filter keeps the deck's fixed positions", () => {
+  it("crewed lava tube: position 1 is still the best visible analog, LunAres stays 3rd", () => {
+    const pit = (id: string, total: number, extra: CardOverrides) =>
+      makeCard({ id, analog: { moon_tranquillitatis_pit: { total, dims: { a: total }, limiting: "a", percentile: 50 } }, ...extra });
+    const cards = [
+      pit("ant1", 0.95, { kind: "discovery", lat: -75 }),
+      pit("ant2", 0.94, { kind: "discovery", lat: -70 }),
+      pit("lanzarote", 0.8, { kind: "benchmark", lat: 29 }),
+      pit("other", 0.7, { kind: "discovery", lat: 20 }),
+      pit("third", 0.6, { kind: "discovery", lat: 10 }),
+      ...CURATED_CARDS,
+    ];
+    const cfg = config({ target: "moon_tranquillitatis_pit", crew: "short", footprint: "compact", mobility: "climber" });
+    const ranked = rankDeck(cards, cfg);
+    const shown = rankIceFiltered(cards, cfg, ranked, true).deck.map((r) => r.card.id);
+    expect(shown[0]).toBe("lanzarote");
+    expect(shown.indexOf(LUNARES_CARD_ID)).toBe(2);
   });
 });

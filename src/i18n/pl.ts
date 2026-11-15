@@ -400,6 +400,7 @@ export const pl: Dictionary = {
     viewFilter: {
       note: "Filtr wyświetlania – wyniki bez zmian. Zob. METHOD_LOG: znane ograniczenie.",
       clear: "Pokaż je ponownie",
+      defaultOn: "Domyślnie włączony dla tego celu – znane ograniczenie, zob. METHOD_LOG.",
     },
     peek: {
       hint: "Dotknij mapy, aby zbadać punkt",

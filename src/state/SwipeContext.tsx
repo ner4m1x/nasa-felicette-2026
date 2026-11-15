@@ -15,9 +15,9 @@
 import { createContext, use, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { browser } from "react-dom";
 import { loadDeck, withGridCards, type DeckLoadResult } from "@/lib/deck";
-import { applyIceFilter } from "@/lib/mapPins";
+import { iceFilterState, rankIceFiltered } from "@/lib/mapPins";
 import { rankDeck } from "@/lib/ranking";
-import type { DeckCard, MissionConfig, RankedCard, RankedDeck } from "@/lib/types";
+import type { DeckCard, MissionConfig, RankedCard, RankedDeck, TargetId } from "@/lib/types";
 import { addUserCard, readUserCards, removeUserCard, writeUserCards, type UserCardsByMission } from "@/lib/userCards";
 import {
   agreementScore,
@@ -54,6 +54,9 @@ interface SwipeValue {
   visible: RankedDeck | null;
   /** display filter: hide ice-sheet candidates (never changes scores) */
   hideIce: boolean;
+  /** the filter is on because it is this target's default (ICE_FILTER_DEFAULT_ON), not by user choice */
+  hideIceByDefault: boolean;
+  /** user's choice for the current target (overrides the target default) */
   setHideIce: (v: boolean) => void;
   /** cards still to judge, in order (skipped cards at the back) */
   queue: RankedCard[];
@@ -148,8 +151,13 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
   }, [deck, grid, userCards]);
 
   const ranked = useMemo(() => (cards ? rankDeck(cards, config) : null), [cards, config]);
-  const [hideIce, setHideIce] = useState(false);
-  const visible = useMemo(() => (ranked ? applyIceFilter(ranked, hideIce) : null), [ranked, hideIce]);
+  const [iceChoices, setIceChoices] = useState<Partial<Record<TargetId, boolean>>>({});
+  const { hide: hideIce, byDefault: hideIceByDefault } = iceFilterState(config.target, iceChoices);
+  const setHideIce = useCallback((v: boolean) => setIceChoices((c) => ({ ...c, [config.target]: v })), [config.target]);
+  const visible = useMemo(
+    () => (cards && ranked ? rankIceFiltered(cards, config, ranked, hideIce) : null),
+    [cards, config, ranked, hideIce],
+  );
 
   const queue = useMemo(() => {
     if (!visible) return [];
@@ -226,6 +234,7 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
       ranked,
       visible,
       hideIce,
+      hideIceByDefault,
       setHideIce,
       queue,
       records,
@@ -238,7 +247,7 @@ export function SwipeProvider({ children }: { children: ReactNode }) {
       removeUserCard: removeUser,
       reset,
     }),
-    [deck, ranked, visible, hideIce, queue, records, verdictFor, decide, skip, userCards, addUser, removeUser, reset],
+    [deck, ranked, visible, hideIce, hideIceByDefault, setHideIce, queue, records, verdictFor, decide, skip, userCards, addUser, removeUser, reset],
   );
 
   return <SwipeContext.Provider value={value}>{children}</SwipeContext.Provider>;

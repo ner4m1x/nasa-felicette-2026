@@ -205,7 +205,7 @@ export function MapClient({ active }: { active: boolean }) {
             hideIce={swipe.hideIce}
             onHideIce={swipe.setHideIce}
           />
-          {swipe.hideIce && <ViewFilterNote className="pointer-events-auto mt-2 max-w-64" />}
+          {swipe.hideIce && <ViewFilterNote byDefault={swipe.hideIceByDefault} className="pointer-events-auto mt-2 max-w-64" />}
         </div>
       </div>
 
