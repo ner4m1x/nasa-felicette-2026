@@ -55,6 +55,15 @@ export const EARTH_CREDITS: Credit[] = [
     url: src("nasa-gibs"),
   },
   {
+    id: "s2cloudless",
+    // attribution verbatim from the EOX WMTS capabilities abstract (see src/lib/gibs.ts)
+    name: "Sentinel-2 cloudless 2025 (ESA Copernicus)",
+    by: "EOX IT Services GmbH · Contains modified Copernicus Sentinel data 2025 · CC BY-NC-SA 4.0",
+    roleKey: "about.credits.s2cloudless",
+    // curl 2026-11-15: HTTP 200, title "EOxCloudless"
+    url: "https://cloudless.eox.at/",
+  },
+  {
     id: "etopo",
     name: "ETOPO 2022 Global Relief Model (60 arc-second)",
     by: "NOAA NCEI",

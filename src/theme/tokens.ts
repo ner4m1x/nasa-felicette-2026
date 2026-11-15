@@ -54,6 +54,11 @@ export const IMAGERY = {
   regionalSpanKm: 220,
   /** Footprint outline drawn on regional cards: the pipeline's grid step (degrees). */
   cellSizeDeg: 0.25,
+  /**
+   * Site / user / curated cards: display zoom of the thumbnail (≈ 27 km across a 360 px card at the
+   * equator). Sentinel-2 cloudless is sharp here; the NDVI / LST overlays (native z7 / z6) stay readable.
+   */
+  siteDisplayZoom: 11,
 } as const;
 
 /** Terminal-style segmented score meter (ScoreBar): number of segments across the bar. */
@@ -61,3 +66,6 @@ export const METER = { segments: 20 } as const;
 
 /** Map point popup (MapPointPopup in ScanMap): tip offset above the pulse ring, and the auto-pan edge padding (px). */
 export const MAP_POPUP = { offsetYPx: -14, autoPanPaddingPx: 16 } as const;
+
+/** Leaflet map zoom limit: lets the Sentinel-2 cloudless base show its detail (GIBS layers upscale above their native zoom). */
+export const MAP = { maxZoom: 12 } as const;

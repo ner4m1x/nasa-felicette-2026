@@ -6,6 +6,8 @@ import {
   GIBS_LAYERS,
   gibsLayerLabel,
   gibsTileUrl,
+  layerAttribution,
+  EOX_ATTRIBUTION_TEXT,
   THEMATIC_LAYERS,
 } from "@/lib/gibs";
 
@@ -33,6 +35,19 @@ describe("GIBS layers", () => {
     expect(gibsLayerLabel(GIBS_LAYERS.blueMarble)).toBe("Blue Marble Shaded Relief (MODIS)");
     expect(gibsLayerLabel(GIBS_LAYERS.trueColor)).toMatch(/2026-09-22$/);
     expect(gibsLayerLabel(GIBS_LAYERS.ndvi)).toMatch(/ 2026-10$/);
+  });
+
+  it("offers Sentinel-2 cloudless (EOX) as a third base with the verified template and attribution", () => {
+    expect(BASE_LAYERS).toEqual(["blueMarble", "trueColor", "s2cloudless"]);
+    expect(gibsTileUrl(GIBS_LAYERS.s2cloudless)).toBe(
+      "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2025_3857/default/g/{z}/{y}/{x}.jpg",
+    );
+    expect(GIBS_LAYERS.s2cloudless.maxZoom).toBe(14);
+    expect(EOX_ATTRIBUTION_TEXT).toContain("Contains modified Copernicus Sentinel data 2025");
+    expect(EOX_ATTRIBUTION_TEXT).toContain("EOX IT Services GmbH");
+    expect(EOX_ATTRIBUTION_TEXT).toContain("CC BY-NC-SA 4.0");
+    expect(layerAttribution(GIBS_LAYERS.s2cloudless)).toContain("https://creativecommons.org/licenses/by-nc-sa/4.0/");
+    expect(layerAttribution(GIBS_LAYERS.blueMarble)).toBe("Imagery: NASA GIBS / ESDIS · Blue Marble Shaded Relief (MODIS)");
   });
 
   it("overlay opacity defaults to 70 %", () => {

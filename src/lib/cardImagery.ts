@@ -1,14 +1,14 @@
 /**
  * Card imagery: Web Mercator tile math for the satellite thumbnail on each swipe card
- * (src/components/swipe/CardImagery.tsx). The thumbnail is a mosaic of plain GIBS WMTS tiles
- * (no Leaflet), positioned so the card's lat/lon sits at the centre of the box.
+ * (src/components/swipe/CardImagery.tsx). The thumbnail is a mosaic of plain WMTS tiles (NASA GIBS,
+ * or EOX Sentinel-2 cloudless; no Leaflet), positioned so the card's lat/lon sits at the centre of the box.
  *
  * Layers, identifiers, TileMatrixSets, dates and max zooms come ONLY from src/lib/gibs.ts.
  * A layer is never requested above its max native zoom: the mosaic is upscaled with CSS instead,
  * so the footprint on screen stays the same when the user switches layers.
  */
 
-import { GIBS_LAYERS, gibsTileUrl, type GibsLayer, type GibsLayerId } from "./gibs";
+import { gibsTileUrl, type GibsLayer, type GibsLayerId } from "./gibs";
 import type { DeckCard } from "./types";
 
 /** WMTS GoogleMapsCompatible tiles are 256 × 256 px. */
@@ -20,14 +20,24 @@ export const MAX_MERCATOR_LAT = 85.0511287798;
 /** WGS84 equatorial circumference (m), the reference of EPSG:3857 ground resolution. */
 const EARTH_CIRCUMFERENCE_M = 2 * Math.PI * 6378137;
 
+export type CardLayerId = Extract<GibsLayerId, "blueMarble" | "s2cloudless" | "ndvi" | "lstDay">;
+
+/**
+ * Cloud-free true colour for a card: Sentinel-2 cloudless (10 m, ESA Copernicus via EOX) for site /
+ * user / curated cards, Blue Marble (500 m) for regional cards, whose box spans ~220 km anyway.
+ */
+export function trueColourLayer(card: Pick<DeckCard, "scale">): CardLayerId {
+  return card.scale === "regional" ? "blueMarble" : "s2cloudless";
+}
+
 /** Layers offered on the card, default first: cloud-free true colour, NDVI, surface temperature. */
-export const CARD_LAYERS = ["blueMarble", "ndvi", "lstDay"] as const satisfies readonly GibsLayerId[];
-export type CardLayerId = (typeof CARD_LAYERS)[number];
-export const DEFAULT_CARD_LAYER: CardLayerId = "blueMarble";
+export function cardLayers(card: Pick<DeckCard, "scale">): readonly CardLayerId[] {
+  return [trueColourLayer(card), "ndvi", "lstDay"];
+}
 
 /** Thematic layers are drawn over the (dimmed) true-colour base, as on the map. */
 export function isThematic(id: CardLayerId): boolean {
-  return id !== "blueMarble";
+  return id === "ndvi" || id === "lstDay";
 }
 
 /** Global pixel position of lat/lon at zoom `z` (fractional zoom allowed), 256 px tiles. */
@@ -77,15 +87,16 @@ export function zoomForSpan(lat: number, widthPx: number, spanKm: number): numbe
 /**
  * Display zoom of a card's thumbnail (the same for every layer, so the footprint does not jump):
  *  - regional cards: the box spans `regionalSpanKm` across its width;
- *  - site / user / curated cards: the max native zoom of the default true-colour layer.
+ *  - site / user / curated cards: a fixed zoom (`siteZoom`, IMAGERY.siteDisplayZoom in tokens.ts).
  */
 export function cardDisplayZoom(
   card: Pick<DeckCard, "scale" | "lat">,
   widthPx: number,
   regionalSpanKm: number,
+  siteZoom: number,
 ): number {
   if (card.scale === "regional") return zoomForSpan(card.lat, widthPx, regionalSpanKm);
-  return GIBS_LAYERS[DEFAULT_CARD_LAYER].maxZoom;
+  return siteZoom;
 }
 
 export interface MosaicTile {

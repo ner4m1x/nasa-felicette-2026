@@ -7,9 +7,12 @@ const terminalFont = JetBrains_Mono({
   subsets: ["latin", "latin-ext"],
 });
 
+// Icons: app/icon.svg and app/apple-icon.png (Félicette, rendered from FelicetteAvatar) via the
+// file conventions; Next adds the <link> tags.
 export const metadata: Metadata = {
-  title: "P.U.R.R. Command Center",
-  description: "Planetary Utility for Regolith Reconnaissance — Earth analogs for Moon and Mars bases.",
+  title: "P.U.R.R. Command Center – Earth analogs for Moon & Mars bases",
+  description:
+    "P.U.R.R. Command Center – Earth analogs for Moon & Mars bases. Swipe through places on Earth ranked by planetary similarity (Analog Score) and by fit for your mission.",
 };
 
 export const viewport: Viewport = {

@@ -11,7 +11,7 @@ const ALL = [...EARTH_CREDITS, ...PLANETARY_CREDITS];
 describe("About & credits", () => {
   it("covers the required datasets and missions", () => {
     const names = ALL.map((c) => c.name).join(" | ");
-    for (const n of ["MODIS", "MERRA-2", "POWER", "GIBS", "Diviner", "LOLA", "MEDA", "SHARAD", "HiRISE", "ETOPO 2022", "GLiM", "Natural Earth"])
+    for (const n of ["MODIS", "MERRA-2", "POWER", "GIBS", "Diviner", "LOLA", "MEDA", "SHARAD", "HiRISE", "ETOPO 2022", "GLiM", "Natural Earth", "Sentinel-2 cloudless"])
       expect(names).toContain(n);
   });
 

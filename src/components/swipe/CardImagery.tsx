@@ -1,12 +1,14 @@
 "use client";
 
 /**
- * Satellite thumbnail of a card's location: plain NASA GIBS WMTS tiles as <img> (no Leaflet),
- * composed so the card's lat/lon sits at the centre (tile math in src/lib/cardImagery.ts).
+ * Satellite thumbnail of a card's location: plain WMTS tiles as <img> (no Leaflet), composed so the
+ * card's lat/lon sits at the centre (tile math in src/lib/cardImagery.ts).
  *
- * - Layers: cloud-free true colour (Blue Marble, default), NDVI, LST day — identifiers, dates and
- *   max zooms only from src/lib/gibs.ts. NDVI/LST are drawn over the dimmed true-colour base.
- * - Overlays: centre crosshair, caption (layer · date · NASA GIBS), ~0.25° cell outline on regional
+ * - Layers: cloud-free true colour (default; Sentinel-2 cloudless via EOX for site / user / curated
+ *   cards, NASA Blue Marble for regional ones), NDVI, LST day — identifiers, dates and max zooms only
+ *   from src/lib/gibs.ts. NDVI/LST are drawn over the dimmed true-colour base.
+ * - Overlays: centre crosshair, caption (layer · date · source; the EOX attribution and licence
+ *   whenever Sentinel-2 is visible, also under NDVI/LST), ~0.25° cell outline on regional
  *   cards, and on trap cards a Félicette hint chip that switches to NDVI.
  * - Gestures: the box keeps `touch-action: pan-y`; images ignore pointer events; the toggle and the
  *   chip stop pointerdown so a tap never starts the card drag.
@@ -22,15 +24,15 @@ import { useI18n } from "@/i18n/I18nProvider";
 import {
   buildMosaic,
   cardDisplayZoom,
-  CARD_LAYERS,
+  cardLayers,
   cellFootprint,
-  DEFAULT_CARD_LAYER,
   isThematic,
   layerDate,
+  trueColourLayer,
   type CardLayerId,
   type MosaicTile,
 } from "@/lib/cardImagery";
-import { GIBS_LAYERS } from "@/lib/gibs";
+import { EOX_ATTRIBUTION_TEXT, GIBS_LAYERS } from "@/lib/gibs";
 import type { DeckCard } from "@/lib/types";
 import { IMAGERY } from "@/theme/tokens";
 
@@ -50,7 +52,8 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
   const { t } = useI18n();
   const box = useRef<HTMLDivElement>(null);
   const size = useBoxSize(box);
-  const [layerId, setLayerId] = useState<CardLayerId>(DEFAULT_CARD_LAYER);
+  const trueColour = trueColourLayer(card);
+  const [layerId, setLayerId] = useState<CardLayerId>(trueColour);
   const [tileState, setTileState] = useState<Record<string, TileState>>({});
 
   const onTile = useCallback((key: string, state: TileState) => {
@@ -59,12 +62,12 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
 
   const layer = GIBS_LAYERS[layerId];
   const thematic = isThematic(layerId);
-  const zoom = size ? cardDisplayZoom(card, size.width, IMAGERY.regionalSpanKm) : null;
+  const zoom = size ? cardDisplayZoom(card, size.width, IMAGERY.regionalSpanKm, IMAGERY.siteDisplayZoom) : null;
   const mosaic = (id: CardLayerId) =>
     size && zoom !== null
       ? buildMosaic({ layer: GIBS_LAYERS[id], lat: card.lat, lon: card.lon, displayZoom: zoom, ...size })
       : null;
-  const base = load ? mosaic(DEFAULT_CARD_LAYER) : null;
+  const base = load ? mosaic(trueColour) : null;
   const top = load && thematic ? mosaic(layerId) : null;
 
   // The visible layer decides the state: all its tiles failed = unavailable; any pending = loading.
@@ -74,9 +77,12 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
   const ready = states.length > 0 && states.every((s) => s !== undefined);
 
   const date = layerDate(layer);
-  const caption = [t(`card.imagery.layer.${layerId}`), date ?? t("card.imagery.composite"), t("card.imagery.source")].join(
-    " · ",
-  );
+  // Sentinel-2 (EOX) is credited verbatim whenever it is on screen, alone or dimmed under NDVI/LST.
+  const caption =
+    layer.provider === "eox"
+      ? t(`card.imagery.layer.${layerId}`)
+      : [t(`card.imagery.layer.${layerId}`), date ?? t("card.imagery.composite"), t("card.imagery.source")].join(" · ");
+  const credit = GIBS_LAYERS[trueColour].provider === "eox" ? EOX_ATTRIBUTION_TEXT : null;
   const footprint =
     card.scale === "regional" && size && zoom !== null
       ? cellFootprint({ lat: card.lat, lon: card.lon, sizeDeg: IMAGERY.cellSizeDeg, displayZoom: zoom, ...size })
@@ -86,7 +92,7 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
     <div
       ref={box}
       role="img"
-      aria-label={`${t("card.imagery.alt", { name: card.name })}. ${caption}`}
+      aria-label={[t("card.imagery.alt", { name: card.name }), caption, credit].filter(Boolean).join(". ")}
       className="relative w-full shrink-0 overflow-hidden border-b border-line bg-bg"
       style={{ height: "var(--imagery-card-height)", touchAction: "pan-y" }}
     >
@@ -137,7 +143,7 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
         className="absolute left-2 top-2 flex overflow-hidden rounded-control border border-line text-[10px] font-bold uppercase tracking-wider"
         style={{ background: "var(--imagery-scrim)" }}
       >
-        {CARD_LAYERS.map((id) => (
+        {cardLayers(card).map((id) => (
           <button
             key={id}
             type="button"
@@ -172,10 +178,11 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
 
       <p
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 truncate px-2 py-1 text-[9px] uppercase tracking-wider text-dim"
+        className="pointer-events-none absolute inset-x-0 bottom-0 px-2 py-1 text-[9px] leading-tight text-dim"
         style={{ background: "var(--imagery-scrim)" }}
       >
-        {caption}
+        <span className="uppercase tracking-wider">{caption}</span>
+        {credit && <span className="block">{credit}</span>}
       </p>
     </div>
   );

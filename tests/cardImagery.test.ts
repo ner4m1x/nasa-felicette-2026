@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   buildMosaic,
   cardDisplayZoom,
-  CARD_LAYERS,
+  cardLayers,
+  isThematic,
   cellFootprint,
   clampTileZoom,
-  DEFAULT_CARD_LAYER,
   gibsTile,
   layerDate,
   lonLatToWorldPx,
@@ -79,9 +79,9 @@ describe("max-zoom clamping", () => {
     for (const t of m.tiles) expect(t.url).toContain("/GoogleMapsCompatible_Level6/6/");
   });
 
-  it("site cards use the true-colour max native zoom; regional cards span the configured km", () => {
-    expect(cardDisplayZoom({ scale: "site", lat: 40 }, 360, 220)).toBe(GIBS_LAYERS[DEFAULT_CARD_LAYER].maxZoom);
-    const z = cardDisplayZoom({ scale: "regional", lat: 40 }, 360, 220);
+  it("site cards use the fixed site zoom; regional cards span the configured km", () => {
+    expect(cardDisplayZoom({ scale: "site", lat: 40 }, 360, 220, 11)).toBe(11);
+    const z = cardDisplayZoom({ scale: "regional", lat: 40 }, 360, 220, 11);
     expect((360 * metresPerPx(40, z)) / 1000).toBeCloseTo(220, 6);
   });
 });
@@ -129,9 +129,20 @@ describe("mosaic", () => {
 });
 
 describe("layer URLs from gibs.ts", () => {
-  it("offers true colour (Blue Marble, default), NDVI and LST day", () => {
-    expect(CARD_LAYERS).toEqual(["blueMarble", "ndvi", "lstDay"]);
-    expect(DEFAULT_CARD_LAYER).toBe("blueMarble");
+  it("offers true colour (default: Sentinel-2 cloudless for sites, Blue Marble for regions), NDVI and LST day", () => {
+    expect(cardLayers({ scale: "regional" })).toEqual(["blueMarble", "ndvi", "lstDay"]);
+    for (const scale of ["site", "user", "curated"] as const) expect(cardLayers({ scale } as never)).toEqual(["s2cloudless", "ndvi", "lstDay"]);
+    expect(isThematic("s2cloudless")).toBe(false);
+    expect(isThematic("blueMarble")).toBe(false);
+    expect(isThematic("ndvi")).toBe(true);
+  });
+
+  it("never requests Sentinel-2 above z14; the site zoom upscales NDVI from z7", () => {
+    const s2 = buildMosaic({ layer: GIBS_LAYERS.s2cloudless, lat: 53.15, lon: 16.74, displayZoom: 11, width: 360, height: 220 });
+    expect(s2.tileZoom).toBe(11);
+    for (const t of s2.tiles) expect(t.url).toMatch(/^https:\/\/tiles\.maps\.eox\.at\/wmts\/1\.0\.0\/s2cloudless-2025_3857\/default\/g\/11\/\d+\/\d+\.jpg$/);
+    expect(buildMosaic({ layer: GIBS_LAYERS.s2cloudless, lat: 0, lon: 0, displayZoom: 16, width: 100, height: 100 }).tileZoom).toBe(14);
+    expect(buildMosaic({ layer: GIBS_LAYERS.ndvi, lat: 0, lon: 0, displayZoom: 11, width: 100, height: 100 }).scale).toBe(16);
   });
 
   it("fills {z}/{y}/{x} in the verified templates", () => {

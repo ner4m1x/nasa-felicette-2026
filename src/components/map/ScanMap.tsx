@@ -17,9 +17,9 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { AttributionControl, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
-import { GIBS_ATTRIBUTION, GIBS_LAYERS, gibsLayerLabel, gibsTileUrl, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
+import { GIBS_LAYERS, gibsTileUrl, layerAttribution, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import type { TargetId } from "@/lib/types";
-import { MAP_POPUP } from "@/theme/tokens";
+import { MAP, MAP_POPUP } from "@/theme/tokens";
 import { CandidateMarkers, type MarkerItem } from "./CandidateMarkers";
 import { LaserCursor } from "./LaserCursor";
 import { ScanOverlay } from "./ScanOverlay";
@@ -104,7 +104,7 @@ export default function ScanMap(props: ScanMapProps) {
         center={[20, 0]}
         zoom={2}
         minZoom={1}
-        maxZoom={9}
+        maxZoom={MAP.maxZoom}
         maxBounds={WORLD}
         maxBoundsViscosity={1}
         worldCopyJump={false}
@@ -119,23 +119,23 @@ export default function ScanMap(props: ScanMapProps) {
           key={base.id}
           url={gibsTileUrl(base)}
           maxNativeZoom={base.maxZoom}
-          maxZoom={9}
+          maxZoom={MAP.maxZoom}
           noWrap
           bounds={WORLD}
           className="purr-base-tiles"
-          attribution={`${GIBS_ATTRIBUTION} · ${gibsLayerLabel(base)}`}
+          attribution={layerAttribution(base)}
         />
         {theme && (
           <TileLayer
             key={theme.id}
             url={gibsTileUrl(theme)}
             maxNativeZoom={theme.maxZoom}
-            maxZoom={9}
+            maxZoom={MAP.maxZoom}
             noWrap
             bounds={WORLD}
             opacity={opacity}
             zIndex={10}
-            attribution={gibsLayerLabel(theme)}
+            attribution={layerAttribution(theme, false)}
           />
         )}
         {showScan && overlayAvailable && <ScanOverlay target={target} opacity={opacity} />}

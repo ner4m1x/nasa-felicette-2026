@@ -27,18 +27,33 @@
  * equinox so both polar regions are lit.
  * Daily LST (MODIS_Terra_Land_Surface_Temp_Day, Level7) exists too, but a single day is mostly
  * cloud gaps; the monthly composite is used instead (max native zoom 6).
+ *
+ * ESA partner imagery — EOX "Sentinel-2 cloudless" (provider "eox"), verified on 2026-11-15 against
+ *   https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml (HTTP 200, `access-control-allow-origin: *`):
+ *  - layer s2cloudless-2025_3857, image/jpeg, TileMatrixSet "g" (EPSG:900913 = Web Mercator, levels 0–21),
+ *    ResourceURL template …/s2cloudless-2025_3857/default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg
+ *  - licence and attribution, verbatim from the layer abstract: "EOxCloudless https://cloudless.eox.at by
+ *    EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2025) released under Creative Commons
+ *    Attribution-NonCommercial-ShareAlike 4.0 International License" (non-commercial use only).
+ *  - sample tiles over https at z13–z17 (Poland, Atacama) returned 200 image/jpeg with CORS. Sentinel-2's
+ *    finest bands are 10 m; z14 is ≈ 9.6 m/px at the equator, so maxZoom 14 here (tiles above it are
+ *    upsampled by the server; we upscale with CSS / Leaflet instead).
  */
 
 export const GIBS_BASE = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best";
 
-export type GibsLayerId = "blueMarble" | "trueColor" | "lstDay" | "ndvi";
+export const EOX_BASE = "https://tiles.maps.eox.at/wmts/1.0.0";
+
+export type GibsLayerId = "blueMarble" | "trueColor" | "lstDay" | "ndvi" | "s2cloudless";
 
 export interface GibsLayer {
   key: GibsLayerId;
+  /** tile server: NASA GIBS, or EOX (ESA Copernicus Sentinel-2 cloudless) */
+  provider: "gibs" | "eox";
   /** WMTS layer identifier */
   id: string;
   tileMatrixSet: string;
-  ext: "jpeg" | "png";
+  ext: "jpeg" | "jpg" | "png";
   /** highest TileMatrix in the set (Leaflet maxNativeZoom) */
   maxZoom: number;
   /** pinned date inside the layer's valid range (see header); null = static layer, no time */
@@ -52,6 +67,7 @@ export interface GibsLayer {
 export const GIBS_LAYERS: Record<GibsLayerId, GibsLayer> = {
   blueMarble: {
     key: "blueMarble",
+    provider: "gibs",
     id: "BlueMarble_ShadedRelief",
     tileMatrixSet: "GoogleMapsCompatible_Level8",
     ext: "jpeg",
@@ -62,6 +78,7 @@ export const GIBS_LAYERS: Record<GibsLayerId, GibsLayer> = {
   },
   trueColor: {
     key: "trueColor",
+    provider: "gibs",
     id: "VIIRS_SNPP_CorrectedReflectance_TrueColor",
     tileMatrixSet: "GoogleMapsCompatible_Level9",
     ext: "jpeg",
@@ -72,6 +89,7 @@ export const GIBS_LAYERS: Record<GibsLayerId, GibsLayer> = {
   },
   lstDay: {
     key: "lstDay",
+    provider: "gibs",
     id: "MODIS_Terra_L3_Land_Surface_Temp_Monthly_Day",
     tileMatrixSet: "GoogleMapsCompatible_Level6",
     ext: "png",
@@ -82,6 +100,7 @@ export const GIBS_LAYERS: Record<GibsLayerId, GibsLayer> = {
   },
   ndvi: {
     key: "ndvi",
+    provider: "gibs",
     id: "MODIS_Terra_L3_NDVI_Monthly",
     tileMatrixSet: "GoogleMapsCompatible_Level7",
     ext: "png",
@@ -90,10 +109,32 @@ export const GIBS_LAYERS: Record<GibsLayerId, GibsLayer> = {
     period: "P1M",
     product: "MODIS Terra L3 NDVI (Monthly)",
   },
+  s2cloudless: {
+    key: "s2cloudless",
+    provider: "eox",
+    id: "s2cloudless-2025_3857",
+    tileMatrixSet: "g",
+    ext: "jpg",
+    maxZoom: 14,
+    time: null,
+    period: null,
+    product: "Sentinel-2 cloudless 2025",
+  },
 };
 
-/** Base layers, default first: cloud-free composite, then the single-day mosaic (may show clouds). */
-export const BASE_LAYERS = ["blueMarble", "trueColor"] as const satisfies readonly GibsLayerId[];
+/** Required attribution of the EOX layer (verbatim facts from its capabilities abstract). */
+export const EOX_ATTRIBUTION_TEXT =
+  "Sentinel-2 cloudless 2025 by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2025) · CC BY-NC-SA 4.0";
+export const EOX_ATTRIBUTION_HTML =
+  '<a href="https://cloudless.eox.at" target="_blank" rel="noreferrer">Sentinel-2 cloudless 2025</a> by EOX IT Services GmbH ' +
+  "(Contains modified Copernicus Sentinel data 2025) · " +
+  '<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer">CC BY-NC-SA 4.0</a>';
+
+/**
+ * Base layers, default first: cloud-free composite, the single-day mosaic (may show clouds), and the
+ * high-resolution Sentinel-2 cloudless mosaic (ESA Copernicus data via EOX).
+ */
+export const BASE_LAYERS = ["blueMarble", "trueColor", "s2cloudless"] as const satisfies readonly GibsLayerId[];
 export type BaseLayerId = (typeof BASE_LAYERS)[number];
 export const DEFAULT_BASE: BaseLayerId = "blueMarble";
 
@@ -111,6 +152,7 @@ export const DEFAULT_SHOW_SCAN = true;
  * Static layers (time null) use the capabilities template without the {Time} segment.
  */
 export function gibsTileUrl(layer: GibsLayer): string {
+  if (layer.provider === "eox") return `${EOX_BASE}/${layer.id}/default/${layer.tileMatrixSet}/{z}/{y}/{x}.${layer.ext}`;
   const time = layer.time === null ? "" : `${layer.time}/`;
   return `${GIBS_BASE}/${layer.id}/default/${time}${layer.tileMatrixSet}/{z}/{y}/{x}.${layer.ext}`;
 }
@@ -122,3 +164,9 @@ export function gibsLayerLabel(layer: GibsLayer): string {
 }
 
 export const GIBS_ATTRIBUTION = "Imagery: NASA GIBS / ESDIS";
+
+/** Leaflet attribution line for a base / thematic layer (HTML; EOX needs its licence link). */
+export function layerAttribution(layer: GibsLayer, withProvider = true): string {
+  if (layer.provider === "eox") return EOX_ATTRIBUTION_HTML;
+  return withProvider ? `${GIBS_ATTRIBUTION} · ${gibsLayerLabel(layer)}` : gibsLayerLabel(layer);
+}
