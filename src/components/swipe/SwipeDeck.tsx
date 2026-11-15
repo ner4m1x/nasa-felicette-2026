@@ -11,6 +11,7 @@
 import { AlertTriangle, Ban, RotateCcw, Settings2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MissionBrief } from "@/components/configurator/MissionBrief";
+import { AskChips, AskFab, AskSheet, useAskFelicette } from "@/components/felicette/AskFelicette";
 import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
 import { FelicetteHero } from "@/components/felicette/FelicetteHero";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
@@ -46,12 +47,16 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
   const topCard = useRef<SwipeCardHandle>(null);
   const [decision, setDecision] = useState<Decision | null>(null);
   const [rejectedOpen, setRejectedOpen] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
 
   const visible = swipe.queue.slice(0, STACK.visible);
   const total = swipe.visible?.deck.length ?? 0;
   const rejected = swipe.visible?.rejected ?? [];
   const strict = strictSpecs(total, rejected.length);
   const purrs = swipe.records.filter((r) => r.verdict === "purr").length;
+  // Ask Félicette: about the top card only; answers reset when it changes.
+  const ask = useAskFelicette(visible[0] ?? null, config.target);
+  const heroText = ask.answer ?? t("felicette.launch");
 
   const onDone = (ranked: RankedCard, action: SwipeAction) => {
     if (action === "skip") {
@@ -196,6 +201,12 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
             .reverse()}
         </div>
 
+        {/* Phone: Ask Félicette button, bottom-right in the strip where the cards behind peek out (the
+            top card never rests there), so it covers neither the card nor the HISS/SKIP/PURR row. */}
+        <div className="pointer-events-none -mt-7 -mb-2 flex h-11 justify-end lg:hidden">
+          <AskFab onClick={() => setAskOpen(true)} disabled={!ask.hasCard} />
+        </div>
+
         <SwipeControls disabled={visible.length === 0} onAction={(a) => topCard.current?.fling(a)} />
         <p className="text-center text-[10px] text-dim">
           <span className="lg:hidden">{t("deck.dragHint")}</span>
@@ -205,7 +216,8 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
 
       {/* ---- Desktop info panel ---- */}
       <aside className="hidden space-y-4 lg:block">
-        <FelicetteHero key="launch" text={t("felicette.launch")} />
+        <FelicetteHero key={heroText} text={heroText} />
+        <AskChips state={ask} />
         <MissionBrief />
         <section className="space-y-1 rounded-control border border-line bg-panel p-3 text-xs">
           <p className="tabular-nums">{t("deck.stats", { purr: purrs, hiss: swipe.records.length - purrs })}</p>
@@ -220,6 +232,7 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
       </aside>
 
       <BreakdownSheet decision={decision} agreement={swipe.agreement} onClose={() => setDecision(null)} />
+      <AskSheet open={askOpen} onClose={() => setAskOpen(false)} state={ask} />
       <RejectedPile open={rejectedOpen} onClose={() => setRejectedOpen(false)} rejected={rejected} />
     </div>
   );
