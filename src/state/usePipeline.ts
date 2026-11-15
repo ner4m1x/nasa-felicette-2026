@@ -11,6 +11,7 @@ import { loadManifest, type Manifest } from "@/lib/manifest";
 import { loadScanGrid, overlayExists, type ScanGridState } from "@/lib/scanGrid";
 import type { TargetId } from "@/lib/types";
 import { loadValidationReport, type ValidationReport } from "@/lib/validationReport";
+import { loadSensitivityReport, type SensitivityReport } from "@/lib/sensitivityReport";
 
 function useLoader<T>(load: (() => Promise<T>) | null): T | undefined {
   const [state, setState] = useState<{ load: (() => Promise<T>) | null; value: T | undefined }>({
@@ -39,6 +40,10 @@ export function useManifest(): Manifest | null | undefined {
 
 export function useValidationReport(): ValidationReport | null | undefined {
   return useLoader(loadValidationReport);
+}
+
+export function useSensitivityReport(): SensitivityReport | null | undefined {
+  return useLoader(loadSensitivityReport);
 }
 
 /** Loads the grid only once `enabled` (e.g. the map tab has been opened). */

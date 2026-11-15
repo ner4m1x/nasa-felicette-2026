@@ -553,6 +553,12 @@ export const pl: Dictionary = {
       no: "nie",
       explain:
         "Mediana percentyla wśród komórek lądowych dla znanych miejsc analogowych (wzorce) i mylących pułapek, dla każdego celu, policzona przez pipeline z zamrożoną konfiguracją.",
+      robust: "Najsł. wzorzec p05 / najlep. pułapka p95",
+      stability: "Stabilność regionów (mediana)",
+      robustLine:
+        "Odporność: wzorce pozostają powyżej pułapek dla {holds}/{total} celów w {runs} przebiegach Monte Carlo{jitter}, porównując najniższy 5. percentyl wzorca z najwyższym 95. percentylem pułapki.",
+      robustJitter: " (wagi ±{w} %, progi ±{th} %)",
+      stabilityExplain: "Stabilność regionu: odsetek przebiegów, w których region kandydacki zostaje w górnym 1 % komórek lądowych (mediana z {n} regionów na cel).",
     },
     shareTitle: "Udostępnij tę misję",
     share: "Udostępnij misję",

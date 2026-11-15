@@ -557,6 +557,12 @@ export const en = {
       no: "no",
       explain:
         "Median percentile among land cells of known analog sites (benchmarks) and of look-alike traps, per target, as computed by the pipeline with the frozen config.",
+      robust: "Worst bench. p05 / best trap p95",
+      stability: "Region stability (median)",
+      robustLine:
+        "Robustness: benchmarks stay above traps for {holds}/{total} targets across {runs} Monte Carlo runs{jitter}, comparing the lowest benchmark 5th percentile with the highest trap 95th percentile.",
+      robustJitter: " (weights ±{w} %, thresholds ±{th} %)",
+      stabilityExplain: "Region stability: share of runs in which a candidate region stays in the top 1 % of land cells (median over {n} regions per target).",
     },
     shareTitle: "Share this mission",
     share: "Share mission",

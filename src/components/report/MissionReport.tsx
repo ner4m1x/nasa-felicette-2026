@@ -26,9 +26,10 @@ import { breakdownFor } from "@/lib/deck";
 import { formatPercentile } from "@/lib/format";
 import type { RankedCard, TargetId } from "@/lib/types";
 import { validationTally, type ValidationReport } from "@/lib/validationReport";
+import { robustnessTally, type SensitivityReport } from "@/lib/sensitivityReport";
 import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
-import { useManifest, useValidationReport } from "@/state/usePipeline";
+import { useManifest, useSensitivityReport, useValidationReport } from "@/state/usePipeline";
 import { MissionPatch } from "./MissionPatch";
 import { PlanetaryReferenceList } from "./PlanetaryReferenceList";
 
@@ -52,6 +53,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
   const swipe = useSwipe();
   const manifest = useManifest();
   const validation = useValidationReport();
+  const sensitivity = useSensitivityReport();
 
   const byId = new Map<string, RankedCard>();
   for (const r of [...(swipe.ranked?.deck ?? []), ...(swipe.ranked?.rejected ?? [])]) byId.set(r.card.id, r);
@@ -162,7 +164,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
 
       {/* ---- Methods & data ---- */}
       <Card title={t("report.methods.title")}>
-        <ValidationBadge report={validation} />
+        <ValidationBadge report={validation} sensitivity={sensitivity} />
 
         <div className="mt-4 grid gap-5 lg:grid-cols-3">
           <section>
@@ -270,7 +272,14 @@ function PurredSite({
   );
 }
 
-function ValidationBadge({ report }: { report: ValidationReport | null | undefined }) {
+function ValidationBadge({
+  report,
+  sensitivity,
+}: {
+  report: ValidationReport | null | undefined;
+  /** robustness columns + line; omitted while loading or when the file is absent */
+  sensitivity: SensitivityReport | null | undefined;
+}) {
   const { t, lang } = useI18n();
   if (report === undefined) return <p className="text-xs text-dim">…</p>;
   if (report === null) {
@@ -319,7 +328,13 @@ function ValidationBadge({ report }: { report: ValidationReport | null | undefin
               <th className="py-1 pr-2 font-normal">{t("report.validation.target")}</th>
               <th className="py-1 pr-2 font-normal">{t("report.validation.benchmarks")}</th>
               <th className="py-1 pr-2 font-normal">{t("report.validation.traps")}</th>
-              <th className="py-1 font-normal">{t("report.validation.holds")}</th>
+              <th className="py-1 pr-2 font-normal">{t("report.validation.holds")}</th>
+              {sensitivity && (
+                <>
+                  <th className="py-1 pr-2 font-normal">{t("report.validation.robust")}</th>
+                  <th className="py-1 font-normal">{t("report.validation.stability")}</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -333,9 +348,10 @@ function ValidationBadge({ report }: { report: ValidationReport | null | undefin
                   <td className="py-1.5 pr-2">
                     {fmtPct(s.traps.medianPercentile)} <span className="text-dim">(n={s.traps.n})</span>
                   </td>
-                  <td className="py-1.5" style={{ color: s.patternHolds ? "var(--phosphor)" : "var(--danger)" }}>
+                  <td className="py-1.5 pr-2" style={{ color: s.patternHolds ? "var(--phosphor)" : "var(--danger)" }}>
                     {s.patternHolds ? t("report.validation.yes") : t("report.validation.no")}
                   </td>
+                  {sensitivity && <RobustCells r={sensitivity.targets[tid]} fmtPct={fmtPct} lang={lang} />}
                 </tr>
               ),
             )}
@@ -343,7 +359,64 @@ function ValidationBadge({ report }: { report: ValidationReport | null | undefin
         </table>
       </div>
       <p className="mt-2 text-[10px] leading-snug text-dim">{t("report.validation.explain")}</p>
+      {sensitivity && <RobustnessLine report={sensitivity} />}
     </div>
+  );
+}
+
+function RobustCells({
+  r,
+  fmtPct,
+  lang,
+}: {
+  r: SensitivityReport["targets"][TargetId];
+  fmtPct: (v: number | null) => string;
+  lang: string;
+}) {
+  if (!r) {
+    return (
+      <>
+        <td className="py-1.5 pr-2 text-dim">—</td>
+        <td className="py-1.5 text-dim">—</td>
+      </>
+    );
+  }
+  const pct = new Intl.NumberFormat(lang, { style: "percent", maximumFractionDigits: 0 });
+  return (
+    <>
+      <td className="whitespace-nowrap py-1.5 pr-2" style={{ color: r.separated ? "var(--phosphor)" : "var(--danger)" }}>
+        {fmtPct(r.worstBenchmarkP05)} {r.separated ? ">" : "≤"} {fmtPct(r.bestTrapP95)}
+      </td>
+      <td className="py-1.5">
+        {r.medianRegionStability === null ? "—" : pct.format(r.medianRegionStability)}{" "}
+        <span className="text-dim">(n={r.nRegions})</span>
+      </td>
+    </>
+  );
+}
+
+function RobustnessLine({ report }: { report: SensitivityReport }) {
+  const { t, lang } = useI18n();
+  const { holds, total } = robustnessTally(report);
+  if (total === 0) return null;
+  const n = new Intl.NumberFormat(lang, { maximumFractionDigits: 0 });
+  const jitter =
+    report.weightJitter !== null && report.thresholdJitter !== null
+      ? t("report.validation.robustJitter", { w: n.format(report.weightJitter * 100), th: n.format(report.thresholdJitter * 100) })
+      : "";
+  const regions = Object.values(report.targets).map((r) => r.nRegions);
+  return (
+    <>
+      <p
+        className="mt-2 text-xs leading-snug"
+        style={{ color: holds === total ? "var(--phosphor)" : "var(--amber)" }}
+      >
+        {t("report.validation.robustLine", { holds, total, runs: report.runs ?? "—", jitter })}
+      </p>
+      <p className="mt-1 text-[10px] leading-snug text-dim">
+        {t("report.validation.stabilityExplain", { n: `${Math.min(...regions)}–${Math.max(...regions)}` })}
+      </p>
+    </>
   );
 }
 
