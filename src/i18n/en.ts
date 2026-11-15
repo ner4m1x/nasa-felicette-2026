@@ -61,6 +61,8 @@ export const en = {
     reconfigure: "Reconfigure",
     briefTitle: "Mission brief",
     shareHint: "This mission is encoded in the page URL: copy the link to share it.",
+    previewCaption: "First card for this mission",
+    previewEmpty: "Every site fails a hard constraint of these specs – relax an option to see a card.",
   },
   felicette: {
     name: "Félicette",

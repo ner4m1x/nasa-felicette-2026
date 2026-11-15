@@ -59,6 +59,8 @@ export const pl: Dictionary = {
     reconfigure: "Zmień konfigurację",
     briefTitle: "Odprawa misji",
     shareHint: "Ta misja jest zapisana w adresie strony: skopiuj link, żeby ją udostępnić.",
+    previewCaption: "Pierwsza karta tej misji",
+    previewEmpty: "Każde miejsce oblewa twardy warunek tej specyfikacji – złagodź jedną z opcji, żeby zobaczyć kartę.",
   },
   felicette: {
     name: "Félicette",

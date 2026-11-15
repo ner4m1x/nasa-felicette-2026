@@ -4,7 +4,8 @@
  * Mission Configurator (landing screen of the Swipe tab).
  * - Phone: one question per screen, progress dots, Back / Next, "Launch scan" on the last question.
  * - Desktop (≥ lg): all four questions as one compact form, with Félicette (FelicetteHero) and the
- *   brief beside it. Phones: FelicetteHero above each question.
+ *   live preview of the first ranked card (PreviewCard), Launch and the brief beside it.
+ *   Phones: FelicetteHero above each question, no preview.
  * The same DOM serves both: on phones, questions other than the current one are hidden by CSS.
  */
 
@@ -15,8 +16,10 @@ import { useI18n } from "@/i18n/I18nProvider";
 import type { I18nKey } from "@/i18n/types";
 import type { MissionConfig } from "@/lib/types";
 import { useMission } from "@/state/MissionContext";
+import { DESKTOP_QUERY, useMediaQuery } from "@/state/useMediaQuery";
 import { MissionBrief } from "./MissionBrief";
 import { OptionCard } from "./OptionCard";
+import { PreviewCard } from "./PreviewCard";
 import { CONFIG_STEPS } from "./steps";
 
 const LAST = CONFIG_STEPS.length - 1;
@@ -32,6 +35,7 @@ const DESKTOP_LAYOUT: Record<keyof MissionConfig, { span: string; cols: string }
 export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
   const { t } = useI18n();
   const { config, update, fromLink } = useMission();
+  const desktop = useMediaQuery(DESKTOP_QUERY);
   // A shared link already carries a full mission: start at the last question, ready to launch.
   const [step, setStep] = useState(fromLink ? LAST : 0);
   const [commentKey, setCommentKey] = useState<I18nKey>("felicette.intro");
@@ -159,8 +163,9 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
       {/* Desktop side panel */}
       <aside className="hidden space-y-4 lg:sticky lg:top-6 lg:block">
         <FelicetteHero key={comment} text={comment} />
-        <MissionBrief />
+        {desktop && <PreviewCard />}
         {launchButton("w-full")}
+        <MissionBrief />
         <p className="text-[11px] leading-relaxed text-dim">{t("config.shareHint")}</p>
       </aside>
     </form>
