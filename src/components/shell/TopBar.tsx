@@ -17,7 +17,7 @@ export function TopBar({ activeTab, onSelectTab, onOpenLimits }: TopBarProps) {
     <header className="border-b border-line bg-panel pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)]">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-3 lg:h-16 lg:px-6">
         <div className="min-w-0 flex-1 lg:flex-none">
-          <h1 className="cursor-blink text-glow truncate text-base font-bold tracking-widest text-phosphor lg:text-lg">
+          <h1 className="cursor-blink truncate text-base font-bold tracking-widest text-phosphor lg:text-lg">
             <span className="sm:hidden">{t("app.short")}</span>
             <span className="hidden sm:inline">{t("app.title")}</span>
           </h1>

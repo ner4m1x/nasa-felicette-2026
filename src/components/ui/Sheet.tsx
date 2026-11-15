@@ -50,7 +50,7 @@ export function Sheet({ open, onClose, titleId, title, subtitle, closeLabel, chi
         <div className="flex items-start gap-3 border-b border-line px-4 pb-3 pt-2 lg:pt-4">
           <div className="min-w-0 flex-1">
             <span aria-hidden className="mx-auto mb-2 block h-1 w-10 rounded-pill bg-line lg:hidden" />
-            <h2 id={titleId} className="text-glow text-base font-bold uppercase tracking-wider text-amber">
+            <h2 id={titleId} className="text-base font-bold uppercase tracking-wider text-amber">
               {title}
             </h2>
             {subtitle && <div className="mt-1 text-xs text-dim">{subtitle}</div>}

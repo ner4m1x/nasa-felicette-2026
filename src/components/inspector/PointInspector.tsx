@@ -354,7 +354,7 @@ function PowerSection({
                 <XAxis dataKey="m" tick={{ fill: "var(--dim)", fontSize: 10 }} tickLine={false} axisLine={{ stroke: "var(--line)" }} interval={0} />
                 <YAxis tick={{ fill: "var(--dim)", fontSize: 10 }} tickLine={false} axisLine={false} width={44} />
                 <Tooltip
-                  cursor={{ fill: "rgb(77 255 154 / 0.08)" }}
+                  cursor={{ fill: "var(--chart-cursor)" }}
                   contentStyle={{ background: "var(--panel)", border: "1px solid var(--line)", fontSize: 11 }}
                   labelStyle={{ color: "var(--dim)" }}
                   formatter={(v) => [typeof v === "number" ? `${fmt(lang, v)} ${displayUnit(series.units)}` : "—", t(`scan.param.${active}`)]}

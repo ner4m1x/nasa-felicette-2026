@@ -53,7 +53,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
     <button
       key="launch"
       type="submit"
-      className={`flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-phosphor px-4 text-sm font-bold uppercase tracking-wider lg:tracking-widest text-bg shadow-[0_0_18px_rgb(77_255_154/0.35)] transition-transform hover:brightness-110 active:scale-[0.98] ${extra}`}
+      className={`flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-amber px-4 text-sm font-bold uppercase tracking-wider lg:tracking-widest text-bg transition-transform hover:brightness-110 active:scale-[0.98] ${extra}`}
     >
       <Rocket aria-hidden size={18} />
       {t("config.launch")}
@@ -68,7 +68,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
     >
       <div className="flex min-h-0 flex-1 flex-col lg:block">
         <header className="flex items-baseline justify-between gap-3 px-4 pt-4 lg:px-0 lg:pt-0">
-          <h2 id="configurator-title" className="text-glow text-sm font-bold uppercase tracking-widest text-phosphor">
+          <h2 id="configurator-title" className="text-sm font-bold uppercase tracking-widest text-phosphor">
             {t("config.heading")}
           </h2>
           <p className="text-xs text-dim lg:hidden">
@@ -149,7 +149,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
               key="next"
               type="button"
               onClick={() => setStep((s) => Math.min(LAST, s + 1))}
-              className="flex min-h-12 items-center gap-1 rounded-lg border border-phosphor px-4 text-sm font-bold uppercase tracking-wider text-phosphor"
+              className="flex min-h-12 items-center gap-1 rounded-lg border border-amber px-4 text-sm font-bold uppercase tracking-wider text-amber hover:bg-amber/10"
             >
               {t("config.next")}
               <ChevronRight aria-hidden size={18} />

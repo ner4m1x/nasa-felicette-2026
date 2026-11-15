@@ -29,7 +29,6 @@
   --radius-pill: var(--pill-radius);
   --shadow-card: var(--card-shadow);
   --shadow-card-top: var(--card-top-shadow);
-  --shadow-glow: var(--glow-shadow);
   --font-mono: var(--font-terminal), ui-monospace, monospace;
   --font-sans: var(--font-terminal), ui-monospace, monospace;
 }
@@ -54,7 +53,7 @@ body {
   overscroll-behavior: none;
 }
 
-/* Subtle CRT scanlines + vignette, never intercepting input. */
+/* Barely visible scanlines + soft vignette (tokens --scanline / --vignette), never intercepting input. */
 body::after {
   content: "";
   position: fixed;
@@ -62,8 +61,8 @@ body::after {
   pointer-events: none;
   z-index: 60;
   background:
-    repeating-linear-gradient(to bottom, rgb(255 255 255 / 0.025) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, transparent 60%, rgb(0 0 0 / 0.35) 100%);
+    repeating-linear-gradient(to bottom, var(--scanline) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 65%, var(--vignette) 100%);
 }
 
 ::selection {
@@ -74,10 +73,6 @@ body::after {
 :focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
-}
-
-.text-glow {
-  text-shadow: var(--glow-shadow);
 }
 
 .cursor-blink::after {
@@ -174,7 +169,7 @@ dialog.purr-sheet::backdrop {
   line-height: 36px;
 }
 .leaflet-container .leaflet-control-attribution.leaflet-control {
-  background: rgb(5 10 7 / 0.8);
+  background: var(--map-attribution-bg);
   color: var(--dim);
   font-size: 10px;
   max-width: calc(100vw - 24px);
@@ -248,11 +243,11 @@ dialog.purr-sheet::backdrop {
   border-radius: 9999px;
   background: var(--pin);
   border: 2px solid var(--bg);
-  box-shadow: 0 0 0 1.5px var(--pin), 0 0 10px var(--pin);
+  box-shadow: 0 0 0 1.5px var(--pin);
 }
 .purr-pin--purred {
   border-color: var(--purr);
-  box-shadow: 0 0 0 2px var(--purr), 0 0 16px var(--purr);
+  box-shadow: 0 0 0 2px var(--purr);
 }
 .purr-pin--rejected {
   opacity: 0.45;
@@ -307,7 +302,6 @@ dialog.purr-sheet::backdrop {
   height: 10px;
   border-radius: 9999px;
   background: var(--laser);
-  box-shadow: 0 0 6px 2px var(--laser), 0 0 18px 6px rgb(255 59 59 / 0.35);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--duration-fast);

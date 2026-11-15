@@ -4,28 +4,33 @@
  * Tailwind utilities (bg-panel, rounded-card, shadow-card, …). Numbers that Framer Motion needs in
  * JS (springs, swipe thresholds) live next door in src/theme/tokens.ts.
  *
- * Dark only (an orbital console has no light mode).
- * Contrast on --bg (#050a07): fg 17.1:1, phosphor 15.3:1, amber 11.1:1, dim 8.8:1, danger 7.2:1;
- * on --panel-2 the lowest is dim at 7.7:1 (all ≥ WCAG AA 4.5:1).
+ * Dark only (an orbital console has no light mode). Restrained "mission control" palette:
+ * graphite/navy surfaces, off-white text, sage green as a small accent only (active tab, PURR,
+ * selected option, positive values), amber as the single strong accent (primary buttons, limiting
+ * dimension, Félicette's bubble). No glows: flat 1px --line borders; the PURR/HISS stamp is the
+ * only "loud" element.
+ * Contrast on --panel-2 (#1B2129, the lightest surface): fg 13.2:1, dim 6.3:1, phosphor 7.1:1,
+ * amber 7.4:1, danger 5.3:1, sky 7.5:1, violet 7.1:1 — lowest is danger (HISS) at 5.3:1
+ * (all ≥ WCAG AA 4.5:1). Amber button label (--bg on --amber) 8.7:1. --line is a border colour, never a text background.
  */
 :root {
   /* ---- Colors ---- */
-  --bg: #050a07;
-  --panel: #0a140e;
-  --panel-2: #0f1d14;
-  --line: #1f3a29;
-  --fg: #d6f5de;
-  --dim: #85b896;
-  --phosphor: #4dff9a;
-  --amber: #ffb22e;
-  --danger: #ff6b6b;
-  --sky: #7cc8ff;
-  --violet: #c7a2ff;
-  /* user scans (P1); 10.3:1 on --bg */
-  --user-scan: #ff9bd2;
+  --bg: #0e1116;
+  --panel: #151a21;
+  --panel-2: #1b2129;
+  --line: #2a313a;
+  --fg: #e6e8eb;
+  --dim: #9aa3ae;
+  --phosphor: #7fb89a;
+  --amber: #e0a458;
+  --danger: #d9776f;
+  --sky: #8ab6d9;
+  --violet: #b4a4d8;
+  /* user scans (P1); 8.2:1 on --bg */
+  --user-scan: #d9a0c2;
 
   /* Map laser cursor and mission-patch bodies (decorative, not data) */
-  --laser: #ff3b3b;
+  --laser: #e5534b;
   --body-moon: #b8c2bc;
   --body-mars: #d9622b;
 
@@ -50,20 +55,24 @@
   --meter-height: 0.6rem;
   --meter-gap: 2px;
   --meter-radius: 1px;
-  --meter-glow: 0 0 4px;
+  /* no glow: the meter is flat (kept as a token so a glow can be re-enabled) */
+  --meter-glow: 0 0 0;
 
   /* ---- Map ---- */
   /* Terminal-style dim on the BASE tile layer only (thematic layers, scan overlay and pins are not
      filtered, so they stay readable on top). Set to "none" to show the base unaltered. */
-  --map-base-filter: brightness(0.75) saturate(0.7) contrast(1.05);
+  --map-base-filter: brightness(0.8) saturate(0.75) contrast(1.05);
   /* Scan overlay (pipeline PNG, never edited): display-only CSS. "normal" + a mild contrast lift
      keeps the colours true to the legend; set the blend to "screen" for a brighter, glowier look. */
   --map-overlay-filter: saturate(1.25) contrast(1.1);
   --map-overlay-blend: normal;
   /* point popup at the tapped spot (MapPointPopup) */
   --map-popup-bg: var(--panel);
-  --map-popup-border: rgb(255 178 46 / 0.7);
-  --map-popup-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
+  --map-popup-border: var(--line);
+  --map-popup-shadow: 0 4px 12px rgb(0 0 0 / 0.35);
+  --map-attribution-bg: rgb(14 17 22 / 0.85);
+  /* Recharts hover band in PointInspector */
+  --chart-cursor: rgb(154 163 174 / 0.12);
 
   /* ---- Card imagery (satellite thumbnail) ---- */
   /* True-colour base: lighter dim than the map so the thumbnail reads; under NDVI/LST it is dimmed more. */
@@ -71,28 +80,28 @@
   --imagery-under-thematic-filter: brightness(0.45) saturate(0.4);
   --imagery-thematic-opacity: 0.9;
   --imagery-crosshair: var(--amber);
-  --imagery-cell: rgb(214 245 222 / 0.55);
+  --imagery-cell: rgb(230 232 235 / 0.55);
   --imagery-skeleton: var(--panel-2);
-  --imagery-skeleton-shine: rgb(77 255 154 / 0.07);
-  --imagery-scrim: rgb(5 10 7 / 0.72);
+  --imagery-skeleton-shine: rgb(230 232 235 / 0.05);
+  --imagery-scrim: rgb(14 17 22 / 0.72);
   --duration-shimmer: 1.4s;
   /* thumbnail height as a share of the card's height (card layout: image ≈ 38–45 %); phones use the
      low end so the scores stay above the fold, desktop (≥ 64rem, Tailwind lg) a bit more */
   --imagery-card-height: 38%;
 
   /* ---- Félicette (FelicetteAvatar): chibi tuxedo cat in a glass helmet ---- */
-  --cat-fur: #101512;
+  --cat-fur: #111419;
   /* lighter rim so the solid black head and ears separate from the dark background */
-  --cat-rim: rgb(133 184 150 / 0.55);
-  --cat-white: #eef7f0;
-  --cat-mouth: #2a332d;
+  --cat-rim: rgb(154 163 174 / 0.55);
+  --cat-white: #eef0f2;
+  --cat-mouth: #2a2f36;
   --cat-eye: var(--phosphor);
   --cat-nose: #f2a2bd;
   --cat-ear-inner: rgb(242 162 189 / 0.45);
-  --cat-whisker: rgb(214 245 222 / 0.5);
-  --felicette-glass: rgb(77 255 154 / 0.1);
-  --felicette-glare: rgb(214 245 222 / 0.5);
-  --felicette-collar: #12321f;
+  --cat-whisker: rgb(230 232 235 / 0.5);
+  --felicette-glass: rgb(154 163 174 / 0.1);
+  --felicette-glare: rgb(230 232 235 / 0.5);
+  --felicette-collar: #243029;
   --felicette-ring: var(--phosphor);
   --felicette-ring-happy: var(--purr);
   --felicette-ring-hiss: var(--hiss);
@@ -130,9 +139,14 @@
   --pill-radius: 9999px;
 
   /* ---- Shadows ---- */
-  --card-shadow: 0 10px 30px rgb(0 0 0 / 0.55), 0 0 0 1px var(--line);
-  --card-top-shadow: 0 18px 40px rgb(0 0 0 / 0.6), 0 0 24px rgb(77 255 154 / 0.08);
-  --glow-shadow: 0 0 8px rgb(77 255 154 / 0.45);
+  /* depth only (neutral, no coloured glow) */
+  --card-shadow: 0 2px 6px rgb(0 0 0 / 0.3), 0 0 0 1px var(--line);
+  --card-top-shadow: 0 8px 24px rgb(0 0 0 / 0.4), 0 0 0 1px var(--line);
+
+  /* ---- Screen texture (body::after) ---- */
+  /* barely visible scanlines + soft vignette; set both to "transparent" to remove */
+  --scanline: rgb(255 255 255 / 0.012);
+  --vignette: rgb(0 0 0 / 0.2);
 
   /* ---- Motion (CSS transitions; Framer values are in tokens.ts) ---- */
   --duration-fast: 120ms;

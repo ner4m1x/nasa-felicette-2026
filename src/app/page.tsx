@@ -11,7 +11,7 @@ import { SwipeProvider } from "@/state/SwipeContext";
 function BootScreen() {
   return (
     <div className="flex h-dvh items-center justify-center bg-bg font-mono text-phosphor">
-      <p className="cursor-blink text-glow text-lg font-bold tracking-widest">P.U.R.R.</p>
+      <p className="cursor-blink text-lg font-bold tracking-widest">P.U.R.R.</p>
     </div>
   );
 }

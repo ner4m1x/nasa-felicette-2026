@@ -39,7 +39,7 @@ export function BottomNav({ active, onSelect, variant }: BottomNavProps) {
                   onClick={() => onSelect(id)}
                   className={`flex min-h-11 items-center gap-2 rounded-md border px-4 text-sm uppercase tracking-wider transition-colors ${
                     isActive
-                      ? "border-phosphor bg-phosphor/10 text-phosphor text-glow"
+                      ? "border-phosphor bg-phosphor/10 text-phosphor"
                       : "border-transparent text-dim hover:border-line hover:text-fg"
                   }`}
                 >
@@ -70,7 +70,7 @@ export function BottomNav({ active, onSelect, variant }: BottomNavProps) {
                 aria-current={isActive ? "page" : undefined}
                 onClick={() => onSelect(id)}
                 className={`relative flex min-h-14 w-full flex-col items-center justify-center gap-0.5 text-[11px] uppercase tracking-wider transition-colors ${
-                  isActive ? "text-phosphor text-glow" : "text-dim active:text-fg"
+                  isActive ? "text-phosphor" : "text-dim active:text-fg"
                 }`}
               >
                 <span

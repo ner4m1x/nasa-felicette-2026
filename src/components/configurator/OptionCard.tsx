@@ -22,7 +22,7 @@ export function OptionCard({ name, value, checked, onSelect, title, subtitle, Ic
     <label
       className={`group flex min-h-14 cursor-pointer items-center gap-3 rounded-lg border px-3 py-3 transition-colors has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-amber lg:py-2.5 ${
         checked
-          ? "border-phosphor bg-phosphor/10 shadow-[0_0_14px_rgb(77_255_154/0.18)]"
+          ? "border-phosphor bg-phosphor/10"
           : "border-line bg-panel hover:border-dim"
       }`}
     >

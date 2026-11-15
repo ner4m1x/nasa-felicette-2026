@@ -123,7 +123,7 @@ export function BreakdownSheet({
           type="button"
           onClick={onClose}
           autoFocus
-          className="flex min-h-12 w-full items-center justify-center rounded-control border-2 border-phosphor text-sm font-bold uppercase tracking-widest text-phosphor hover:bg-phosphor/10"
+          className="flex min-h-12 w-full items-center justify-center rounded-control border border-amber text-sm font-bold uppercase tracking-widest text-amber hover:bg-amber/10"
         >
           {closeActionLabel ?? t("breakdown.next")}
         </button>

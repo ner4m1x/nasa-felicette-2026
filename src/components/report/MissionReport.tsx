@@ -67,7 +67,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.kicker")}</p>
-          <h2 className="text-glow text-xl font-bold uppercase tracking-wider text-phosphor">{t("report.title")}</h2>
+          <h2 className="text-xl font-bold uppercase tracking-wider text-phosphor">{t("report.title")}</h2>
         </div>
         <button
           type="button"
@@ -98,7 +98,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
           </Card>
 
           <Card title={t("report.agreementTitle")}>
-            <p className="text-glow text-4xl font-bold tabular-nums text-phosphor">
+            <p className="text-4xl font-bold tabular-nums text-phosphor">
               {agreement.ratio === null ? "—" : `${Math.round(agreement.ratio * 100)}%`}
             </p>
             <p className="mt-1 text-xs tabular-nums text-dim">
@@ -380,7 +380,7 @@ function ShareCard() {
       <button
         type="button"
         onClick={share}
-        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-control border-2 border-phosphor text-sm font-bold uppercase tracking-widest text-phosphor hover:bg-phosphor/10"
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-control border border-amber text-sm font-bold uppercase tracking-widest text-amber hover:bg-amber/10"
       >
         <Share2 aria-hidden size={18} />
         {t("report.share")}
