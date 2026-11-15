@@ -39,6 +39,13 @@ body {
   height: 100%;
 }
 
+/* The viewport takes overscroll-behavior from <html>, not <body>: without this a horizontal swipe that
+   nothing consumes (e.g. on an open BreakdownSheet) triggers the browser's swipe-back navigation and
+   leaves the app. */
+html {
+  overscroll-behavior: none;
+}
+
 body {
   background: var(--bg);
   color: var(--fg);
