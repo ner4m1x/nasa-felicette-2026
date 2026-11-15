@@ -1,3 +1,15 @@
+# P.U.R.R. — Félicette's Earth analogs for Moon and Mars bases
+
+Swipe through places on Earth that resemble Moon and Mars base sites, ranked by an Analog Score from a
+frozen global-scan pipeline and a Mission Fit for your configured mission.
+
+- Data sources and credits: in the app under **Report → About & credits**; method notes in [`docs/`](docs/).
+- **AI disclosure:** [`docs/AI_DISCLOSURE.md`](docs/AI_DISCLOSURE.md). In short: concept and design
+  decisions by the author; code written with AI assistance (Anthropic Claude Code); all data values come
+  from cited datasets and publications, not from AI.
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

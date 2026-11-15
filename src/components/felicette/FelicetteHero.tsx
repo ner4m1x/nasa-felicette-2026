@@ -8,6 +8,7 @@
  * Same typewriter + a11y as FelicetteSays (give it `key={text}`; screen readers get the sentence once;
  * reduced motion = full text at once). Sizes and colours: --hero-* tokens in tokens.css.
  * Compact places (card teaser, inspector summary line, trap chip, verdict row) keep the small avatar.
+ * Under the avatar: a small, always-visible "AI-assisted artwork" caption.
  */
 
 import { useI18n } from "@/i18n/I18nProvider";
@@ -75,6 +76,8 @@ export function FelicetteHero({ text, mood = "neutral", followPointer = false, a
         label={avatarLabel}
         className="mt-[calc(var(--hero-tail-h)-2px)] h-[var(--hero-avatar-size)] w-[var(--hero-avatar-size)] shrink-0"
       />
+      {/* persistent AI disclosure for the large mascot artwork (About & credits has the full text) */}
+      <p className="mt-0.5 w-[var(--hero-avatar-size)] text-center text-[9px] leading-tight text-dim">{t("about.artCaption")}</p>
     </figure>
   );
 }

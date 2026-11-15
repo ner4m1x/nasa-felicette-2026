@@ -12,7 +12,7 @@
  * - Share: Web Share API on touch devices, clipboard otherwise, a selectable URL as last resort.
  */
 
-import { BadgeCheck, CircleDashed, ExternalLink, Share2, TriangleAlert } from "lucide-react";
+import { BadgeCheck, CircleDashed, ExternalLink, Info, Share2, TriangleAlert } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
 import { EarthLimitsList } from "@/components/shell/EarthLimitsSheet";
@@ -42,9 +42,11 @@ const BLIND_SPOTS: I18nKey[] = [
 
 interface MissionReportProps {
   onGoToSwipe: () => void;
+  /** opens About & credits (data credits, repo, AI disclosure) */
+  onOpenAbout: () => void;
 }
 
-export function MissionReport({ onGoToSwipe }: MissionReportProps) {
+export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) {
   const { t, lang, dim } = useI18n();
   const { config } = useMission();
   const swipe = useSwipe();
@@ -67,6 +69,14 @@ export function MissionReport({ onGoToSwipe }: MissionReportProps) {
           <p className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.kicker")}</p>
           <h2 className="text-glow text-xl font-bold uppercase tracking-wider text-phosphor">{t("report.title")}</h2>
         </div>
+        <button
+          type="button"
+          onClick={onOpenAbout}
+          className="flex min-h-11 items-center gap-1.5 rounded-control border border-line px-3 text-[11px] font-bold uppercase tracking-wider text-dim hover:border-phosphor hover:text-phosphor"
+        >
+          <Info aria-hidden size={14} />
+          {t("about.link")}
+        </button>
         {swipe.isFixture && (
           <p className="rounded-pill border border-danger px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-danger">
             {t("fixture.banner")}

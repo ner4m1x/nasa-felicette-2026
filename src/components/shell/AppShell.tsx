@@ -7,6 +7,7 @@
  *   visit to the Map tab and re-measured whenever the tab becomes visible again).
  * - On desktop (≥ lg) the bottom nav becomes a tab bar inside the TopBar.
  * - The red FixtureBanner shows whenever the loaded deck is dev fixture data (ground rule 2).
+ * - About & credits (AboutSheet): opened from the Report tab, and from a small footer on desktop.
  */
 
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
@@ -15,9 +16,11 @@ import { MissionConfigurator } from "@/components/configurator/MissionConfigurat
 import { MapClient } from "@/components/map/MapClient";
 import { MissionReport } from "@/components/report/MissionReport";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
+import { useI18n } from "@/i18n/I18nProvider";
 import { useMission } from "@/state/MissionContext";
 import { useSwipe } from "@/state/SwipeContext";
 import { BottomNav, TAB_IDS, type TabId } from "./BottomNav";
+import { AboutSheet } from "./AboutSheet";
 import { EarthLimitsSheet } from "./EarthLimitsSheet";
 import { FixtureBanner } from "./FixtureBanner";
 import { TopBar } from "./TopBar";
@@ -25,6 +28,8 @@ import { TopBar } from "./TopBar";
 export function AppShell() {
   const [tab, setTab] = useState<TabId>("swipe");
   const [limitsOpen, setLimitsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const { t } = useI18n();
   const { isFixture } = useSwipe();
 
   return (
@@ -43,13 +48,27 @@ export function AppShell() {
             >
               {id === "swipe" && <SwipeTab active={tab === "swipe"} />}
               {id === "map" && <MapClient active={tab === "map"} />}
-              {id === "report" && <MissionReport onGoToSwipe={() => setTab("swipe")} />}
+              {id === "report" && <MissionReport onGoToSwipe={() => setTab("swipe")} onOpenAbout={() => setAboutOpen(true)} />}
             </section>
           ))}
         </main>
 
         <BottomNav variant="bottom" active={tab} onSelect={setTab} />
+        {/* desktop footer: About & credits + AI disclosure (phones reach it from the Report tab) */}
+        <footer className="hidden shrink-0 items-center justify-end gap-3 border-t border-line bg-panel px-6 py-1 text-[10px] text-dim lg:flex">
+          {(["about.aiTitle", "about.link"] as const).map((key) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setAboutOpen(true)}
+              className="min-h-6 uppercase tracking-wider underline decoration-dotted underline-offset-2 hover:text-phosphor"
+            >
+              {t(key)}
+            </button>
+          ))}
+        </footer>
         <EarthLimitsSheet open={limitsOpen} onClose={() => setLimitsOpen(false)} />
+        <AboutSheet open={aboutOpen} onClose={() => setAboutOpen(false)} />
       </div>
     </MotionConfig>
   );

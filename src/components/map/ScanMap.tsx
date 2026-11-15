@@ -16,7 +16,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { AttributionControl, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { GIBS_ATTRIBUTION, GIBS_LAYERS, gibsLayerLabel, gibsTileUrl, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import type { TargetId } from "@/lib/types";
 import { MAP_POPUP } from "@/theme/tokens";
@@ -57,6 +57,7 @@ const pulseIcon = L.divIcon({
   iconAnchor: [18, 18],
 });
 
+const LEAFLET_PREFIX = '<a href="https://leafletjs.com" target="_blank" rel="noreferrer">Leaflet</a>';
 const POPUP_OFFSET: L.PointExpression = [0, MAP_POPUP.offsetYPx];
 const POPUP_PAD: L.PointExpression = [MAP_POPUP.autoPanPaddingPx, MAP_POPUP.autoPanPaddingPx];
 
@@ -109,8 +110,10 @@ export default function ScanMap(props: ScanMapProps) {
         worldCopyJump={false}
         zoomControl
         className="h-full w-full"
-        attributionControl
+        attributionControl={false}
       >
+        {/* Leaflet credit as plain text: the default prefix adds a flag icon, and the app shows no flags */}
+        <AttributionControl prefix={LEAFLET_PREFIX} />
         {/* key: remount on switch so Leaflet's attribution control drops the old base's line */}
         <TileLayer
           key={base.id}

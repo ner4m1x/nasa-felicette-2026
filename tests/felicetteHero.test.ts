@@ -34,6 +34,10 @@ describe("FelicetteHero", () => {
     expect(html).toContain("lg:hidden");
   });
 
+  it("always shows the AI-assisted artwork caption under the avatar", () => {
+    expect(render("Hi")).toContain(`>${en.about.artCaption}</p>`);
+  });
+
   it("uses the hero avatar size token and passes the mood through", () => {
     for (const mood of FELICETTE_MOODS) {
       const html = render("Hi", mood);
