@@ -42,13 +42,15 @@ interface CardImageryProps {
   load: boolean;
   /** the top card: its controls are focusable */
   interactive: boolean;
+  /** CSS height of the box (default: --imagery-card-height, a share of the card) */
+  height?: string;
 }
 
 type TileState = "loaded" | "failed";
 
 const stop = (e: PointerEvent) => e.stopPropagation();
 
-export function CardImagery({ card, load, interactive }: CardImageryProps) {
+export function CardImagery({ card, load, interactive, height = "var(--imagery-card-height)" }: CardImageryProps) {
   const { t } = useI18n();
   const box = useRef<HTMLDivElement>(null);
   const size = useBoxSize(box);
@@ -94,7 +96,7 @@ export function CardImagery({ card, load, interactive }: CardImageryProps) {
       role="img"
       aria-label={[t("card.imagery.alt", { name: card.name }), caption, credit].filter(Boolean).join(". ")}
       className="relative w-full shrink-0 overflow-hidden border-b border-line bg-bg"
-      style={{ height: "var(--imagery-card-height)", touchAction: "pan-y" }}
+      style={{ height, touchAction: "pan-y" }}
     >
       {base && (
         <TileLayer

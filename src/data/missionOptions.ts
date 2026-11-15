@@ -62,7 +62,7 @@ export interface CrewOption {
   descKey: I18nKey;
   /** a permanent base needs the target's local resource (ISRU ice or lava-tube shielding) */
   requiresResource: boolean;
-  /** operational (human-ops) analogs are boosted to the top of the deck for crewed missions */
+  /** operational (human-ops) analogs are pinned early in the deck (ranking.ts OPERATIONAL_POSITION) for crewed missions */
   boostsOperational: boolean;
 }
 

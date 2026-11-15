@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CURATED_CARDS, LUNARES_CARD_ID } from "@/data/curatedCards";
-import { INTERLEAVE_EVERY, rankDeck } from "@/lib/ranking";
+import { CURATED_CARDS, HAMMAGUIR_CARD_ID, LUNARES_CARD_ID } from "@/data/curatedCards";
+import { INTERLEAVE_EVERY, OPERATIONAL_POSITION, rankDeck } from "@/lib/ranking";
 import { TARGET_IDS, type AnalogEntry, type DeckCard } from "@/lib/types";
 import { allConfigs, config, deepFreeze, makeCard } from "./helpers";
 
@@ -48,15 +48,47 @@ describe("rankDeck — order", () => {
   });
 });
 
-describe("rankDeck — LunAres boost", () => {
-  const cards = [...Array.from({ length: 5 }, (_, i) => scoredCard(`s${i}`, 0.9 - i * 0.1)), ...CURATED_CARDS];
+describe("rankDeck — pins (LunAres for crews, Hammaguir for Jezero)", () => {
+  const cards = [...Array.from({ length: 6 }, (_, i) => scoredCard(`s${i}`, 0.9 - i * 0.1)), ...CURATED_CARDS];
+  const ids = (cfg: Parameters<typeof config>[0]) => rankDeck(cards, config(cfg)).deck.map((r) => r.card.id);
 
-  it.each(["short", "permanent"] as const)("puts LunAres on top for %s crews", (crew) => {
-    expect(rankDeck(cards, config({ crew })).deck[0].card.id).toBe(LUNARES_CARD_ID);
+  it.each(["short", "permanent"] as const)("pins LunAres at position 3 for %s crews", (crew) => {
+    for (const target of TARGET_IDS) {
+      const deck = ids({ crew, target, footprint: "compact", mobility: "climber" });
+      if (deck.includes(LUNARES_CARD_ID)) expect(deck.indexOf(LUNARES_CARD_ID), `${target}`).toBe(OPERATIONAL_POSITION - 1);
+    }
   });
 
-  it("does not boost LunAres for robotic missions", () => {
-    expect(rankDeck(cards, config({ crew: "robotic" })).deck[0].card.id).not.toBe(LUNARES_CARD_ID);
+  it("position 1 is always the best Analog × Fit card, for every configuration", () => {
+    for (const cfg of allConfigs()) {
+      const { deck } = rankDeck(cards, cfg);
+      const best = deck.filter((r) => r.rankScore !== null).sort((a, b) => b.rankScore! - a.rankScore!)[0];
+      if (best) expect(deck[0].card.id, JSON.stringify(cfg)).toBe(best.card.id);
+      expect(deck[0].card.kind).not.toBe("operational");
+    }
+  });
+
+  it("keeps Hammaguir 2nd and LunAres 3rd in the crewed Jezero deck", () => {
+    // Hammaguir is grid-built at runtime; a low-scored stand-in with its id shows the pin works
+    const hammaguir = makeCard({ id: HAMMAGUIR_CARD_ID, kind: "curated", analog: { mars_jezero: entry(0.05) } });
+    const deck = rankDeck([...cards, hammaguir], config({ target: "mars_jezero", crew: "short", footprint: "compact", mobility: "climber" }));
+    const order = deck.deck.map((r) => r.card.id);
+    expect(order[0]).toBe("s0");
+    expect(order.indexOf(HAMMAGUIR_CARD_ID)).toBe(1);
+    expect(order.indexOf(LUNARES_CARD_ID)).toBe(2);
+  });
+
+  it("appends LunAres when the deck is shorter than its position", () => {
+    const lunares = CURATED_CARDS.find((c) => c.id === LUNARES_CARD_ID)!;
+    expect(rankDeck([scoredCard("only", 0.8), lunares], config({ crew: "short" })).deck.map((r) => r.card.id)).toEqual([
+      "only",
+      LUNARES_CARD_ID,
+    ]);
+  });
+
+  it("does not pin LunAres for robotic missions", () => {
+    const deck = ids({ crew: "robotic" });
+    expect(deck[0]).not.toBe(LUNARES_CARD_ID);
   });
 });
 

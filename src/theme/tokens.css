@@ -120,8 +120,8 @@
   /* ---- Swipe deck ---- */
   /* desktop: the card stays phone-width, centred, with the info panel beside it */
   --deck-desktop-width: 400px;
-  /* desktop configurator: height of the static first-card preview (PreviewCard) */
-  --preview-card-height: 25rem;
+  /* desktop configurator: satellite image height in the compact first-card preview (PreviewCard) */
+  --preview-imagery-height: 10rem;
 
   /* ---- Radii ---- */
   --card-radius: 1rem;

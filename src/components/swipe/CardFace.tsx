@@ -9,6 +9,8 @@
  *      active target (a short text block when the card has no dims);
  *   4. Félicette's line, then the "Scan with whiskers" live NASA POWER cross-check.
  * Items 3–4 scroll inside the card body; the actions (HISS / Skip / PURR) sit below the card.
+ * `compact` (desktop configurator preview): image (fixed --preview-imagery-height), header and the two
+ * meters only — sized to its content, no radar / legend / Félicette line / whisker scan.
  */
 
 import { MapPin, Star, Trash2 } from "lucide-react";
@@ -33,9 +35,11 @@ interface CardFaceProps {
   interactive: boolean;
   /** fetch the satellite thumbnail (top card and the next one, as a prefetch) */
   loadImagery: boolean;
+  /** preview variant: image, header and both meters; ends cleanly at its natural height */
+  compact?: boolean;
 }
 
-export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
+export function CardFace({ ranked, interactive, loadImagery, compact = false }: CardFaceProps) {
   const { t, lang, dim } = useI18n();
   const { card, analog, missionFit } = ranked;
   const { removeUserCard } = useSwipe();
@@ -75,8 +79,13 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <CardImagery card={card} load={loadImagery} interactive={interactive} />
+    <div className={compact ? "flex flex-col" : "flex h-full flex-col"}>
+      <CardImagery
+        card={card}
+        load={loadImagery}
+        interactive={interactive}
+        height={compact ? "var(--preview-imagery-height)" : undefined}
+      />
       <header className="shrink-0 border-b border-line px-4 pb-2 pt-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <KindBadge kind={card.kind} label={t(`kinds.${card.kind}`)} />
@@ -112,44 +121,50 @@ export function CardFace({ ranked, interactive, loadImagery }: CardFaceProps) {
         </p>
       </header>
 
-      {/* The body is its own scroll container, so its touch-action alone decides who owns a touch
-          that starts here: pan-y = the browser scrolls vertically, horizontal drags reach the card's
-          Framer drag (one finger). Without it ("auto") the browser claims horizontal pans → pointercancel. */}
-      <div
-        className={`min-h-0 flex-1 space-y-3 px-4 py-3 ${interactive ? "overflow-y-auto overscroll-contain" : "overflow-hidden"}`}
-        style={{ touchAction: "pan-y" }}
-      >
-        {/* Scores first (primary), then the compact radar + legend.
-            Phone: bars full width, radar and legend side by side below.
-            Desktop (lg): bars with the radar beside them, legend underneath. */}
-        {withRadar ? (
-          <div className="grid grid-cols-[var(--radar-size)_minmax(0,1fr)] items-center gap-x-3 gap-y-3 [grid-template-areas:'bars_bars'_'radar_legend'] lg:grid-cols-[minmax(0,1fr)_var(--radar-size)] lg:[grid-template-areas:'bars_radar'_'legend_legend']">
-            <div className="[grid-area:bars]">{bars}</div>
-            <DimensionRadar entry={analog} className="[grid-area:radar]" />
-            <DimensionLegend entry={analog} className="[grid-area:legend]" />
+      {compact ? (
+        <div className="px-4 py-3">{bars}</div>
+      ) : (
+        <>
+          {/* The body is its own scroll container, so its touch-action alone decides who owns a touch
+              that starts here: pan-y = the browser scrolls vertically, horizontal drags reach the card's
+              Framer drag (one finger). Without it ("auto") the browser claims horizontal pans → pointercancel. */}
+          <div
+            className={`min-h-0 flex-1 space-y-3 px-4 py-3 ${interactive ? "overflow-y-auto overscroll-contain" : "overflow-hidden"}`}
+            style={{ touchAction: "pan-y" }}
+          >
+            {/* Scores first (primary), then the compact radar + legend.
+                Phone: bars full width, radar and legend side by side below.
+                Desktop (lg): bars with the radar beside them, legend underneath. */}
+            {withRadar ? (
+              <div className="grid grid-cols-[var(--radar-size)_minmax(0,1fr)] items-center gap-x-3 gap-y-3 [grid-template-areas:'bars_bars'_'radar_legend'] lg:grid-cols-[minmax(0,1fr)_var(--radar-size)] lg:[grid-template-areas:'bars_radar'_'legend_legend']">
+                <div className="[grid-area:bars]">{bars}</div>
+                <DimensionRadar entry={analog} className="[grid-area:radar]" />
+                <DimensionLegend entry={analog} className="[grid-area:legend]" />
+              </div>
+            ) : (
+              <>
+                {bars}
+                {hasDims(analog) ? <DimensionLegend entry={analog} /> : <DimensionNone />}
+              </>
+            )}
+
+            {card.kind === "user" && card.lowScore?.[config.target] && <LowScoreNote reason={card.lowScore[config.target]!} />}
+
+            <NdviImputedNote imputed={card.ndviImputed} label={t("card.ndviImputed")} />
+
+            <p className="flex items-start gap-2 text-xs italic leading-relaxed text-fg/90">
+              <FelicetteAvatar mood={moodForTeaser(analog?.total)} compact className="h-7 w-7 shrink-0" />
+              <span>{t(card.id === HAMMAGUIR_CARD_ID ? "card.hammaguir.teaser" : `card.teaser.${card.kind}`)}</span>
+            </p>
+
+            {card.id === HAMMAGUIR_CARD_ID && <HammaguirStory ranked={ranked} />}
+
+            <WhiskerScan lat={card.lat} lon={card.lon} interactive={interactive} />
+
+            {pctText && <p className="text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
           </div>
-        ) : (
-          <>
-            {bars}
-            {hasDims(analog) ? <DimensionLegend entry={analog} /> : <DimensionNone />}
-          </>
-        )}
-
-        {card.kind === "user" && card.lowScore?.[config.target] && <LowScoreNote reason={card.lowScore[config.target]!} />}
-
-        <NdviImputedNote imputed={card.ndviImputed} label={t("card.ndviImputed")} />
-
-        <p className="flex items-start gap-2 text-xs italic leading-relaxed text-fg/90">
-          <FelicetteAvatar mood={moodForTeaser(analog?.total)} compact className="h-7 w-7 shrink-0" />
-          <span>{t(card.id === HAMMAGUIR_CARD_ID ? "card.hammaguir.teaser" : `card.teaser.${card.kind}`)}</span>
-        </p>
-
-        {card.id === HAMMAGUIR_CARD_ID && <HammaguirStory ranked={ranked} />}
-
-        <WhiskerScan lat={card.lat} lon={card.lon} interactive={interactive} />
-
-        {pctText && <p className="text-[10px] leading-snug text-dim">* {t("card.tieNote")}</p>}
-      </div>
+        </>
+      )}
     </div>
   );
 }

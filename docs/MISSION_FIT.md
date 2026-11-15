@@ -65,8 +65,13 @@ Robotic and short-stay crews have no resource requirement.
 |---|---|---|
 | `INTERLEAVE_EVERY` | 3 | Unscored cards (curated / trap, `analog: null`) are placed at positions 3, 6, 9, … |
 
-- Operational cards (LunAres) skip terrain and resource constraints, and are boosted to the top of
-  the deck for `short` and `permanent` crews.
+| `OPERATIONAL_POSITION` | 3 | For `short` / `permanent` crews, operational cards (LunAres) are pinned at position 3 (appended if the deck is shorter) |
+
+- Position 1 is always the best Analog × Fit card. Pins (Hammaguir at position 2 of the Jezero deck,
+  LunAres at position 3 for crewed missions) never take the first slot.
+- Operational cards (LunAres) skip terrain and resource constraints. They are useful for crew
+  training but are not geological analogs, so they are never the headline result; for `robotic`
+  missions they are ranked like any other unscored card.
 - Pipeline cards without a score for the selected target are omitted.
 
 ## Félicette's verdict (`src/lib/verdict.ts`) — UI assumptions

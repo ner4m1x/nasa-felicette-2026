@@ -6,7 +6,10 @@
  * - Cards with `analog: null` (curated, trap, operational hand-written cards) cannot be ranked by
  *   the Analog Score, so they are interleaved at fixed positions (every INTERLEAVE_EVERY-th slot).
  * - Pipeline cards with no entry for the selected target are not relevant to it and are omitted.
- * - Operational cards are boosted to the top for crewed missions (short / permanent).
+ * - Position 1 is always the best Analog × Fit card (pins start at position 2).
+ * - Crewed missions (short / permanent): operational cards (LunAres) are pinned from position
+ *   OPERATIONAL_POSITION (appended if the deck is shorter) — useful for crew training, but never the
+ *   headline result, since they are not geological analogs.
  * - Any card with a hard-failed constraint goes to the "Rejected by your mission specs" pile.
  */
 import { HAMMAGUIR_CARD_ID } from "@/data/curatedCards";
@@ -18,6 +21,9 @@ import type { DeckCard, MissionConfig, RankedCard, RankedDeck, TargetId } from "
 export const PINNED_CARDS: Partial<Record<TargetId, readonly { id: string; position: number }[]>> = {
   mars_jezero: [{ id: HAMMAGUIR_CARD_ID, position: 2 }],
 };
+
+/** 1-based deck position of operational cards (LunAres) for crewed missions. */
+export const OPERATIONAL_POSITION = 3;
 
 /** Move pinned cards to their positions (clamped to the deck length); everything else keeps its order. */
 export function applyPinned(deck: RankedCard[], pins: readonly { id: string; position: number }[] = []): RankedCard[] {
@@ -79,9 +85,13 @@ export function rankDeck(cards: readonly DeckCard[], config: MissionConfig): Ran
   const unscored = passing.filter((r) => r.analog === null); // keeps input (curated) order
 
   const boost = CREW_OPTIONS[config.crew].boostsOperational;
-  const top = boost ? unscored.filter((r) => r.card.kind === "operational") : [];
+  const operational = boost ? unscored.filter((r) => r.card.kind === "operational") : [];
   const rest = boost ? unscored.filter((r) => r.card.kind !== "operational") : unscored;
 
-  const deck = [...top, ...interleave(scored, rest, top.length + 1)];
-  return { deck: applyPinned(deck, PINNED_CARDS[config.target]), rejected };
+  const pins = [
+    ...(PINNED_CARDS[config.target] ?? []),
+    ...operational.map((r, i) => ({ id: r.card.id, position: OPERATIONAL_POSITION + i })),
+  ];
+  const deck = applyPinned([...interleave(scored, rest), ...operational], pins);
+  return { deck, rejected };
 }
