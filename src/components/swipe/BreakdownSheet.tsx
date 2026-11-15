@@ -131,7 +131,7 @@ export function BreakdownSheet({
     >
       <div className="space-y-5">
         <section className="rounded-control border p-3" style={{ borderColor: toneColor }}>
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("breakdown.verdictTitle")}</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("breakdown.verdictTitle")}</h3>
           <p
             className="mt-1 text-xs font-black uppercase tracking-widest"
             style={{ color: record ? toneColor : "var(--dim)" }}
@@ -167,7 +167,7 @@ export function BreakdownSheet({
 
         {sections.map((s) => (
           <section key={s.id}>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-phosphor">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-fg">
               <s.Icon aria-hidden size={13} className="mr-1 inline align-[-2px]" />
               {s.title}
             </h3>
@@ -186,7 +186,7 @@ export function BreakdownSheet({
         <PlanetaryComparisonAt target={config.target} lat={card.lat} lon={card.lon} />
 
         <section>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-phosphor">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-fg">
             <span aria-hidden>🛰️</span> {t("breakdown.fit")}
           </h3>
           {missionFit.failed.length === 0 ? (
@@ -217,7 +217,7 @@ export function BreakdownSheet({
         </section>
 
         <section>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-phosphor">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-fg">
             <span aria-hidden>📚</span> {t("breakdown.sources")}
           </h3>
           <div className="mt-1">

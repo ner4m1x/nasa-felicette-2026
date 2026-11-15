@@ -14,7 +14,7 @@ export function PlanetaryReferenceList() {
   const { planetValue } = usePlanetaryFormat();
   return (
     <section>
-      <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("planetary.methodsTitle")}</h4>
+      <h4 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("planetary.methodsTitle")}</h4>
       <ul className="mt-1.5 space-y-1 text-xs">
         {PLANETARY_REFERENCE.map((ref) => {
           const src = getSource(ref.sourceId);

@@ -23,7 +23,7 @@ export function PreviewCard() {
 
   return (
     <figure aria-labelledby="preview-caption" className="space-y-1.5">
-      <figcaption id="preview-caption" className="text-[11px] font-bold uppercase tracking-widest text-amber">
+      <figcaption id="preview-caption" className="text-[11px] font-bold uppercase tracking-widest text-dim">
         {t("config.previewCaption")}
       </figcaption>
       <div className="relative overflow-hidden rounded-card border border-line bg-panel shadow-card">
@@ -43,7 +43,7 @@ export function PreviewCard() {
           </AnimatePresence>
         ) : (
           <div className="flex h-[var(--preview-imagery-height)] flex-col items-center justify-center gap-2 p-6 text-center">
-            <p className="text-xs font-bold uppercase tracking-wider text-phosphor">
+            <p className="text-xs font-bold uppercase tracking-wider text-fg">
               {t(status === "loading" ? "deck.loading" : "deck.emptyTitle")}
             </p>
             {status === "empty" && <p className="text-[11px] leading-relaxed text-dim">{t("config.previewEmpty")}</p>}

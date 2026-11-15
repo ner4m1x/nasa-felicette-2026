@@ -59,7 +59,7 @@ function CreditList({ items }: { items: Credit[] }) {
 }
 
 const H = ({ children }: { children: ReactNode }) => (
-  <h3 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-phosphor">{children}</h3>
+  <h3 className="mb-2 text-[11px] font-bold uppercase tracking-wider text-dim">{children}</h3>
 );
 
 export function AboutSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -70,7 +70,7 @@ export function AboutSheet({ open, onClose }: { open: boolean; onClose: () => vo
         <p className="text-xs leading-relaxed">{t("about.intro")}</p>
 
         <section aria-labelledby="about-ai" className="rounded-control border border-amber/50 p-3">
-          <h3 id="about-ai" className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
+          <h3 id="about-ai" className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-dim">
             {t("about.aiTitle")}
           </h3>
           <p className="text-xs leading-relaxed">{t("about.ai")}</p>

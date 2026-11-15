@@ -66,8 +66,8 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
     <div className="mx-auto max-w-5xl space-y-5 px-3 py-4 lg:px-6 lg:py-6">
       <header className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.kicker")}</p>
-          <h2 className="text-xl font-bold uppercase tracking-wider text-phosphor">{t("report.title")}</h2>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("report.kicker")}</p>
+          <h2 className="text-xl font-bold uppercase tracking-wider text-fg">{t("report.title")}</h2>
         </div>
         <button
           type="button"
@@ -166,7 +166,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
 
         <div className="mt-4 grid gap-5 lg:grid-cols-3">
           <section>
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.methods.docs")}</h4>
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("report.methods.docs")}</h4>
             <ul className="mt-1.5 space-y-1 text-xs">
               {METHOD_DOCS.map((d) => (
                 <li key={d.file}>
@@ -182,7 +182,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
             <p className="mt-3 text-[11px] leading-relaxed text-dim">{t("report.methods.deckSource", { source: t(`report.methods.source.${swipe.status === "ready" ? (swipe.isFixture ? "fixture" : swipe.notice ? "curatedOnly" : "pipeline") : "loading"}`) })}</p>
           </section>
           <section>
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.methods.datasets")}</h4>
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("report.methods.datasets")}</h4>
             <div className="mt-1.5">
               {manifest === undefined ? (
                 <p className="text-xs text-dim">…</p>
@@ -210,7 +210,7 @@ export function MissionReport({ onGoToSwipe, onOpenAbout }: MissionReportProps) 
           </section>
           <PlanetaryReferenceList />
           <section>
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("report.methods.literature")}</h4>
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("report.methods.literature")}</h4>
             <div className="mt-1.5">
               <SourceList
                 ids={Object.keys(SOURCES)}
@@ -407,7 +407,7 @@ function ShareCard() {
 function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
     <section className="rounded-card border border-line bg-panel p-4">
-      <h3 className="text-xs font-bold uppercase tracking-wider text-phosphor">{title}</h3>
+      <h3 className="text-xs font-bold uppercase tracking-wider text-fg">{title}</h3>
       {subtitle && <p className="mt-0.5 text-[11px] leading-snug text-dim">{subtitle}</p>}
       <div className="mt-3">{children}</div>
     </section>

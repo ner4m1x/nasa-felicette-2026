@@ -117,7 +117,7 @@ export function SwipeDeck({ active, onReconfigure }: SwipeDeckProps) {
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:max-h-[800px]">
         <div className="flex items-center gap-2">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[11px] font-bold uppercase tracking-wider text-amber">
+            <p className="truncate text-[11px] font-bold uppercase tracking-wider text-dim">
               {t(TARGETS[config.target].catKey)}
             </p>
             <p className="truncate text-[10px] tabular-nums text-dim">

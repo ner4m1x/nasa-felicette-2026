@@ -89,7 +89,7 @@ export function EarthLimitsList({ compact = false }: { compact?: boolean }) {
     <ul className={compact ? "grid gap-3 sm:grid-cols-2" : "space-y-4"}>
       {ITEMS.map((item) => (
         <li key={item.id} className="rounded-control border border-line bg-panel-2 p-3">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-phosphor">{t(item.titleKey)}</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-fg">{t(item.titleKey)}</h3>
           <p className="mt-1 text-sm leading-relaxed">{t(item.bodyKey, item.params?.(lang))}</p>
           <p className="mt-2 text-[11px] text-dim">
             {t("limits.sources")}:{" "}

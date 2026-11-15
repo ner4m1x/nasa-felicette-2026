@@ -53,7 +53,7 @@ export function RejectedPile({ open, onClose, rejected }: RejectedPileProps) {
         <p className="text-sm text-dim">{t("deck.rejectedEmpty")}</p>
       ) : (
         <div className="space-y-4">
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("deck.strict.groupedTitle")}</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("deck.strict.groupedTitle")}</h3>
           {groups.map((g) => (
             <section key={g.id} className="rounded-control border border-hiss/40 bg-panel-2">
               <header className="space-y-1.5 border-b border-line p-3">

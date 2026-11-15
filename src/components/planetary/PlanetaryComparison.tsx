@@ -57,7 +57,7 @@ export function PlanetaryComparison({ target, sample, gridLoading = false }: Pla
 
   return (
     <section className="space-y-2">
-      <h4 className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("planetary.title")}</h4>
+      <h4 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("planetary.title")}</h4>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-[11px]">
           <thead>

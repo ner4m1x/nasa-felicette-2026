@@ -69,7 +69,7 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
         className={`${open ? "mt-2 block" : "hidden"} w-64 max-w-[calc(100vw-2rem)] rounded-control border border-line bg-panel/95 p-3 text-xs shadow-card backdrop-blur-sm lg:mt-0 lg:block`}
       >
         <fieldset>
-          <legend className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
+          <legend className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-dim">
             {t("map.layers.base")}
           </legend>
           <div className="space-y-0.5">
@@ -96,7 +96,7 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
 
         <fieldset className="mt-2 border-t border-line pt-2">
           <legend className="sr-only">{t("map.layers.thematic")}</legend>
-          <p aria-hidden className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
+          <p aria-hidden className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-dim">
             {t("map.layers.thematic")}
           </p>
           <div className="space-y-0.5">
@@ -150,7 +150,7 @@ export function LayerSwitcher(props: LayerSwitcherProps) {
         </div>
 
         <fieldset className="mt-2 border-t border-line pt-2">
-          <legend className="mb-1 text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.layers.pins")}</legend>
+          <legend className="mb-1 text-[11px] font-bold uppercase tracking-wider text-dim">{t("map.layers.pins")}</legend>
           <label className="flex min-h-9 cursor-pointer items-start gap-2 px-1 pt-1">
             <input
               type="checkbox"

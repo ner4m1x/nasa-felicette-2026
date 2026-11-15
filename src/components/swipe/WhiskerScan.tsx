@@ -78,7 +78,7 @@ export function WhiskerScan({ lat, lon, interactive }: WhiskerScanProps) {
   return (
     <div role="status">
       <section className="rounded-control border border-line bg-panel-2 p-3">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider text-phosphor">{t("scan.title")}</h4>
+        <h4 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("scan.title")}</h4>
         <div className="mt-2">
           <PowerValueList data={data} />
         </div>

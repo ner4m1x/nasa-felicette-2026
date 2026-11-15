@@ -129,7 +129,7 @@ export function PointInspector({ point, grid, config, deckAction, heroInHeader =
       {/* Coordinates + Add-to-deck: sticky so the action stays in reach while the panel scrolls. */}
       <div className="sticky top-0 z-10 -mx-4 -mt-4 space-y-2 border-b border-line bg-panel px-4 pb-3 pt-4">
         <header id="inspector-header" tabIndex={-1} className="outline-none">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.inspector.title")}</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("map.inspector.title")}</p>
           <p className="mt-0.5 text-base font-bold tabular-nums">{formatCoords(lang, point.lat, point.lon)}</p>
         </header>
         {grid?.status !== "pending" && <AddToDeck action={deckAction} />}
@@ -137,7 +137,7 @@ export function PointInspector({ point, grid, config, deckAction, heroInHeader =
 
       {/* ---- 1. From the global scan ---- */}
       <section aria-labelledby="inspector-scan">
-        <h3 id="inspector-scan" className="text-xs font-bold uppercase tracking-wider text-phosphor">
+        <h3 id="inspector-scan" className="text-xs font-bold uppercase tracking-wider text-fg">
           {t("map.inspector.scanTitle")}
           {(!grid || grid.status !== "ready") && <span className="text-amber"> {t("map.inspector.pendingTag")}</span>}
         </h3>
@@ -164,7 +164,7 @@ export function PointInspector({ point, grid, config, deckAction, heroInHeader =
 
       {/* ---- 2. Live NASA POWER ---- */}
       <section aria-labelledby="inspector-power" aria-live="polite">
-        <h3 id="inspector-power" className="text-xs font-bold uppercase tracking-wider text-phosphor">
+        <h3 id="inspector-power" className="text-xs font-bold uppercase tracking-wider text-fg">
           {t("scan.title")}
         </h3>
         {power.status === "loading" && (
@@ -193,7 +193,7 @@ export function PointInspector({ point, grid, config, deckAction, heroInHeader =
       {/* ---- 3. Cross-check ---- */}
       {cross && (
         <section className="rounded-control border border-sky/40 p-3 text-xs">
-          <h3 className="text-[11px] font-bold uppercase tracking-wider text-sky">{t("map.inspector.crossTitle")}</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-dim">{t("map.inspector.crossTitle")}</h3>
           <p className="mt-1 tabular-nums">
             {t("map.inspector.crossLine", { power: fmt(lang, cross.powerMmYr, 0), grid: fmt(lang, cross.gridMmYr, 0) })}
           </p>

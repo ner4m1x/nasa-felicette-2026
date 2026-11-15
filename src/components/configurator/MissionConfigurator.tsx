@@ -68,7 +68,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
     >
       <div className="flex min-h-0 flex-1 flex-col lg:block">
         <header className="flex items-baseline justify-between gap-3 px-4 pt-4 lg:px-0 lg:pt-0">
-          <h2 id="configurator-title" className="text-sm font-bold uppercase tracking-widest text-phosphor">
+          <h2 id="configurator-title" className="text-sm font-bold uppercase tracking-widest text-fg">
             {t("config.heading")}
           </h2>
           <p className="text-xs text-dim lg:hidden">
@@ -83,7 +83,7 @@ export function MissionConfigurator({ onLaunch }: { onLaunch: () => void }) {
             const layout = DESKTOP_LAYOUT[s.field];
             return (
               <fieldset key={s.field} className={`${i === step ? "block" : "hidden"} lg:block ${layout.span}`}>
-                <legend className="mb-3 text-lg font-bold text-fg lg:mb-2 lg:text-xs lg:uppercase lg:tracking-widest lg:text-amber">
+                <legend className="mb-3 text-lg font-bold text-fg lg:mb-2 lg:text-xs lg:uppercase lg:tracking-widest lg:text-dim">
                   <span aria-hidden className="mr-2 text-amber lg:hidden">
                     {">"}
                   </span>
