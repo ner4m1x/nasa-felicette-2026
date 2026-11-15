@@ -8,15 +8,18 @@
  * - The map sits in a tab panel that is hidden, not unmounted: when the tab becomes visible again
  *   `invalidateSize()` re-measures the container.
  * - Click/tap anywhere → onPick(lat, lon). The selected point gets a pulse marker (this is the
- *   touch feedback; mouse users also get the LaserCursor).
+ *   touch feedback; mouse users also get the LaserCursor) and, when given, a popup (MapPointPopup:
+ *   best target + "Add to deck" + "Details"). One Popup instance per point (keyed), so a stale
+ *   popup's close event can be told apart from the current one by the caller.
  */
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useEffect, useRef } from "react";
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { GIBS_ATTRIBUTION, GIBS_LAYERS, gibsLayerLabel, gibsTileUrl, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import type { TargetId } from "@/lib/types";
+import { MAP_POPUP } from "@/theme/tokens";
 import { CandidateMarkers, type MarkerItem } from "./CandidateMarkers";
 import { LaserCursor } from "./LaserCursor";
 import { ScanOverlay } from "./ScanOverlay";
@@ -33,6 +36,10 @@ export interface ScanMapProps {
   markerTitle: (item: MarkerItem) => string;
   selected: { lat: number; lon: number } | null;
   onPick: (lat: number, lon: number) => void;
+  /** popup content at the selected point (null = no popup) */
+  popup?: ReactNode;
+  /** the popup at the selected point was closed (× button, Esc, or a click elsewhere) */
+  onPopupClose?: () => void;
   onOpenCard: (cardId: string) => void;
   /** accessible label of the map region */
   label: string;
@@ -49,6 +56,9 @@ const pulseIcon = L.divIcon({
   iconSize: [36, 36],
   iconAnchor: [18, 18],
 });
+
+const POPUP_OFFSET: L.PointExpression = [0, MAP_POPUP.offsetYPx];
+const POPUP_PAD: L.PointExpression = [MAP_POPUP.autoPanPaddingPx, MAP_POPUP.autoPanPaddingPx];
 
 function SizeSync({ active }: { active: boolean }) {
   const map = useMap();
@@ -82,6 +92,10 @@ export default function ScanMap(props: ScanMapProps) {
   const wrap = useRef<HTMLDivElement>(null);
   const base = GIBS_LAYERS[baseId];
   const theme = thematic ? GIBS_LAYERS[thematic] : null;
+  const { popup, onPopupClose } = props;
+  // Stable identities: react-leaflet re-opens the popup whenever `position` changes identity.
+  const popupPos = useMemo<L.LatLngTuple | null>(() => (selected ? [selected.lat, selected.lon] : null), [selected]);
+  const popupEvents = useMemo(() => ({ remove: () => onPopupClose?.() }), [onPopupClose]);
 
   return (
     <div ref={wrap} className="relative h-full w-full" role="region" aria-label={props.label}>
@@ -124,6 +138,18 @@ export default function ScanMap(props: ScanMapProps) {
         {showScan && overlayAvailable && <ScanOverlay target={target} opacity={opacity} />}
         <CandidateMarkers items={markers} onOpen={props.onOpenCard} titleFor={markerTitle} />
         {selected && <Marker position={[selected.lat, selected.lon]} icon={pulseIcon} interactive={false} keyboard={false} />}
+        {popupPos && popup && (
+          <Popup
+            key={popupPos.join(",")}
+            position={popupPos}
+            className="purr-popup"
+            offset={POPUP_OFFSET}
+            autoPanPadding={POPUP_PAD}
+            eventHandlers={popupEvents}
+          >
+            {popup}
+          </Popup>
+        )}
         <ClickHandler onPick={props.onPick} />
         <SizeSync active={active} />
       </MapContainer>

@@ -11,20 +11,26 @@
  * - Pins (src/lib/mapPins.ts): top candidate regions + benchmark/trap/curated cards, sized by rank;
  *   "Show all candidates" lifts the cap. The ice-sheet view filter (SwipeContext) applies here too.
  *   Tapping a pin opens its breakdown.
+ * - Add to Félicette's deck (useDeckAction, one state for all three entry points): a popup at the
+ *   tapped point (best target + "+ Add to deck" + "Details"), a compact "+ Deck" in the phone
+ *   peek bar, and a sticky action row under the coordinates in the inspector.
  */
 
 import { motion, useDragControls } from "framer-motion";
-import { ChevronUp } from "lucide-react";
+import { Check, ChevronUp, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FelicetteAvatar } from "@/components/felicette/FelicetteAvatar";
+import type { DeckAction } from "@/components/inspector/AddToDeck";
 import { PointInspector } from "@/components/inspector/PointInspector";
+import { useDeckAction } from "@/components/inspector/useDeckAction";
 import { ViewFilterNote } from "@/components/shell/ViewFilterNote";
 import { formatCoords, to100 } from "@/components/swipe/parts";
 import { BreakdownSheet, type Decision } from "@/components/swipe/BreakdownSheet";
 import { TARGETS } from "@/data/targets";
 import { useI18n } from "@/i18n/I18nProvider";
 import { bestTarget, targetRows } from "@/lib/bestTarget";
+import { DECK_ACTION_REASON_KEY } from "@/lib/deckAction";
 import { selectPins } from "@/lib/mapPins";
 import { DEFAULT_BASE, DEFAULT_OVERLAY_OPACITY, DEFAULT_SHOW_SCAN, type BaseLayerId, type GibsLayerId } from "@/lib/gibs";
 import { useMission } from "@/state/MissionContext";
@@ -32,6 +38,7 @@ import { DESKTOP_QUERY, useMediaQuery } from "@/state/useMediaQuery";
 import { useSwipe } from "@/state/SwipeContext";
 import { useOverlayAvailable, useScanGrid } from "@/state/usePipeline";
 import type { MarkerItem } from "./CandidateMarkers";
+import { MapPointPopup } from "./MapPointPopup";
 import { LayerSwitcher } from "./LayerSwitcher";
 
 const ScanMap = dynamic(() => import("./ScanMap"), {
@@ -54,6 +61,9 @@ export function MapClient({ active }: { active: boolean }) {
   const [showScan, setShowScan] = useState(DEFAULT_SHOW_SCAN);
   const [opacity, setOpacity] = useState(DEFAULT_OVERLAY_OPACITY);
   const [point, setPoint] = useState<{ lat: number; lon: number } | null>(null);
+  /** the point whose popup is open (same object as `point`, or null once closed) */
+  const [popupFor, setPopupFor] = useState<{ lat: number; lon: number } | null>(null);
+  const asideRef = useRef<HTMLElement>(null);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -74,15 +84,20 @@ export function MapClient({ active }: { active: boolean }) {
     );
   }, [swipe.visible, swipe.records, showAll]);
 
-  // One-line peek summary for the phone sheet: best of the four targets at the clicked cell.
+  const sample = useMemo(
+    () => (point && grid?.status === "ready" ? grid.grid.sample(point.lat, point.lon) : null),
+    [point, grid],
+  );
+  const deckAction = useDeckAction(point, grid?.status === "ready" ? grid.grid : null, sample, config);
+
+  // One-line summary (phone peek + map popup): best of the four targets at the clicked cell.
   const peek = useMemo(() => {
-    if (!point || grid?.status !== "ready") return null;
-    const sample = grid.grid.sample(point.lat, point.lon);
+    if (!point || !sample || grid?.status !== "ready") return null;
     if (sample.land === false) return { best: null, score: null };
     const rows = targetRows(sample, (tid) => grid.grid.percentile(tid, point.lat, point.lon));
     const best = bestTarget(rows);
     return { best, score: rows.find((r) => r.target === best)?.total ?? null };
-  }, [point, grid]);
+  }, [point, sample, grid]);
 
   const markerTitle = useCallback(
     (m: MarkerItem) =>
@@ -103,7 +118,22 @@ export function MapClient({ active }: { active: boolean }) {
   }, [markers, openCardId, swipe]);
 
   // Picking a point keeps the phone sheet at its peek: the summary shows there, the map stays visible.
-  const onPick = useCallback((lat: number, lon: number) => setPoint({ lat, lon }), []);
+  const onPick = useCallback((lat: number, lon: number) => {
+    const p = { lat, lon };
+    setPoint(p);
+    setPopupFor(p);
+  }, []);
+  // Only the current point's popup may close itself (a replaced popup's late close is ignored).
+  const onPopupClose = useCallback(() => setPopupFor((open) => (open === point ? null : open)), [point]);
+  const onDetails = useCallback(() => {
+    if (!desktop) {
+      setPopupFor(null);
+      setExpanded(true);
+      return;
+    }
+    asideRef.current?.scrollTo({ top: 0 });
+    document.getElementById("inspector-header")?.focus();
+  }, [desktop]);
 
   const cutoff = grid?.status === "ready" ? grid.grid.meta.overlayTransparentBelow?.[config.target] : undefined;
   const peekText = !point
@@ -116,7 +146,9 @@ export function MapClient({ active }: { active: boolean }) {
         ? t("map.peek.none")
         : formatCoords(lang, point.lat, point.lon);
 
-  const inspector = <PointInspector point={point} grid={grid} config={config} />;
+  const inspector = <PointInspector point={point} grid={grid} config={config} deckAction={deckAction} />;
+  const popup =
+    point && popupFor === point ? <MapPointPopup summary={peekText} action={deckAction} onDetails={onDetails} /> : null;
 
   return (
     <div className="relative h-full lg:grid lg:grid-cols-[minmax(0,1fr)_400px]">
@@ -134,6 +166,8 @@ export function MapClient({ active }: { active: boolean }) {
             markerTitle={markerTitle}
             selected={point}
             onPick={onPick}
+            popup={popup}
+            onPopupClose={onPopupClose}
             onOpenCard={setOpenCardId}
             label={t("map.aria")}
           />
@@ -163,7 +197,7 @@ export function MapClient({ active }: { active: boolean }) {
       </div>
 
       {desktop ? (
-        <aside className="min-h-0 overflow-y-auto border-l border-line bg-panel" aria-label={t("map.inspector.title")}>
+        <aside ref={asideRef} className="min-h-0 overflow-y-auto border-l border-line bg-panel" aria-label={t("map.inspector.title")}>
           <div className="flex justify-center border-b border-line py-3">
             <FelicetteAvatar followPointer label={t("map.eyesAria")} className="h-24 w-24" />
           </div>
@@ -176,6 +210,7 @@ export function MapClient({ active }: { active: boolean }) {
           label={t("map.inspector.title")}
           summary={peekText}
           toggleLabel={t(expanded ? "map.peek.collapse" : "map.peek.expand")}
+          action={point ? <PeekDeckButton action={deckAction} /> : null}
         >
           {inspector}
         </MobileSheet>
@@ -198,6 +233,7 @@ function MobileSheet({
   label,
   summary,
   toggleLabel,
+  action,
   children,
 }: {
   expanded: boolean;
@@ -206,6 +242,8 @@ function MobileSheet({
   /** one-line summary shown in the peek (best target + score) */
   summary: string;
   toggleLabel: string;
+  /** compact control at the right end of the peek row (e.g. "+ Deck"); not part of the drag handle */
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -244,25 +282,59 @@ function MobileSheet({
       }}
       style={{ touchAction: "none" }}
     >
-      <button
-        type="button"
-        onPointerDown={(e) => controls.start(e)}
-        onClick={() => onExpanded(!expanded)}
-        aria-expanded={expanded}
-        aria-label={`${toggleLabel}: ${summary}`}
-        className="flex min-h-[72px] w-full shrink-0 cursor-grab flex-col items-center gap-2 px-4 pt-2"
-        style={{ touchAction: "none" }}
-      >
-        <span aria-hidden className="block h-1.5 w-12 rounded-pill bg-line" />
-        <span aria-live="polite" className="flex w-full items-center gap-2 text-left text-xs font-bold text-fg">
-          <FelicetteAvatar compact className="h-6 w-6 shrink-0" />
-          <span className="min-w-0 flex-1 truncate">{summary}</span>
-          <ChevronUp aria-hidden size={16} className={`shrink-0 text-dim transition-transform ${expanded ? "rotate-180" : ""}`} />
-        </span>
-      </button>
+      <div className="flex min-h-[72px] w-full shrink-0 items-stretch gap-2 pr-3">
+        <button
+          type="button"
+          onPointerDown={(e) => controls.start(e)}
+          onClick={() => onExpanded(!expanded)}
+          aria-expanded={expanded}
+          aria-label={`${toggleLabel}: ${summary}`}
+          className="flex min-w-0 flex-1 cursor-grab flex-col items-center gap-2 pl-4 pt-2"
+          style={{ touchAction: "none" }}
+        >
+          <span aria-hidden className="block h-1.5 w-12 rounded-pill bg-line" />
+          <span aria-live="polite" className="flex w-full items-center gap-2 text-left text-xs font-bold text-fg">
+            <FelicetteAvatar compact className="h-6 w-6 shrink-0" />
+            <span className="min-w-0 flex-1 truncate">{summary}</span>
+            <ChevronUp aria-hidden size={16} className={`shrink-0 text-dim transition-transform ${expanded ? "rotate-180" : ""}`} />
+          </span>
+        </button>
+        {action && <div className="flex shrink-0 items-center pt-3.5">{action}</div>}
+      </div>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain" style={{ touchAction: "pan-y" }}>
         {children}
       </div>
     </motion.div>
+  );
+}
+
+/** Compact Add-to-deck control in the phone peek bar (full reasons live in the popup and the sheet). */
+function PeekDeckButton({ action }: { action: DeckAction }) {
+  const { t } = useI18n();
+  const { state } = action;
+  if (state.kind === "inDeck") {
+    return (
+      <span
+        role="status"
+        className="flex min-h-10 items-center gap-1 rounded-control border border-phosphor/50 px-2.5 text-[11px] font-bold uppercase tracking-wider text-phosphor"
+      >
+        <Check aria-hidden size={13} />
+        {t("map.peek.inDeck")}
+      </span>
+    );
+  }
+  const reason = state.kind === "disabled" ? t(DECK_ACTION_REASON_KEY[state.reason]) : undefined;
+  return (
+    <button
+      type="button"
+      onClick={action.add}
+      disabled={state.kind !== "add"}
+      title={reason}
+      aria-label={reason ? `${t("map.inspector.add.button")} – ${reason}` : t("map.inspector.add.button")}
+      className="flex min-h-10 items-center gap-1 rounded-control border border-[var(--kind-user)] px-2.5 text-[11px] font-bold uppercase tracking-wider text-[var(--kind-user)] hover:bg-[var(--kind-user)]/10 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      <Plus aria-hidden size={14} />
+      {t("map.peek.add")}
+    </button>
   );
 }

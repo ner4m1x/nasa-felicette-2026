@@ -405,6 +405,15 @@ export const pl: Dictionary = {
       none: "Brak wyniku analogii dla tej komórki",
       expand: "Rozwiń inspektor punktu",
       collapse: "Zwiń inspektor punktu",
+      add: "Talia",
+      inDeck: "Talia",
+    },
+    popup: {
+      add: "Dodaj do talii",
+      details: "Szczegóły",
+      inDeck: "W twojej talii – następna karta",
+      inRejected: "W twojej talii – ale specyfikacja ją odrzuca",
+      remove: "Usuń",
     },
     inspector: {
       title: "Inspektor punktu",

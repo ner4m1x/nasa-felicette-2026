@@ -60,6 +60,10 @@
      keeps the colours true to the legend; set the blend to "screen" for a brighter, glowier look. */
   --map-overlay-filter: saturate(1.25) contrast(1.1);
   --map-overlay-blend: normal;
+  /* point popup at the tapped spot (MapPointPopup) */
+  --map-popup-bg: var(--panel);
+  --map-popup-border: rgb(255 178 46 / 0.7);
+  --map-popup-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
 
   /* ---- Card imagery (satellite thumbnail) ---- */
   /* True-colour base: lighter dim than the map so the thumbnail reads; under NDVI/LST it is dimmed more. */

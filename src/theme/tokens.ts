@@ -58,3 +58,6 @@ export const IMAGERY = {
 
 /** Terminal-style segmented score meter (ScoreBar): number of segments across the bar. */
 export const METER = { segments: 20 } as const;
+
+/** Map point popup (MapPointPopup in ScanMap): tip offset above the pulse ring, and the auto-pan edge padding (px). */
+export const MAP_POPUP = { offsetYPx: -14, autoPanPaddingPx: 16 } as const;

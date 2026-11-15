@@ -4,57 +4,30 @@
  * "Add to Félicette's deck": turns the clicked grid cell into a user card (src/lib/userCards.ts)
  * that becomes the next card of the current deck. Disabled, with the reason, when the cell cannot
  * be scored for the configured target (ocean, no grid, target unscored). An added cell can be removed.
+ * Presentational: the state comes from useDeckAction (shared with the map popup and the peek bar).
  */
 
 import { Check, PlusCircle, Trash2 } from "lucide-react";
-import { useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
-import { hasHardFail, missionFit } from "@/lib/missionFit";
-import type { ScanGrid, ScanGridSample } from "@/lib/scanGrid";
-import type { MissionConfig } from "@/lib/types";
-import { canAddUserCard, createUserCard, userCardId } from "@/lib/userCards";
-import { useSwipe } from "@/state/SwipeContext";
+import { DECK_ACTION_REASON_KEY } from "@/lib/deckAction";
+import type { useDeckAction } from "./useDeckAction";
 
-interface AddToDeckProps {
-  point: { lat: number; lon: number };
-  grid: ScanGrid | null;
-  sample: ScanGridSample | null;
-  config: MissionConfig;
-}
+export type DeckAction = ReturnType<typeof useDeckAction>;
 
-export function AddToDeck({ point, grid, sample, config }: AddToDeckProps) {
+export function AddToDeck({ action }: { action: DeckAction }) {
   const { t } = useI18n();
-  const swipe = useSwipe();
-  const [justAdded, setJustAdded] = useState<{ id: string; rejected: boolean } | null>(null);
+  const { state } = action;
 
-  const existing = new Set(swipe.userCards.map((c) => c.id));
-  const check = canAddUserCard(sample, config.target, existing);
-  const id = sample ? userCardId(sample) : null;
-  const inDeck = id !== null && existing.has(id);
-
-  const add = () => {
-    if (!grid || !check.ok) return;
-    const regions = [...(swipe.ranked?.deck ?? []), ...(swipe.ranked?.rejected ?? [])].map((r) => r.card);
-    const card = createUserCard(grid, point.lat, point.lon, regions);
-    if (!card) return;
-    swipe.addUserCard(card);
-    setJustAdded({ id: card.id, rejected: hasHardFail(missionFit(card, config)) });
-  };
-
-  if (inDeck) {
-    const rejected = justAdded?.id === id && justAdded.rejected;
+  if (state.kind === "inDeck") {
     return (
       <div className="space-y-1.5">
         <p role="status" className="flex items-start gap-1.5 text-xs text-phosphor">
           <Check aria-hidden size={14} className="mt-0.5 shrink-0" />
-          {t(rejected ? "map.inspector.add.addedRejected" : "map.inspector.add.inDeck")}
+          {t(state.rejected ? "map.inspector.add.addedRejected" : "map.inspector.add.inDeck")}
         </p>
         <button
           type="button"
-          onClick={() => {
-            swipe.removeUserCard(id);
-            setJustAdded(null);
-          }}
+          onClick={action.remove}
           className="flex min-h-11 w-full items-center justify-center gap-2 rounded-control border border-hiss/50 text-xs font-bold uppercase tracking-wider text-hiss hover:bg-hiss/10"
         >
           <Trash2 aria-hidden size={14} />
@@ -64,24 +37,16 @@ export function AddToDeck({ point, grid, sample, config }: AddToDeckProps) {
     );
   }
 
-  const reasonKey = check.ok
-    ? null
-    : check.reason === "ocean"
-      ? "map.inspector.add.ocean"
-      : check.reason === "unscored"
-        ? "map.inspector.add.unscored"
-        : check.reason === "noGrid"
-          ? "map.inspector.add.noGrid"
-          : null;
+  const reasonKey = state.kind === "disabled" ? DECK_ACTION_REASON_KEY[state.reason] : null;
 
   return (
     <div className="space-y-1.5">
       <button
         type="button"
-        onClick={add}
-        disabled={!check.ok}
+        onClick={action.add}
+        disabled={state.kind !== "add"}
         aria-describedby={reasonKey ? "add-to-deck-reason" : undefined}
-        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-control border border-[var(--kind-user)] text-xs font-bold uppercase tracking-wider text-[var(--kind-user)] hover:bg-[var(--kind-user)]/10 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex min-h-11 w-full items-center justify-center gap-2 rounded-control border border-[var(--kind-user)] bg-panel text-xs font-bold uppercase tracking-wider text-[var(--kind-user)] hover:bg-[var(--kind-user)]/10 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <PlusCircle aria-hidden size={16} />
         {t("map.inspector.add.button")}

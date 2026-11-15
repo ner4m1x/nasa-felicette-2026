@@ -409,6 +409,15 @@ export const en = {
       none: "No analog score for this cell",
       expand: "Expand point inspector",
       collapse: "Collapse point inspector",
+      add: "Deck",
+      inDeck: "Deck",
+    },
+    popup: {
+      add: "Add to deck",
+      details: "Details",
+      inDeck: "In your deck – next card",
+      inRejected: "In your deck – but your specs reject it",
+      remove: "Remove",
     },
     inspector: {
       title: "Point inspector",

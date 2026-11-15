@@ -17,7 +17,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { FelicetteSays } from "@/components/felicette/FelicetteSays";
 import { PlanetaryComparison } from "@/components/planetary/PlanetaryComparison";
 import { formatCoords, reasonText, ScoreBar } from "@/components/swipe/parts";
-import { AddToDeck } from "./AddToDeck";
+import { AddToDeck, type DeckAction } from "./AddToDeck";
 import { TargetComparison } from "./TargetComparison";
 import { PowerValueList } from "@/components/swipe/PowerValueList";
 import { TARGETS } from "@/data/targets";
@@ -54,6 +54,8 @@ interface PointInspectorProps {
   /** undefined = grid not requested/loading */
   grid: ScanGridState | undefined;
   config: MissionConfig;
+  /** shared Add-to-deck state (useDeckAction in MapClient), shown as a sticky action row */
+  deckAction: DeckAction;
 }
 
 const fmt = (lang: Lang, v: number, digits = 2) => new Intl.NumberFormat(lang, { maximumFractionDigits: digits }).format(v);
@@ -91,7 +93,7 @@ function usePower(point: { lat: number; lon: number } | null) {
   return { power: state.key === key ? state.power : ({ status: "loading" } as PowerState), retry: () => setRetry((n) => n + 1) };
 }
 
-export function PointInspector({ point, grid, config }: PointInspectorProps) {
+export function PointInspector({ point, grid, config, deckAction }: PointInspectorProps) {
   const { t, lang } = useI18n();
   const { power, retry } = usePower(point);
   const [chartParam, setChartParam] = useState<PowerParameterId>("TS");
@@ -122,10 +124,14 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
 
   return (
     <div className="space-y-5 p-4">
-      <header>
-        <p className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.inspector.title")}</p>
-        <p className="mt-0.5 text-base font-bold tabular-nums">{formatCoords(lang, point.lat, point.lon)}</p>
-      </header>
+      {/* Coordinates + Add-to-deck: sticky so the action stays in reach while the panel scrolls. */}
+      <div className="sticky top-0 z-10 -mx-4 -mt-4 space-y-2 border-b border-line bg-panel px-4 pb-3 pt-4">
+        <header id="inspector-header" tabIndex={-1} className="outline-none">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-amber">{t("map.inspector.title")}</p>
+          <p className="mt-0.5 text-base font-bold tabular-nums">{formatCoords(lang, point.lat, point.lon)}</p>
+        </header>
+        {grid?.status !== "pending" && <AddToDeck action={deckAction} />}
+      </div>
 
       {/* ---- 1. From the global scan ---- */}
       <section aria-labelledby="inspector-scan">
@@ -136,11 +142,6 @@ export function PointInspector({ point, grid, config }: PointInspectorProps) {
         {targets && (
           <div className="mt-2">
             <TargetComparison rows={targets.rows} best={targets.best} bestLow={targets.bestLow} configured={config.target} />
-          </div>
-        )}
-        {grid?.status !== "pending" && (
-          <div className="mt-3">
-            <AddToDeck point={point} grid={grid?.status === "ready" ? grid.grid : null} sample={sample} config={config} />
           </div>
         )}
         <GridSection
